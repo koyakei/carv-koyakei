@@ -14,7 +14,7 @@ let id: UUID
 let peripheral: CBPeripheral
 @Published var connectionState: CBPeripheralState
     @Published var services: [CBService] = []
-    @State var carv2DataPair: Carv2DataPair
+    @Published var carv2DataPair: Carv2DataPair
     init(peripheral: CBPeripheral, carv2DataPair: Carv2DataPair) {
     self.id = peripheral.identifier
     self.peripheral = peripheral
@@ -104,14 +104,11 @@ func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CB
             let data1 = value.dropFirst(1)
             if peripheral.identifier == Carv2Data.rightCharactaristicUUID{
                 carv2DataPair.right = Carv2Data(rightData: data1)
-                
-                
             }
             if peripheral.identifier == Carv2Data.leftCharactaristicUUID {
                 carv2DataPair.left = Carv2Data(leftData: data1)
-                print(Angle2D(radians: carv2DataPair.yawingDiffrencial).degrees)
             }
-
+            print(self.carv2DataPair.left.attitude)
         }
         
         

@@ -11,7 +11,7 @@ import simd
 import SwiftUICore
 
 public class Carv2Data :ObservableObject{
-    var attitude: Rotation3D
+    @Published var attitude: Rotation3D
     var acceleration: SIMD3<Float>
     static let rightCharactaristicUUID = UUID(uuidString: "85A29A4C-09C3-C632-858A-3387339C67CF")
     static let leftCharactaristicUUID = UUID(uuidString:  "850D8BCF-3B03-1322-F51C-DD38E961FC1A")

@@ -10,7 +10,7 @@ import simd
 import SwiftUICore
 
 public class Carv2DataPair :ObservableObject{
-    var left: Carv2Data = Carv2Data.init()
+    @Published var left: Carv2Data = Carv2Data.init()
     var right: Carv2Data = Carv2Data.init()
     var yawingSide: YawingSide = .straight
     static let periferalName = "CARV 2"

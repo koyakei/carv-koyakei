@@ -56,12 +56,11 @@ struct ContentView: View {
     
     var body: some View {
         VStack {
-            
-            var rot = ble.carvDeviceList.first(where:{$0.peripheral.name == Carv2DataPair.periferalName && $0.id ==  Carv2Data.leftCharactaristicUUID})
-            Text(rot?.description ?? "none" )
-            Text(ble.carv2DataPair.left.attitude.description)
-            Text(rot?.carv2DataPair.yawingDiffrencial.description ?? "s")
-            Text(rot?.carv2DataPair.left.acceleration.description ?? "s")
+//            var rot = ble.carvDeviceList.first(where:{$0.peripheral.name == Carv2DataPair.periferalName && $0.id ==  Carv2Data.leftCharactaristicUUID})
+            List(ble.carvDeviceList){ devise in
+                Text(devise.carv2DataPair.left.attitude.description )
+                
+            }
             Button(action: { ble.scan() }) {
                 Text("Scan")
             }

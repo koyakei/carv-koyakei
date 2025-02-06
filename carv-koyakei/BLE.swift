@@ -4,11 +4,23 @@ import Foundation
 
  class BLE: NSObject, ObservableObject, CBCentralManagerDelegate {
  @Published var carvDeviceList: [CarvDevice] = []
-     @Published var carv2DataPair: Carv2DataPair = Carv2DataPair()
-var centralManager: CBCentralManager!
+     @Published var carv2DataPair: Carv2DataPair{
+         didSet {
+             objectWillChange.send() // 明示的な変更通知
+         }
+     }
+//     func didUpdateData(_ data: Data) {
+//             DispatchQueue.main.async { [weak self] in
+//                 self?.carv2DataPair = Carv2DataPair(leftData: data)
+//                 print("データ更新: \(data)")
+//             }
+//         }
+     var centralManager: CBCentralManager!
     static let targetServiceUUID = CBUUID(string: "2DFBFFFF-960D-4909-8D28-F353CB168E8A")
 
 override init() {
+    
+    carv2DataPair = Carv2DataPair()
     super.init()
     centralManager = CBCentralManager(delegate: self, queue: nil)
 }
