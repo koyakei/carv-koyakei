@@ -10,15 +10,11 @@ import Spatial
 import simd
 import SwiftUICore
 
-struct MotionSensorData{
-    public let attitude: Rotation3D
-    public let acceleration: SIMD3<Float>
-    public let angularVelocity: SIMD3<Float> = .zero
-}
 public class Carv2Data :ObservableObject{
-    public var attitude: Rotation3D
-    public var acceleration: SIMD3<Float>
-    
+    var attitude: Rotation3D
+    var acceleration: SIMD3<Float>
+    static let rightCharactaristicUUID = UUID(uuidString: "85A29A4C-09C3-C632-858A-3387339C67CF")
+    static let leftCharactaristicUUID = UUID(uuidString:  "850D8BCF-3B03-1322-F51C-DD38E961FC1A")
     static private func int16ToFloat(data: Data) -> MotionSensorData {
 //        let intbyte : [Float] = data.withUnsafeBytes { rawBuffer in
 //            rawBuffer.bindMemory(to: Int16.self).map { Float($0 << 16)}
@@ -59,58 +55,4 @@ public class Carv2Data :ObservableObject{
     }
 }
 
-public class Carv2DataPair :ObservableObject{
-    @Published public var left: Carv2Data = Carv2Data.init()
-    @Published public var right: Carv2Data = Carv2Data.init()
-    var yawingSide: YawingSide = .straight
-    
-    func signedAngleBetweenUpVectors(q1: simd_quatd, q2: simd_quatd) -> Double {
-        let baseUp = simd_double3(0, 1, 0)
-        let rotatedUp1 = q1.act(baseUp)
-        let rotatedUp2 = q2.act(baseUp)
-        
-        let cross = simd_cross(rotatedUp1, rotatedUp2)
-        let sign = simd_dot(cross, baseUp) >= 0 ? 1.0 : -1.0
-        return sign * angleBetweenUpVectors(q1: q1, q2: q2)
-    }
-    func angleBetweenUpVectors(q1: simd_quatd, q2: simd_quatd) -> Double {
-        // 基準の上方向ベクトル
-        let baseUp = simd_double3(0, 1, 0)
-        
-        // 各クォータニオンで回転後の上方向ベクトルを取得
-        let rotatedUp1 = q1.act(baseUp)
-        let rotatedUp2 = q2.act(baseUp)
-        
-        // 内積から角度を計算（0〜πラジアン）
-        let dot = simd_dot(rotatedUp1, rotatedUp2)
-        return acos(dot)
-    }
-    
-    var yawingDiffrencial: Double {
-        return signedAngleBetweenUpVectors(q1: left.attitude.quaternion, q2: right.attitude.quaternion)
-//        let angle1 = yRotationAngle(from: left.attitude.quaternion)
-//        let angle2 = yRotationAngle(from: right.attitude.quaternion)
-//            let delta = angle2 - angle1
-//            
-//            // 角度差を[-π, π)の範囲に正規化
-//            return atan2(sin(delta), cos(delta))
-//        let baseYAxis = simd_double3(1, 0, 0)
-//
-//            // 各クォータニオンで回転させたY軸ベクトルを計算
-//        let yAxis1 = left.attitude.quaternion.act(baseYAxis)
-//            let yAxis2 = right.attitude.quaternion.act(baseYAxis)
-//
-//            // ベクトルの内積から角度を計算
-//            let dotProduct = simd_dot(yAxis1, yAxis2)
-////            let clampedDot = min(max(dotProduct, -1.0), 1.0) // 数値誤差対策
-//            return acos(dotProduct)
-    }
-    
-    
-}
 
-enum YawingSide {
-    case straight
-    case left
-    case right
-}

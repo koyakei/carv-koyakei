@@ -7,21 +7,19 @@
 import CoreBluetooth
 import Spatial
 import Foundation
+import SwiftUI
 
 class CarvDevice: NSObject, ObservableObject, Identifiable, CBPeripheralDelegate {
 let id: UUID
 let peripheral: CBPeripheral
 @Published var connectionState: CBPeripheralState
     @Published var services: [CBService] = []
-    let carv1PeriferalName = "⛷CARV"
-    let carv2PeriferalName = "CARV 2"
-    static let carv2RightCharactaristicUUID = UUID(uuidString: "85A29A4C-09C3-C632-858A-3387339C67CF")
-    static let carv2LeftCharactaristicUUID = UUID(uuidString:  "850D8BCF-3B03-1322-F51C-DD38E961FC1A")
-    @Published var carv2DataPair: Carv2DataPair = Carv2DataPair()
-init(peripheral: CBPeripheral) {
+    @State var carv2DataPair: Carv2DataPair
+    init(peripheral: CBPeripheral, carv2DataPair: Carv2DataPair) {
     self.id = peripheral.identifier
     self.peripheral = peripheral
     self.connectionState = peripheral.state
+        self.carv2DataPair = carv2DataPair
     super.init()
     self.peripheral.delegate = self
 }
@@ -97,18 +95,19 @@ func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CB
     }
     
     if let value = characteristic.value {
-        if characteristic.service?.peripheral?.name == carv1PeriferalName {
+        if characteristic.service?.peripheral?.name == Carv1DataPair.periferalName{
             // ここで受信したデータを処理します
                 let data1 = value.dropFirst(51)
     //            print(data1.map{String(format: "%02hhx", $0)}.joined())
                 notificationHandler(data: data1)
-        } else if characteristic.service?.peripheral?.name == carv2PeriferalName {
+        } else if characteristic.service?.peripheral?.name == Carv2DataPair.periferalName {
             let data1 = value.dropFirst(1)
-            if peripheral.identifier == CarvDevice.carv2RightCharactaristicUUID {
+            if peripheral.identifier == Carv2Data.rightCharactaristicUUID{
                 carv2DataPair.right = Carv2Data(rightData: data1)
                 
+                
             }
-            if peripheral.identifier == CarvDevice.carv2LeftCharactaristicUUID {
+            if peripheral.identifier == Carv2Data.leftCharactaristicUUID {
                 carv2DataPair.left = Carv2Data(leftData: data1)
                 print(Angle2D(radians: carv2DataPair.yawingDiffrencial).degrees)
             }

@@ -2,12 +2,12 @@ import CoreBluetooth
 import Spatial
 import Foundation
 
-class BLE: NSObject, ObservableObject, CBCentralManagerDelegate {
-@Published var carvDeviceList: [CarvDevice] = []
+ class BLE: NSObject, ObservableObject, CBCentralManagerDelegate {
+ @Published var carvDeviceList: [CarvDevice] = []
+     @Published var carv2DataPair: Carv2DataPair = Carv2DataPair()
 var centralManager: CBCentralManager!
     static let targetServiceUUID = CBUUID(string: "2DFBFFFF-960D-4909-8D28-F353CB168E8A")
-static let carv1PeriferalName = "⛷CARV"
-    static let carv2PeriferalName = "CARV 2"
+
 override init() {
     super.init()
     centralManager = CBCentralManager(delegate: self, queue: nil)
@@ -40,7 +40,7 @@ func disconnect(carvDevice: CarvDevice) {
 
 private func addDevice(_ peripheral: CBPeripheral) {
     if !carvDeviceList.contains(where: { $0.id == peripheral.identifier }) {
-        let newDevice = CarvDevice(peripheral: peripheral)
+        let newDevice = CarvDevice(peripheral: peripheral, carv2DataPair: carv2DataPair)
         DispatchQueue.main.async {
             self.carvDeviceList.append(newDevice)
         }
@@ -62,7 +62,7 @@ func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPerip
 func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
     if let device = carvDeviceList.first(where: {
         print (peripheral.name)
-        return $0.peripheral.name == BLE.carv1PeriferalName || $0.peripheral.name == BLE.carv2PeriferalName
+        return $0.peripheral.name == Carv1DataPair.periferalName || $0.peripheral.name == Carv2DataPair.periferalName
     }) {
         device.updateConnectionState(.connected)
         peripheral.discoverServices([BLE.targetServiceUUID])

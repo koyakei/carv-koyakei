@@ -6,7 +6,7 @@ import SceneKit
 import RealityKit
 import Spatial
 struct Arrow3DRealityView: View {
-    @ObservedObject var ble: BLE
+    @StateObject var ble: BLE
     
     var body: some View {
             RealityView { content in
@@ -57,9 +57,9 @@ struct ContentView: View {
     var body: some View {
         VStack {
             
-            var rot = ble.carvDeviceList.first(where:{$0.peripheral.name == BLE.carv2PeriferalName && $0.id == CarvDevice.carv2LeftCharactaristicUUID})
+            var rot = ble.carvDeviceList.first(where:{$0.peripheral.name == Carv2DataPair.periferalName && $0.id ==  Carv2Data.leftCharactaristicUUID})
             Text(rot?.description ?? "none" )
-            Text(rot?.carv2DataPair.left.attitude.description ?? "none" )
+            Text(ble.carv2DataPair.left.attitude.description)
             Text(rot?.carv2DataPair.yawingDiffrencial.description ?? "s")
             Text(rot?.carv2DataPair.left.acceleration.description ?? "s")
             Button(action: { ble.scan() }) {
@@ -74,60 +74,59 @@ struct ContentView: View {
             }
         }
         
-        VStack {
-                        Text("3D Arrow View")
-                            .font(.title)
-            RealityView { content in
-                            // 立方体の生成
-                let arrowEntity = ModelEntity()
-
-                // メイン軸（青）
-                let mainShaft = ModelEntity(
-                    mesh: .generateCylinder(height: 0.5, radius: 0.03),
-                    materials: [SimpleMaterial(color: .blue, isMetallic: true)]
-                )
-                mainShaft.position.y = 0.5
-
-                // 矢先（赤）
-                let arrowHead = ModelEntity(
-                    mesh: .generateCone(height: 0.3, radius: 0.1),
-                    materials: [SimpleMaterial(color: .red, isMetallic: true)]
-                )
-                arrowHead.position.y = 0.65
-
-                // 方向マーカー（X軸）
-                let xMarker = ModelEntity(
-                    mesh: .generateBox(size: [1, 0.02, 0.02]),
-                    materials: [SimpleMaterial(color: .red, isMetallic: false)]
-                )
-                xMarker.position.x = 0.05
-
-                // 方向マーカー（Z軸）
-                let zMarker = ModelEntity(
-                    mesh: .generateBox(size: [0.02, 0.02, 1]),
-                    materials: [SimpleMaterial(color: .green, isMetallic: false)]
-                )
-                zMarker.position.z = 0.05
-
-                // ベースプレート（方向判別用）
-                let basePlate = ModelEntity(
-                    mesh: .generateBox(size: [0.2, 0.01, 0.2]),
-                    materials: [SimpleMaterial(color: .gray, roughness: 0.5, isMetallic: true)]
-                )
-                basePlate.position.y = -0.005
-
-                // 全パーツを追加
-                arrowEntity.addChild(mainShaft)
-                arrowEntity.addChild(arrowHead)
-                arrowEntity.addChild(xMarker)
-                arrowEntity.addChild(zMarker)
-                arrowEntity.addChild(basePlate)
-                        // コンテンツ追加
-                        content.add(arrowEntity)
-                arrowEntity.transform.rotation = simd_quatf(from: rotation.vector)
-            }
-            .frame(height: 400)
-        }
+//        VStack { Text("3D Arrow View")
+//                            .font(.title)
+//            RealityView { content in
+//                            // 立方体の生成
+//                let arrowEntity = ModelEntity()
+//
+//                // メイン軸（青）
+//                let mainShaft = ModelEntity(
+//                    mesh: .generateCylinder(height: 0.5, radius: 0.03),
+//                    materials: [SimpleMaterial(color: .blue, isMetallic: true)]
+//                )
+//                mainShaft.position.y = 0.5
+//
+//                // 矢先（赤）
+//                let arrowHead = ModelEntity(
+//                    mesh: .generateCone(height: 0.3, radius: 0.1),
+//                    materials: [SimpleMaterial(color: .red, isMetallic: true)]
+//                )
+//                arrowHead.position.y = 0.65
+//
+//                // 方向マーカー（X軸）
+//                let xMarker = ModelEntity(
+//                    mesh: .generateBox(size: [1, 0.02, 0.02]),
+//                    materials: [SimpleMaterial(color: .red, isMetallic: false)]
+//                )
+//                xMarker.position.x = 0.05
+//
+//                // 方向マーカー（Z軸）
+//                let zMarker = ModelEntity(
+//                    mesh: .generateBox(size: [0.02, 0.02, 1]),
+//                    materials: [SimpleMaterial(color: .green, isMetallic: false)]
+//                )
+//                zMarker.position.z = 0.05
+//
+//                // ベースプレート（方向判別用）
+//                let basePlate = ModelEntity(
+//                    mesh: .generateBox(size: [0.2, 0.01, 0.2]),
+//                    materials: [SimpleMaterial(color: .gray, roughness: 0.5, isMetallic: true)]
+//                )
+//                basePlate.position.y = -0.005
+//
+//                // 全パーツを追加
+//                arrowEntity.addChild(mainShaft)
+//                arrowEntity.addChild(arrowHead)
+//                arrowEntity.addChild(xMarker)
+//                arrowEntity.addChild(zMarker)
+//                arrowEntity.addChild(basePlate)
+//                        // コンテンツ追加
+//                        content.add(arrowEntity)
+//                arrowEntity.transform.rotation = simd_quatf(from: rotation.vector)
+//            }
+//            .frame(height: 400)
+//        }
     }
    
 }
