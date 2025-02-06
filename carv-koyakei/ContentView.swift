@@ -52,15 +52,15 @@ struct Arrow3DRealityView: View {
 struct ContentView: View {
     @StateObject var ble = BLE()
     
-    var rotation: Rotation3D = .identity
-    
+    static var rotation: Rotation3D = .identity
     var body: some View {
         VStack {
 //            var rot = ble.carvDeviceList.first(where:{$0.peripheral.name == Carv2DataPair.periferalName && $0.id ==  Carv2Data.leftCharactaristicUUID})
-            List(ble.carvDeviceList){ devise in
-                Text(devise.carv2DataPair.left.attitude.description )
-                
-            }
+//            List(ble.carvDeviceList){ devise in
+//                Text(devise.carv2DataPair.left.attitude.description )
+//                
+//            }
+            Text(ContentView.rotation.description)
             Button(action: { ble.scan() }) {
                 Text("Scan")
             }

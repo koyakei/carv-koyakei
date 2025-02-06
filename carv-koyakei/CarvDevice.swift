@@ -108,7 +108,7 @@ func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CB
             if peripheral.identifier == Carv2Data.leftCharactaristicUUID {
                 carv2DataPair.left = Carv2Data(leftData: data1)
             }
-            print(self.carv2DataPair.left.attitude)
+            
         }
         
         

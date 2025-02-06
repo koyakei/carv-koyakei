@@ -9,6 +9,7 @@ import Foundation
 import Spatial
 import simd
 import SwiftUICore
+import Combine
 
 public class Carv2Data :ObservableObject{
     @Published var attitude: Rotation3D
@@ -39,6 +40,12 @@ public class Carv2Data :ObservableObject{
                                           iz: motionSensorData.attitude.vector.z,
                                           r: motionSensorData.attitude.vector.w))
                      acceleration = motionSensorData.acceleration
+        $attitude
+                   .sink { newValue in
+                       print("Attitude updated (right): \(newValue)")
+                       ContentView.rotation = newValue
+                   }
+                   .store(in: &cancellables)
 //        print("yaw: \(Angle2D(radians: attitude.eulerAngles(order: .xyz).angles.x).degrees), pitch: \(Angle2D(radians: attitude.eulerAngles(order: .xyz).angles.y).degrees), roll: \(Angle2D(radians: attitude.eulerAngles(order: .xyz).angles.z).degrees)" )
     }
     
@@ -46,12 +53,24 @@ public class Carv2Data :ObservableObject{
         let motionSensorData = Carv2Data.int16ToFloat(data: data)
         attitude = motionSensorData.attitude
         acceleration = motionSensorData.acceleration
+        $attitude
+                   .sink { newValue in
+                       print("Attitude updated (left): \(newValue)")
+                       ContentView.rotation = newValue
+                   }
+                   .store(in: &cancellables)
 //        print("yaw: \(Angle2D(radians: attitude.eulerAngles(order: .xyz).angles.x).degrees), pitch: \(Angle2D(radians: attitude.eulerAngles(order: .xyz).angles.y).degrees), roll: \(Angle2D(radians: attitude.eulerAngles(order: .xyz).angles.z).degrees)" )
     }
-    
+    private var cancellables = Set<AnyCancellable>()
     public init () {
         attitude = .identity
         acceleration = .zero
+//        $attitude
+//                   .sink { newValue in
+//                       print("Attitude updated (willSet): \(newValue)")
+//                       ContentView.rotation = newValue
+//                   }
+//                   .store(in: &cancellables)
     }
 }
 
