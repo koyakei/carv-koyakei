@@ -60,6 +60,7 @@ struct ContentView: View {
 //                Text(devise.carv2DataPair.left.attitude.description )
 //                
 //            }
+            Text(ble.carv2DataPair.left.attitude.description)
             Text(ContentView.rotation.description)
             Button(action: { ble.scan() }) {
                 Text("Scan")
