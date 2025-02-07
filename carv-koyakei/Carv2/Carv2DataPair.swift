@@ -9,21 +9,10 @@ import Spatial
 import simd
 import SwiftUICore
 
-public class Carv2DataPair :ObservableObject{
-    @Published var left: Carv2Data = Carv2Data.init(){
-        didSet {
-            DispatchQueue.main.async {
-                self.objectWillChange.send()
-            }
-        }
-    }
-    @Published var right: Carv2Data = Carv2Data.init(){
-        didSet {
-            DispatchQueue.main.async {
-                self.objectWillChange.send()
-            }
-        }
-    }
+class Carv2DataPair : ObservableObject{
+    @Published var left: Carv2Data = Carv2Data.init()
+    @Published var right: Carv2Data = Carv2Data.init()
+    public static var shared: Carv2DataPair = .init()
     var yawingSide: YawingSide = .straight
     static let periferalName = "CARV 2"
     func signedAngleBetweenUpVectors(q1: simd_quatd, q2: simd_quatd) -> Double {

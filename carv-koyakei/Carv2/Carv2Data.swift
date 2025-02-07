@@ -11,8 +11,8 @@ import simd
 import SwiftUICore
 import Combine
 
-public class Carv2Data :ObservableObject{
-    @Published var attitude: Rotation3D
+class Carv2Data {
+    var attitude: Rotation3D
     var acceleration: SIMD3<Float>
     static let rightCharactaristicUUID = UUID(uuidString: "85A29A4C-09C3-C632-858A-3387339C67CF")
     static let leftCharactaristicUUID = UUID(uuidString:  "850D8BCF-3B03-1322-F51C-DD38E961FC1A")
@@ -40,12 +40,8 @@ public class Carv2Data :ObservableObject{
                                           iz: motionSensorData.attitude.vector.z,
                                           r: motionSensorData.attitude.vector.w))
                      acceleration = motionSensorData.acceleration
-        $attitude
-                   .sink { newValue in
-                       print("Attitude updated (right): \(newValue)")
-                       ContentView.rotation = newValue
-                   }
-                   .store(in: &cancellables)
+  
+        
 //        print("yaw: \(Angle2D(radians: attitude.eulerAngles(order: .xyz).angles.x).degrees), pitch: \(Angle2D(radians: attitude.eulerAngles(order: .xyz).angles.y).degrees), roll: \(Angle2D(radians: attitude.eulerAngles(order: .xyz).angles.z).degrees)" )
     }
     
@@ -53,25 +49,14 @@ public class Carv2Data :ObservableObject{
         let motionSensorData = Carv2Data.int16ToFloat(data: data)
         attitude = motionSensorData.attitude
         acceleration = motionSensorData.acceleration
-        $attitude
-                   .sink { newValue in
-                       print("Attitude updated (left): \(newValue)")
-                       ContentView.rotation = newValue
-                   }
-                   .store(in: &cancellables)
 //        print("yaw: \(Angle2D(radians: attitude.eulerAngles(order: .xyz).angles.x).degrees), pitch: \(Angle2D(radians: attitude.eulerAngles(order: .xyz).angles.y).degrees), roll: \(Angle2D(radians: attitude.eulerAngles(order: .xyz).angles.z).degrees)" )
     }
     private var cancellables = Set<AnyCancellable>()
     public init () {
         attitude = .identity
         acceleration = .zero
-//        $attitude
-//                   .sink { newValue in
-//                       print("Attitude updated (willSet): \(newValue)")
-//                       ContentView.rotation = newValue
-//                   }
-//                   .store(in: &cancellables)
     }
 }
+
 
 

@@ -1,4 +1,5 @@
 import SwiftUI
+import Combine
 import CoreBluetooth
 import Spatial
 import SceneKit
@@ -6,8 +7,7 @@ import SceneKit
 import RealityKit
 import Spatial
 struct Arrow3DRealityView: View {
-    @StateObject var ble: BLE
-    
+    @StateObject var ble: BluethoothCentralManager
     var body: some View {
             RealityView { content in
                 // 矢印エンティティの作成と追加
@@ -24,7 +24,6 @@ struct Arrow3DRealityView: View {
                 directionalLight.light.intensity = 1000
                 directionalLight.look(at: [0, 0, 0], from: [1, 1, 2], relativeTo: nil)
                 content.add(directionalLight)
-                
             }
         }
         
@@ -50,18 +49,17 @@ struct Arrow3DRealityView: View {
 
 
 struct ContentView: View {
-    @StateObject var ble = BLE()
-    
-    static var rotation: Rotation3D = .identity
+    @ObservedObject var ble = BluethoothCentralManager()
+    @StateObject var carv2DataPair: Carv2DataPair = Carv2DataPair.shared
     var body: some View {
         VStack {
-//            var rot = ble.carvDeviceList.first(where:{$0.peripheral.name == Carv2DataPair.periferalName && $0.id ==  Carv2Data.leftCharactaristicUUID})
-//            List(ble.carvDeviceList){ devise in
-//                Text(devise.carv2DataPair.left.attitude.description )
-//                
-//            }
-            Text(ble.carv2DataPair.left.attitude.description)
-            Text(ContentView.rotation.description)
+            List(ble.carvDeviceList){ devise in
+                Text(devise.leftCarv2Data.attitude.description )
+            }
+            Text(Carv2DataPair.shared.left.attitude.description)
+            Text(carv2DataPair.right.attitude.description).onReceive(ble.objectWillChange) { _ in
+                // 強制再描画
+            } //この数値が更新されないので、更新できるように変更してほしい
             Button(action: { ble.scan() }) {
                 Text("Scan")
             }
@@ -70,63 +68,83 @@ struct ContentView: View {
             }
             .padding()
             List(ble.carvDeviceList) { device in
+                device.id == Carv2Data.leftCharactaristicUUID ? Text("Left") : Text("Right")
+                
                 DeviceRow(device: device, ble: ble)
             }
         }
         
-//        VStack { Text("3D Arrow View")
-//                            .font(.title)
-//            RealityView { content in
-//                            // 立方体の生成
-//                let arrowEntity = ModelEntity()
-//
-//                // メイン軸（青）
-//                let mainShaft = ModelEntity(
-//                    mesh: .generateCylinder(height: 0.5, radius: 0.03),
-//                    materials: [SimpleMaterial(color: .blue, isMetallic: true)]
-//                )
-//                mainShaft.position.y = 0.5
-//
-//                // 矢先（赤）
-//                let arrowHead = ModelEntity(
-//                    mesh: .generateCone(height: 0.3, radius: 0.1),
-//                    materials: [SimpleMaterial(color: .red, isMetallic: true)]
-//                )
-//                arrowHead.position.y = 0.65
-//
-//                // 方向マーカー（X軸）
-//                let xMarker = ModelEntity(
-//                    mesh: .generateBox(size: [1, 0.02, 0.02]),
-//                    materials: [SimpleMaterial(color: .red, isMetallic: false)]
-//                )
-//                xMarker.position.x = 0.05
-//
-//                // 方向マーカー（Z軸）
-//                let zMarker = ModelEntity(
-//                    mesh: .generateBox(size: [0.02, 0.02, 1]),
-//                    materials: [SimpleMaterial(color: .green, isMetallic: false)]
-//                )
-//                zMarker.position.z = 0.05
-//
-//                // ベースプレート（方向判別用）
-//                let basePlate = ModelEntity(
-//                    mesh: .generateBox(size: [0.2, 0.01, 0.2]),
-//                    materials: [SimpleMaterial(color: .gray, roughness: 0.5, isMetallic: true)]
-//                )
-//                basePlate.position.y = -0.005
-//
-//                // 全パーツを追加
-//                arrowEntity.addChild(mainShaft)
-//                arrowEntity.addChild(arrowHead)
-//                arrowEntity.addChild(xMarker)
-//                arrowEntity.addChild(zMarker)
-//                arrowEntity.addChild(basePlate)
-//                        // コンテンツ追加
-//                        content.add(arrowEntity)
-//                arrowEntity.transform.rotation = simd_quatf(from: rotation.vector)
-//            }
-//            .frame(height: 400)
-//        }
+        VStack { Text("3D Arrow View")
+                            .font(.title)
+            RealityView { content in
+                            // 立方体の生成
+                let arrowEntity = ModelEntity()
+
+                // メイン軸（青）
+                let mainShaft = ModelEntity(
+                    mesh: .generateCylinder(height: 0.5, radius: 0.03),
+                    materials: [SimpleMaterial(color: .blue, isMetallic: true)]
+                )
+                mainShaft.position.y = 0.5
+
+                // 矢先（赤）
+                let arrowHead = ModelEntity(
+                    mesh: .generateCone(height: 0.3, radius: 0.1),
+                    materials: [SimpleMaterial(color: .red, isMetallic: true)]
+                )
+                arrowHead.position.y = 0.65
+
+                // 方向マーカー（X軸）
+                let xMarker = ModelEntity(
+                    mesh: .generateBox(size: [1, 0.02, 0.02]),
+                    materials: [SimpleMaterial(color: .red, isMetallic: false)]
+                )
+                xMarker.position.x = 0.05
+
+                // 方向マーカー（Z軸）
+                let zMarker = ModelEntity(
+                    mesh: .generateBox(size: [0.02, 0.02, 1]),
+                    materials: [SimpleMaterial(color: .green, isMetallic: false)]
+                )
+                zMarker.position.z = 0.05
+
+                // ベースプレート（方向判別用）
+                let basePlate = ModelEntity(
+                    mesh: .generateBox(size: [0.2, 0.01, 0.2]),
+                    materials: [SimpleMaterial(color: .gray, roughness: 0.5, isMetallic: true)]
+                )
+                basePlate.position.y = -0.005
+
+                // 全パーツを追加
+                arrowEntity.addChild(mainShaft)
+                arrowEntity.addChild(arrowHead)
+                arrowEntity.addChild(xMarker)
+                arrowEntity.addChild(zMarker)
+                arrowEntity.addChild(basePlate)
+                        // コンテンツ追加
+                        
+                Carv2DataPair.shared.left.attitude // これで与えられた姿勢に　arrowEntity　を向ける
+                // 姿勢更新ハンドラ
+                let controller = RotationController(entity: arrowEntity)
+                    content.add(arrowEntity)
+                    func updateRotation(_ rotation: Rotation3D) {
+                        let current = arrowEntity.transform.rotation
+                        let target = simd_quatf(from: Carv2DataPair.shared.left.attitude.vector)
+                        arrowEntity.transform.rotation = simd_slerp(current, target, 0.1)
+                    }
+                    
+                    // Combineによる更新
+                Carv2DataPair.shared.$left
+                        .map(\.attitude)
+                        .eraseToAnyPublisher() // 型変換を明示化
+                        .sink { rotation in
+                            controller.bind(rotationPublisher: Just(rotation).eraseToAnyPublisher())
+                        }
+                        .store(in: &controller.cancellables)
+                content.add(arrowEntity)
+            }
+            .frame(height: 400)
+        }
     }
    
 }
@@ -141,11 +159,20 @@ extension simd_quatf {
         )
     }
 }
+// Carv2DataPairの拡張
+extension Carv2DataPair {
+    var rotationPublisher: AnyPublisher<Rotation3D, Never> {
+        $left.map(\.attitude).eraseToAnyPublisher()
+    }
+}
+
+
+
 
 struct DeviceRow: View {
     @ObservedObject var device: CarvDevice
-    let ble: BLE
-
+    let ble: BluethoothCentralManager
+    
     var body: some View {
         VStack(alignment: .leading) {
             Text(device.id.uuidString)
@@ -153,6 +180,8 @@ struct DeviceRow: View {
             Text("State: \(device.connectionState.rawValue)")
                 .font(.subheadline)
             Text(device.peripheral.name ?? "(unknown)")
+//            Text(device.carv2DataPaird.right.attitude.description)
+            Text(device.leftCarv2Data.attitude.description)// この数値は更新される
             HStack {
                 Button(action: { ble.connect(carvDevice: device) }) {
                     Text("Connect")
@@ -165,7 +194,6 @@ struct DeviceRow: View {
                         Text("Subscribe")
                     }
                 }
-                
             }
             
             if !device.services.isEmpty {

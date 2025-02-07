@@ -10,19 +10,20 @@ import Foundation
 import SwiftUI
 
 class CarvDevice: NSObject, ObservableObject, Identifiable, CBPeripheralDelegate {
-let id: UUID
-let peripheral: CBPeripheral
-@Published var connectionState: CBPeripheralState
+    let id: UUID
+    let peripheral: CBPeripheral
+    @Published var connectionState: CBPeripheralState
     @Published var services: [CBService] = []
-    @Published var carv2DataPair: Carv2DataPair
-    init(peripheral: CBPeripheral, carv2DataPair: Carv2DataPair) {
-    self.id = peripheral.identifier
-    self.peripheral = peripheral
-    self.connectionState = peripheral.state
+    @Published var carv2DataPair: Carv2DataPair = Carv2DataPair.shared
+    @Published var leftCarv2Data: Carv2Data = Carv2Data()
+    init(peripheral: CBPeripheral, carv2DataPair: inout Carv2DataPair) {
+        self.id = peripheral.identifier
+        self.peripheral = peripheral
+        self.connectionState = peripheral.state
         self.carv2DataPair = carv2DataPair
-    super.init()
-    self.peripheral.delegate = self
-}
+        super.init()
+        self.peripheral.delegate = self
+    }
     // 特性発見メソッドを実装
         public func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
             if let error = error {
@@ -103,12 +104,23 @@ func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CB
         } else if characteristic.service?.peripheral?.name == Carv2DataPair.periferalName {
             let data1 = value.dropFirst(1)
             if peripheral.identifier == Carv2Data.rightCharactaristicUUID{
-                carv2DataPair.right = Carv2Data(rightData: data1)
+                DispatchQueue.main.async {
+                    let cd = Carv2Data(rightData: data1)
+                    self.carv2DataPair.right = cd
+                }
+                print("right \(carv2DataPair.right.attitude)")
             }
             if peripheral.identifier == Carv2Data.leftCharactaristicUUID {
-                carv2DataPair.left = Carv2Data(leftData: data1)
+                DispatchQueue.main.async {
+                        let cd = Carv2Data(leftData: data1)
+                        self.carv2DataPair.left = cd
+                    Carv2DataPair.shared.left = cd
+                    self.leftCarv2Data = cd
+                    self.objectWillChange.send()
+                }
+//                print("left \(carv2DataPair.left.attitude) right \(carv2DataPair.right.attitude)")
+                print("left \(carv2DataPair.left.attitude)")
             }
-            
         }
         
         
@@ -141,13 +153,7 @@ func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CB
         print("roll: \(Angle2D(radians: rotation2.eulerAngles(order: .xyz).angles.x).degrees), yaw: \(Angle2D(radians: rotation2.eulerAngles(order: .xyz).angles.y).degrees), pitch: \(Angle2D(radians: rotation2.eulerAngles(order: .xyz).angles.z).degrees)" )
         }
     
-    
-    private func rightCarv2DataHandler(data: Data) {
-        
-    }
-    private func leftCarv2DataHandler(data: Data){
-        
-    }
+
     private func carv2dataHandler(data: Data) {
         guard data.count >= 24 else { print("less 24")
             return }

@@ -1,40 +1,27 @@
 import CoreBluetooth
 import Spatial
 import Foundation
-
- class BLE: NSObject, ObservableObject, CBCentralManagerDelegate {
- @Published var carvDeviceList: [CarvDevice] = []
-     @Published var carv2DataPair: Carv2DataPair{
-         didSet {
-            print(self.carv2DataPair.left.attitude)
-             DispatchQueue.main.async {
-                 self.objectWillChange.send()
-             }
-         }
-     }
-
-     func didUpdateData(_ data: Carv2DataPair) {
-         DispatchQueue.main.async { [weak self] in
-             self?.carv2DataPair = data
-         }
-     }
-     
+import SwiftUI
+ class BluethoothCentralManager: NSObject, ObservableObject, CBCentralManagerDelegate {
+     public static var shared: BluethoothCentralManager = .init()
+     @Published var carvDeviceList: [CarvDevice] = []
+     @Published var rotation3D: Rotation3D = .identity
+     @Published var carv2DataPair: Carv2DataPair = Carv2DataPair()
      var centralManager: CBCentralManager!
     static let targetServiceUUID = CBUUID(string: "2DFBFFFF-960D-4909-8D28-F353CB168E8A")
-
+     @Published var carv2PeripheralLeft : Carv2PeripheralLeft?
 override init() {
-    carv2DataPair = Carv2DataPair()
     super.init()
     centralManager = CBCentralManager(delegate: self, queue: nil)
 }
 
 func scan() {
     guard centralManager.state == .poweredOn else { return }
-    centralManager.scanForPeripherals(withServices: [BLE.targetServiceUUID], options: nil)
+    centralManager.scanForPeripherals(withServices: [BluethoothCentralManager.targetServiceUUID], options: nil)
 }
 
 func retrieveAndConnect() {
-    let connectedPeripherals = centralManager.retrieveConnectedPeripherals(withServices: [BLE.targetServiceUUID])
+    let connectedPeripherals = centralManager.retrieveConnectedPeripherals(withServices: [BluethoothCentralManager.targetServiceUUID])
     for peripheral in connectedPeripherals {
         addDevice(peripheral)
     }
@@ -54,8 +41,10 @@ func disconnect(carvDevice: CarvDevice) {
 }
 
 private func addDevice(_ peripheral: CBPeripheral) {
-    if !carvDeviceList.contains(where: { $0.id == peripheral.identifier }) {
-        let newDevice = CarvDevice(peripheral: peripheral, carv2DataPair: carv2DataPair)
+    if !carvDeviceList.contains(where: { $0.id == Carv2Data.leftCharactaristicUUID &&
+        $0.peripheral.name == Carv2DataPair.periferalName
+    }) {
+        let newDevice = CarvDevice(peripheral: peripheral,carv2DataPair: &carv2DataPair)
         DispatchQueue.main.async {
             self.carvDeviceList.append(newDevice)
         }
@@ -80,7 +69,7 @@ func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeriph
         return $0.peripheral.name == Carv1DataPair.periferalName || $0.peripheral.name == Carv2DataPair.periferalName
     }) {
         device.updateConnectionState(.connected)
-        peripheral.discoverServices([BLE.targetServiceUUID])
+        peripheral.discoverServices([BluethoothCentralManager.targetServiceUUID])
         print(peripheral.name)
         print("connected")
     }
