@@ -258,7 +258,7 @@ struct ContentView: View {
                 arrowEntity.addChild(basePlate)
                         // コンテンツ追加
                 // 姿勢更新ハンドラ
-                let controller = RotationController(entity: arrowEntity)                
+                let controller = RotationController(entity: arrowEntity)
                     // Combineによる更新
                 Carv2DataPair.shared.$left
                     .map(\.realityKitRotation3)

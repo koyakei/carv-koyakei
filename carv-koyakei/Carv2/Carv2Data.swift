@@ -29,37 +29,36 @@ class Carv2Data {
     static let leftCharactaristicUUID = UUID(uuidString:  "850D8BCF-3B03-1322-F51C-DD38E961FC1A")
 
     
+    var realityKitRotation3: Rotation3D {
+                let attitude = self.attitude
+                
+                // クォータニオン取得（CM → SIMD変換）
+                let cmQuat = attitude.quaternion
+            let deviceQuat = simd_quatd(ix: cmQuat.vector.z,
+                                        iy: cmQuat.vector.x,
+                                        iz: -cmQuat.vector.y,
+                                        
+                                        r: -cmQuat.vector.w)
+            return Rotation3D( deviceQuat  )
+        }
+    var realityKitRotation2: Rotation3D {
+        let attitude = self.attitude
+        
+        // クォータニオン取得（CM → SIMD変換）
+        let cmQuat = attitude.quaternion
+    let deviceQuat = simd_quatd(ix: cmQuat.vector.z,
+                                iy: cmQuat.vector.x,
+                                iz: cmQuat.vector.y,
+                                
+                                r: -cmQuat.vector.w)
+    return Rotation3D( deviceQuat  )
+        }
     var realityKitRotation: Rotation3D {
             let attitude = self.attitude
             
-        // クォータニオン取得（CM → SIMD変換）
-        let cmQuat = attitude.quaternion
-        var deviceQuat = simd_quatd(real: 1,
-                                    imag: simd_double3(
-                                    x: 0, y: 0, z: 0)
-            ).normalized
-
-//            )
-    return Rotation3D( deviceQuat  )
-        }
-    var realityKitRotation2: Rotation3D {
-            let attitude = self.attitude
-            
             // クォータニオン取得（CM → SIMD変換）
             let cmQuat = attitude.quaternion
-        var deviceQuat = simd_quatd(ix: -cmQuat.vector.z,
-                                    iy: cmQuat.vector.y,
-                                    iz: -cmQuat.vector.x,
-                                    
-                                    r: -cmQuat.vector.w)
-        return Rotation3D( deviceQuat  )
-        }
-    var realityKitRotation3: Rotation3D {
-            let attitude = self.attitude
-            
-            // クォータニオン取得（CM → SIMD変換）
-            let cmQuat = attitude.quaternion
-        var deviceQuat = simd_quatd(ix: -cmQuat.vector.z,
+        let deviceQuat = simd_quatd(ix: -cmQuat.vector.z,
                                     iy: cmQuat.vector.x,
                                     iz: -cmQuat.vector.y,
                                     
