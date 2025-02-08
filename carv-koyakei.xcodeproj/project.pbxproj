@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		221E10B32D571635003B5AAF /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 221E10B22D57162D003B5AAF /* README.md */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		22A73C852D4241AD00C1BF1C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -24,6 +28,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		221E10B22D57162D003B5AAF /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		22A73C732D4241AB00C1BF1C /* carv-koyakei.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "carv-koyakei.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		22A73C842D4241AD00C1BF1C /* carv-koyakeiTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "carv-koyakeiTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		22A73C8E2D4241AD00C1BF1C /* carv-koyakeiUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "carv-koyakeiUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -100,6 +105,7 @@
 		22A73C6A2D4241AB00C1BF1C = {
 			isa = PBXGroup;
 			children = (
+				221E10B22D57162D003B5AAF /* README.md */,
 				22A73C752D4241AB00C1BF1C /* carv-koyakei */,
 				22A73C872D4241AD00C1BF1C /* carv-koyakeiTests */,
 				22A73C912D4241AD00C1BF1C /* carv-koyakeiUITests */,
@@ -237,6 +243,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				221E10B32D571635003B5AAF /* README.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
