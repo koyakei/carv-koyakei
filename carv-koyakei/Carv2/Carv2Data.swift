@@ -32,35 +32,42 @@ class Carv2Data {
     var realityKitRotation: Rotation3D {
             let attitude = self.attitude
             
+        // クォータニオン取得（CM → SIMD変換）
+        let cmQuat = attitude.quaternion
+        var deviceQuat = simd_quatd(real: 1,
+                                    imag: simd_double3(
+                                    x: 0, y: 0, z: 0)
+            ).normalized
+
+//            )
+    return Rotation3D( deviceQuat  )
+        }
+    var realityKitRotation2: Rotation3D {
+            let attitude = self.attitude
+            
             // クォータニオン取得（CM → SIMD変換）
             let cmQuat = attitude.quaternion
-            var deviceQuat = simd_quatd(
-                ix: attitude.vector.x,
-                iy: attitude.vector.y,
-                iz: attitude.vector.z,
-                r: attitude.vector.w
-            ).normalized
-//        if deviceQuat.axis.z < 0 {
-//            deviceQuat = simd_quatf(
-//                    ix: Float(-cmQuat.axis.x),
-//                    iy: Float(-cmQuat.axis.y),
-//                    iz: Float(cmQuat.axis.z),
-//                    r: Float(cmQuat.angle)
-//                )
-//            }
-            
-            // 座標系変換（Z-up → Y-up）
-            let coordinateTransform = simd_quatd(angle: .pi, axis: [0, 0, 1])
-            let adjustedQuat =  deviceQuat
-//            // 右手系補正（必要に応じて追加）
-//            let rightHandedQuat = simd_quatf(
-//                ix: -adjustedQuat.vector.x,
-//                iy: -adjustedQuat.vector.y,
-//                iz: adjustedQuat.vector.z,
-//                r: adjustedQuat.vector.w
-//            )
-        return Rotation3D( coordinateTransform * deviceQuat * coordinateTransform.inverse  )
+        var deviceQuat = simd_quatd(ix: -cmQuat.vector.z,
+                                    iy: cmQuat.vector.y,
+                                    iz: -cmQuat.vector.x,
+                                    
+                                    r: -cmQuat.vector.w)
+        return Rotation3D( deviceQuat  )
         }
+    var realityKitRotation3: Rotation3D {
+            let attitude = self.attitude
+            
+            // クォータニオン取得（CM → SIMD変換）
+            let cmQuat = attitude.quaternion
+        var deviceQuat = simd_quatd(ix: -cmQuat.vector.z,
+                                    iy: cmQuat.vector.x,
+                                    iz: -cmQuat.vector.y,
+                                    
+                                    r: -cmQuat.vector.w)
+        return Rotation3D( deviceQuat  )
+        }
+    
+//                                        x: cmQuat.imag.z, y: -cmQuat.imag.y, z: -cmQuat.imag.x)
     static private func int16ToFloat(data: Data) -> MotionSensorData {
 //        let intbyte : [Float] = data.withUnsafeBytes { rawBuffer in
 //            rawBuffer.bindMemory(to: Int16.self).map { Float($0 << 16)}

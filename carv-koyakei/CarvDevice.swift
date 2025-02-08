@@ -15,7 +15,6 @@ class CarvDevice: NSObject, ObservableObject, Identifiable, CBPeripheralDelegate
     @Published var connectionState: CBPeripheralState
     @Published var services: [CBService] = []
     @Published var carv2DataPair: Carv2DataPair = Carv2DataPair.shared
-    @Published var leftCarv2Data: Carv2Data = Carv2Data()
     init(peripheral: CBPeripheral, carv2DataPair: inout Carv2DataPair) {
         self.id = peripheral.identifier
         self.peripheral = peripheral
