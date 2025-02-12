@@ -95,32 +95,6 @@ struct ContentView: View {
         
         HStack {
             RealityView { content in
-                content.camera = .spatialTracking
-                
-                // ワールド空間アンカーを使用
-                let worldAnchor = AnchorEntity(world: .zero)
-                let arrowEntity = createArrowEntity()
-                worldAnchor.addChild(arrowEntity)
-                content.add(worldAnchor)
-                
-                // 磁北補正用コンポーネント
-                let magNorthCorrector = MagneticNorthCorrector()
-                
-                let controller = RotationController(entity: arrowEntity)
-                
-                Carv2DataPair.shared.$left
-                    .map(\.realityKitRotation)
-                    .sink { rotation in
-                        controller.bind(rotationPublisher: Just(rotation).eraseToAnyPublisher())
-                    }
-                    .store(in: &controller.cancellables)
-                
-                // センサーデータとARセッション情報を統合
-
-            }
-            .frame(height: 400)
-            
-            RealityView { content in
                 // カメラ設定（空間追跡有効化）
                 content.camera = .spatialTracking
                 
@@ -144,28 +118,47 @@ struct ContentView: View {
                         controller.bind(rotationPublisher: Just(rotation).eraseToAnyPublisher())
                     }
                     .store(in: &controller.cancellables)
+
+            }
+            .frame(height: 400)
+            
+            RealityView { content in
+                // カメラ設定（空間追跡有効化）
+                content.camera = .spatialTracking
+                
+                
+                let arrowEntity = createArrowEntity()
+                let worldAnchor = AnchorEntity(world: .zero)
+                worldAnchor.addChild(arrowEntity)
+                content.add(worldAnchor)
+                
+                if let cameraTransform = content.cameraTarget?.transform {
+                    arrowEntity.transform.translation = cameraTransform.translation
+                }
+                
+//                 姿勢更新コントローラー
+                let controller = RotationController(entity: arrowEntity)
+                
+                // センサーデータ購読
+                Carv2DataPair.shared.$left
+                    .map(\.realityKitRotation)
+                    .sink { rotation in
+                        controller.bind(rotationPublisher: Just(rotation).eraseToAnyPublisher())
+                    }
+                    .store(in: &controller.cancellables)
             } update: { content in
                 // フレーム更新処理
                 guard let currentFrame = arSession.currentFrame else { return }
                 
                 // デバイスの姿勢情報取得
                 let deviceTransform = currentFrame.camera.transform
-                let deviceRotation = simd_quatf(deviceTransform)
-                
-                // 磁北補正
-                if let heading = locationManager.heading {
-                    let northRotation = simd_quatf(
-                        angle: Float(-heading.magneticHeading).degreesToRadians,
-                        axis: [0, 1, 0]
-                    )
-                    
-                    // センサーデータと統合
-                    let correctedRotation = deviceRotation * northRotation
-                    content.entities[0].transform.rotation = correctedRotation
-                }
+                if let arrow = content.entities.first {
+//                                    arrow.position = worldPosition
+                                    arrow.transform.rotation = simd_quatf(carv2DataPair.left.realityKitRotation)
+                                }
                 
                 // センサーデータ適用
-                content.entities[0].transform.rotation = simd_quatf(carv2DataPair.left.realityKitRotation)
+//                content.entities[0].transform.rotation = simd_quatf(carv2DataPair.left.realityKitRotation)
             }
             .frame(height: 400)
         }
