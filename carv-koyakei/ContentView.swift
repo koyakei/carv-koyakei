@@ -3,55 +3,13 @@ import Combine
 import CoreBluetooth
 import Spatial
 import SceneKit
-
 import RealityKit
 import Spatial
 import simd
-
-
-struct Arrow3DRealityView: View {
-    @StateObject var ble: BluethoothCentralManager
-    var body: some View {
-            RealityView { content in
-                // 矢印エンティティの作成と追加
-                let arrowEntity = createArrowEntity()
-                content.add(arrowEntity)
-                // カメラと照明の設定（検索結果[5][10]を参考）
-                let cameraAnchor = AnchorEntity(.camera)
-                let camera = PerspectiveCamera()
-                camera.look(at: [0, 0, 0], from: [0, 0, 2], relativeTo: nil)
-                cameraAnchor.addChild(camera)
-                content.add(cameraAnchor)
-                
-                let directionalLight = DirectionalLight()
-                directionalLight.light.intensity = 1000
-                directionalLight.look(at: [0, 0, 0], from: [1, 1, 2], relativeTo: nil)
-                content.add(directionalLight)
-            }
-        }
-        
-        private func createArrowEntity() -> ModelEntity {
-            let shaftMesh = MeshResource.generateCylinder(height: 1.0, radius: 0.02)
-            let headMesh = MeshResource.generateCone(height: 0.3, radius: 0.08)
-            let material = SimpleMaterial(color: .blue, isMetallic: true)
-            
-            let shaftEntity = ModelEntity(mesh: shaftMesh, materials: [material])
-            let headEntity = ModelEntity(mesh: headMesh, materials: [material])
-            
-            shaftEntity.position.y = 0.5
-            headEntity.position.y = 1.0
-            
-            let arrowEntity = ModelEntity()
-            arrowEntity.addChild(shaftEntity)
-            arrowEntity.addChild(headEntity)
-            arrowEntity.name = "mainArrow"
-            
-            return arrowEntity
-        }
-}
-
-
+import ARKit
 struct ContentView: View {
+    @State private var arSession = ARSession()
+    @State private var locationManager = CLLocationManager()
     func formatQuaternion(_ quat: simd_quatd) -> String {
         let components = [quat.real, quat.imag.x, quat.imag.y, quat.imag.z]
         
@@ -86,188 +44,128 @@ struct ContentView: View {
             }
         }
         
+        var createArrowEntity = {
+            // 矢印エンティティの生成
+            // メイン軸（青）
+            let mainShaft = ModelEntity(
+                mesh: .generateCylinder(height: 0.5, radius: 0.03),
+                materials: [SimpleMaterial(color: .blue, isMetallic: true)]
+            )
+            mainShaft.position.y = 0.5
+
+            // 矢先（赤）
+            let arrowHead = ModelEntity(
+                mesh: .generateCone(height: 0.3, radius: 0.1),
+                materials: [SimpleMaterial(color: .red, isMetallic: true)]
+            )
+            arrowHead.position.y = 0.65
+
+            // 方向マーカー（X軸）
+            let xMarker = ModelEntity(
+                mesh: .generateBox(size: [1, 0.02, 0.02]),
+                materials: [SimpleMaterial(color: .red, isMetallic: false)]
+            )
+            xMarker.position.x = 0.1
+
+            // 方向マーカー（Z軸）
+            let zMarker = ModelEntity(
+                mesh: .generateBox(size: [0.02, 0.02, 1]),
+                materials: [SimpleMaterial(color: .green, isMetallic: false)]
+            )
+            zMarker.position.z = 0.09
+
+            // ベースプレート（方向判別用）
+            let basePlate = ModelEntity(
+                mesh: .generateBox(size: [0.2, 0.01, 0.2]),
+                materials: [SimpleMaterial(color: .gray, roughness: 0.5, isMetallic: true)]
+            )
+            basePlate.position.y = -0.005
+            let arrowEntity = ModelEntity()
+            // 全パーツを追加
+            arrowEntity.addChild(mainShaft)
+            arrowEntity.addChild(arrowHead)
+            arrowEntity.addChild(xMarker)
+            arrowEntity.addChild(zMarker)
+            arrowEntity.addChild(basePlate)
+            
+            // 中央固定設定
+            arrowEntity.position = [0, 0, -2] // カメラ前方1m
+            return arrowEntity
+        }
+        
         HStack {
             RealityView { content in
-                            // 立方体の生成
-                let arrowEntity = ModelEntity()
-
-                // メイン軸（青）
-                let mainShaft = ModelEntity(
-                    mesh: .generateCylinder(height: 0.5, radius: 0.03),
-                    materials: [SimpleMaterial(color: .blue, isMetallic: true)]
-                )
-                mainShaft.position.y = 0.5
-
-                // 矢先（赤）
-                let arrowHead = ModelEntity(
-                    mesh: .generateCone(height: 0.3, radius: 0.1),
-                    materials: [SimpleMaterial(color: .red, isMetallic: true)]
-                )
-                arrowHead.position.y = 0.65
-
-                // 方向マーカー（X軸）
-                let xMarker = ModelEntity(
-                    mesh: .generateBox(size: [1, 0.02, 0.02]),
-                    materials: [SimpleMaterial(color: .red, isMetallic: false)]
-                )
-                xMarker.position.x = 0.1
-
-                // 方向マーカー（Z軸）
-                let zMarker = ModelEntity(
-                    mesh: .generateBox(size: [0.02, 0.02, 1]),
-                    materials: [SimpleMaterial(color: .green, isMetallic: false)]
-                )
-                zMarker.position.z = 0.09
-
-                // ベースプレート（方向判別用）
-                let basePlate = ModelEntity(
-                    mesh: .generateBox(size: [0.2, 0.01, 0.2]),
-                    materials: [SimpleMaterial(color: .gray, roughness: 0.5, isMetallic: true)]
-                )
-                basePlate.position.y = -0.005
-
-                // 全パーツを追加
-                arrowEntity.addChild(mainShaft)
-                arrowEntity.addChild(arrowHead)
-                arrowEntity.addChild(xMarker)
-                arrowEntity.addChild(zMarker)
-                arrowEntity.addChild(basePlate)
-                        // コンテンツ追加
-                        
-                Carv2DataPair.shared.left.attitude // これで与えられた姿勢に　arrowEntity　を向ける
-                // 姿勢更新ハンドラ
-                let controller = RotationController(entity: arrowEntity)
-                    content.add(arrowEntity)
+                content.camera = .spatialTracking
                 
-                    // Combineによる更新
+                // ワールド空間アンカーを使用
+                let worldAnchor = AnchorEntity(world: .zero)
+                let arrowEntity = createArrowEntity()
+                worldAnchor.addChild(arrowEntity)
+                content.add(worldAnchor)
+                
+                // 磁北補正用コンポーネント
+                let magNorthCorrector = MagneticNorthCorrector()
+                
+                let controller = RotationController(entity: arrowEntity)
+                
                 Carv2DataPair.shared.$left
                     .map(\.realityKitRotation)
-                        .eraseToAnyPublisher() // 型変換を明示化
-                        .sink { rotation in
-                            controller.bind(rotationPublisher: Just(rotation).eraseToAnyPublisher())
-                        }
-                        .store(in: &controller.cancellables)
-                content.add(arrowEntity)
-            }
-            .frame(height: 400)
-            RealityView { content in
-                            // 立方体の生成
-                let arrowEntity = ModelEntity()
-
-                // メイン軸（青）
-                let mainShaft = ModelEntity(
-                    mesh: .generateCylinder(height: 0.5, radius: 0.03),
-                    materials: [SimpleMaterial(color: .blue, isMetallic: true)]
-                )
-                mainShaft.position.y = 0.5
-
-                // 矢先（赤）
-                let arrowHead = ModelEntity(
-                    mesh: .generateCone(height: 0.3, radius: 0.1),
-                    materials: [SimpleMaterial(color: .red, isMetallic: true)]
-                )
-                arrowHead.position.y = 0.65
-
-                // 方向マーカー（X軸）
-                let xMarker = ModelEntity(
-                    mesh: .generateBox(size: [1, 0.02, 0.02]),
-                    materials: [SimpleMaterial(color: .red, isMetallic: false)]
-                )
-                xMarker.position.x = 0.1
-
-                // 方向マーカー（Z軸）
-                let zMarker = ModelEntity(
-                    mesh: .generateBox(size: [0.02, 0.02, 1]),
-                    materials: [SimpleMaterial(color: .green, isMetallic: false)]
-                )
-                zMarker.position.z = 0.09
-
-                // ベースプレート（方向判別用）
-                let basePlate = ModelEntity(
-                    mesh: .generateBox(size: [0.2, 0.01, 0.2]),
-                    materials: [SimpleMaterial(color: .gray, roughness: 0.5, isMetallic: true)]
-                )
-                basePlate.position.y = -0.005
-
-                // 全パーツを追加
-                arrowEntity.addChild(mainShaft)
-                arrowEntity.addChild(arrowHead)
-                arrowEntity.addChild(xMarker)
-                arrowEntity.addChild(zMarker)
-                arrowEntity.addChild(basePlate)
-                        // コンテンツ追加
-                // 姿勢更新ハンドラ
-                let controller = RotationController(entity: arrowEntity)
-                    content.add(arrowEntity)
+                    .sink { rotation in
+                        controller.bind(rotationPublisher: Just(rotation).eraseToAnyPublisher())
+                    }
+                    .store(in: &controller.cancellables)
                 
-                    // Combineによる更新
-                Carv2DataPair.shared.$left
-                    .map(\.realityKitRotation2)
-                        .eraseToAnyPublisher() // 型変換を明示化
-                        .sink { rotation in
-                            controller.bind(rotationPublisher: Just(rotation).eraseToAnyPublisher())
-                        }
-                        .store(in: &controller.cancellables)
-                content.add(arrowEntity)
+                // センサーデータとARセッション情報を統合
+
             }
             .frame(height: 400)
+            
             RealityView { content in
-                            // 立方体の生成
-                let arrowEntity = ModelEntity()
-
-                // メイン軸（青）
-                let mainShaft = ModelEntity(
-                    mesh: .generateCylinder(height: 0.5, radius: 0.03),
-                    materials: [SimpleMaterial(color: .blue, isMetallic: true)]
-                )
-                mainShaft.position.y = 0.5
-
-                // 矢先（赤）
-                let arrowHead = ModelEntity(
-                    mesh: .generateCone(height: 0.3, radius: 0.1),
-                    materials: [SimpleMaterial(color: .red, isMetallic: true)]
-                )
-                arrowHead.position.y = 0.65
-
-                // 方向マーカー（X軸）
-                let xMarker = ModelEntity(
-                    mesh: .generateBox(size: [1, 0.02, 0.02]),
-                    materials: [SimpleMaterial(color: .red, isMetallic: false)]
-                )
-                xMarker.position.x = 0.1
-
-                // 方向マーカー（Z軸）
-                let zMarker = ModelEntity(
-                    mesh: .generateBox(size: [0.02, 0.02, 1]),
-                    materials: [SimpleMaterial(color: .green, isMetallic: false)]
-                )
-                zMarker.position.z = 0.09
-
-                // ベースプレート（方向判別用）
-                let basePlate = ModelEntity(
-                    mesh: .generateBox(size: [0.2, 0.01, 0.2]),
-                    materials: [SimpleMaterial(color: .gray, roughness: 0.5, isMetallic: true)]
-                )
-                basePlate.position.y = -0.005
-
-                // 全パーツを追加
-                arrowEntity.addChild(mainShaft)
-                arrowEntity.addChild(arrowHead)
-                arrowEntity.addChild(xMarker)
-                arrowEntity.addChild(zMarker)
-                arrowEntity.addChild(basePlate)
-                        // コンテンツ追加
-                // 姿勢更新ハンドラ
+                // カメラ設定（空間追跡有効化）
+                content.camera = .spatialTracking
+                
+                
+                let arrowEntity = createArrowEntity()
+                let worldAnchor = AnchorEntity(world: .zero)
+                worldAnchor.addChild(arrowEntity)
+                content.add(worldAnchor)
+                
+                if let cameraTransform = content.cameraTarget?.transform {
+                    arrowEntity.transform.translation = cameraTransform.translation
+                }
+                
+                // 姿勢更新コントローラー
                 let controller = RotationController(entity: arrowEntity)
-                    // Combineによる更新
+                
+                // センサーデータ購読
                 Carv2DataPair.shared.$left
-                    .map(\.realityKitRotation3)
-                        .eraseToAnyPublisher() // 型変換を明示化
-                        .sink { rotation in
-                            controller.bind(rotationPublisher: Just(rotation).eraseToAnyPublisher())
-                        }
-                        .store(in: &controller.cancellables)
-                content.add(arrowEntity)
+                    .map(\.realityKitRotation)
+                    .sink { rotation in
+                        controller.bind(rotationPublisher: Just(rotation).eraseToAnyPublisher())
+                    }
+                    .store(in: &controller.cancellables)
+            } update: { content in
+                // フレーム更新処理
+                guard let currentFrame = arSession.currentFrame else { return }
+                
+                // デバイスの姿勢情報取得
+                let deviceTransform = currentFrame.camera.transform
+                let deviceRotation = simd_quatf(deviceTransform)
+                
+                // 磁北補正
+                if let heading = locationManager.heading {
+                    let northRotation = simd_quatf(
+                        angle: Float(-heading.magneticHeading).degreesToRadians,
+                        axis: [0, 1, 0]
+                    )
+                    
+                    // センサーデータと統合
+                    let correctedRotation = deviceRotation * northRotation
+                    content.entities[0].transform.rotation = correctedRotation
+                }
+                
+                // センサーデータ適用
+                content.entities[0].transform.rotation = simd_quatf(carv2DataPair.left.realityKitRotation)
             }
             .frame(height: 400)
         }
@@ -295,57 +193,6 @@ extension Carv2DataPair {
 
 
 
-struct DeviceRow: View {
-    @ObservedObject var device: CarvDevice
-    let ble: BluethoothCentralManager
-    
-    var body: some View {
-        VStack(alignment: .leading) {
-            Text(device.id.uuidString)
-                .font(.headline)
-            Text("State: \(device.connectionState.rawValue)")
-                .font(.subheadline)
-            Text(device.peripheral.name ?? "(unknown)")
-//            Text(device.carv2DataPaird.right.attitude.description)
-            HStack {
-                Button(action: { ble.connect(carvDevice: device) }) {
-                    Text("Connect")
-                }
-                .disabled(device.connectionState == .connected)
-                
-                
-                if let service = device.services.first {
-                    Button(action: { ble.subscribe(servece: service) }) {
-                        Text("Subscribe")
-                    }
-                }
-            }
-            
-            if !device.services.isEmpty {
-                            Text("Services:")
-                                .font(.headline)
-                
-                            ForEach(device.services, id: \.uuid) { service in
-                                Text(service.uuid.uuidString)
-                                    .font(.caption)
-                                Button(action: {
-                                    device.subscribeAttitude()
-                                }) {
-                                    Text("Subscribe")
-                                }
-//                                .disabled(
-//                                    device.connectionState != .connected
-//                                )
-                                
-//                                Button(action: { device.unsubscribeAttitude() }) {
-//                                    Text("Unsubscribe")
-//                                }
-//                                .disabled(device.connectionState == .connected)
-                            }
-                        }
-        }
-    }
-}
 
 
 

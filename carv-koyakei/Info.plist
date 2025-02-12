@@ -2,14 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>NSBluetoothPeripheralUsageDescription</key>
-	<string>ｐつかう</string>
-	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>つかう</string>
 	<key>NSBluetoothServices</key>
 	<array>
 		<string></string>
 	</array>
+	<key>NSWorldSensingUsageDescription</key>
+	<string></string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>bluetooth-central</string>
