@@ -88,8 +88,7 @@ struct ContentView: View {
             arrowEntity.addChild(zMarker)
             arrowEntity.addChild(basePlate)
             
-            // 中央固定設定
-            arrowEntity.position = [0, 0, -2] // カメラ前方1m
+            // 中央固定設定// カメラ前方1m
             return arrowEntity
         }
         
@@ -100,67 +99,26 @@ struct ContentView: View {
                 
                 
                 let arrowEntity = createArrowEntity()
-                let worldAnchor = AnchorEntity(world: .zero)
+                let worldAnchor = AnchorEntity(.camera)
                 worldAnchor.addChild(arrowEntity)
                 content.add(worldAnchor)
-                
+                worldAnchor.position.z = -2
+                worldAnchor.name = "ArrowAnchor"
                 if let cameraTransform = content.cameraTarget?.transform {
                     arrowEntity.transform.translation = cameraTransform.translation
                 }
                 
                 // 姿勢更新コントローラー
-                let controller = RotationController(entity: arrowEntity)
+              
+            } update: { content in
+                if let arrow = content.entities.first(where: { $0.name == "ArrowAnchor" }) {
+                    arrow.transform.rotation = simd_quatf(Carv2DataPair.shared.left.realityKitRotation)
+                }
                 
-                // センサーデータ購読
-                Carv2DataPair.shared.$left
-                    .map(\.realityKitRotation)
-                    .sink { rotation in
-                        controller.bind(rotationPublisher: Just(rotation).eraseToAnyPublisher())
-                    }
-                    .store(in: &controller.cancellables)
-
             }
             .frame(height: 400)
             
-            RealityView { content in
-                // カメラ設定（空間追跡有効化）
-                content.camera = .spatialTracking
-                
-                
-                let arrowEntity = createArrowEntity()
-                let worldAnchor = AnchorEntity(world: .zero)
-                worldAnchor.addChild(arrowEntity)
-                content.add(worldAnchor)
-                
-                if let cameraTransform = content.cameraTarget?.transform {
-                    arrowEntity.transform.translation = cameraTransform.translation
-                }
-                
-//                 姿勢更新コントローラー
-                let controller = RotationController(entity: arrowEntity)
-                
-                // センサーデータ購読
-                Carv2DataPair.shared.$left
-                    .map(\.realityKitRotation)
-                    .sink { rotation in
-                        controller.bind(rotationPublisher: Just(rotation).eraseToAnyPublisher())
-                    }
-                    .store(in: &controller.cancellables)
-            } update: { content in
-                // フレーム更新処理
-                guard let currentFrame = arSession.currentFrame else { return }
-                
-                // デバイスの姿勢情報取得
-                let deviceTransform = currentFrame.camera.transform
-                if let arrow = content.entities.first {
-//                                    arrow.position = worldPosition
-                                    arrow.transform.rotation = simd_quatf(carv2DataPair.left.realityKitRotation)
-                                }
-                
-                // センサーデータ適用
-//                content.entities[0].transform.rotation = simd_quatf(carv2DataPair.left.realityKitRotation)
-            }
-            .frame(height: 400)
+            
         }
     }
    
