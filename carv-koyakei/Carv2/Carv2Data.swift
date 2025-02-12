@@ -53,7 +53,7 @@ class Carv2Data {
                                 
                                 r: cmQuat.vector.w)
         
-    return Rotation3D( deviceQuat  * simd_quatd(angle: .pi / 2.0, axis: [1,0,0]))
+    return Rotation3D( deviceQuat)
         }
     var realityKitRotation: Rotation3D {
             let attitude = self.attitude

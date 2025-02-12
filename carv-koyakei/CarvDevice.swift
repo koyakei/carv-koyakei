@@ -106,14 +106,11 @@ func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CB
                 DispatchQueue.main.async {
                     Carv2DataPair.shared.right = Carv2Data(rightData: data1)
                 }
-                print("right \(carv2DataPair.right.attitude)")
             }
             if peripheral.identifier == Carv2Data.leftCharactaristicUUID {
                 DispatchQueue.main.async {
                     Carv2DataPair.shared.left = Carv2Data(leftData: data1)
                 }
-//                print("left \(carv2DataPair.left.attitude) right \(carv2DataPair.right.attitude)")
-                print("left \(carv2DataPair.left.attitude)")
             }
         }
         

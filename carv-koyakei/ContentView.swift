@@ -44,7 +44,7 @@ struct ContentView: View {
             }
         }
         
-        var createArrowEntity = {
+        let createArrowEntity = {
             // 矢印エンティティの生成
             // メイン軸（青）
             let mainShaft = ModelEntity(
@@ -96,27 +96,18 @@ struct ContentView: View {
             RealityView { content in
                 // カメラ設定（空間追跡有効化）
                 content.camera = .spatialTracking
-                let configuration = ARWorldTrackingConfiguration()
-                arSession.run(configuration)
-                
                 let arrowEntity = createArrowEntity()
                 let worldAnchor = AnchorEntity(.camera)
                 worldAnchor.addChild(arrowEntity)
                 content.add(worldAnchor)
                 worldAnchor.position.z = -2
                 worldAnchor.name = "ArrowAnchor"
-              
             } update: { content in
-                if let cameraTransForm  = arSession.currentFrame?.camera.transform {
-                   guard let rotation = Pose3D(cameraTransForm)?.rotation else { return }
                 if let arrow = content.entities.first(where: { $0.name == "ArrowAnchor" }) {
-                    arrow.transform.rotation = simd_quatf(rotation).inverse * simd_quatf(Carv2DataPair.shared.left.realityKitRotation)
-                }
+                    arrow.setOrientation(simd_quatf(Carv2DataPair.shared.left.realityKitRotation), relativeTo: nil)
                 }
             }
             .frame(height: 400)
-            
-            
         }
     }
    
