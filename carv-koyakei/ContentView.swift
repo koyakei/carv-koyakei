@@ -96,7 +96,8 @@ struct ContentView: View {
             RealityView { content in
                 // カメラ設定（空間追跡有効化）
                 content.camera = .spatialTracking
-                
+                let configuration = ARWorldTrackingConfiguration()
+                arSession.run(configuration)
                 
                 let arrowEntity = createArrowEntity()
                 let worldAnchor = AnchorEntity(.camera)
@@ -104,17 +105,14 @@ struct ContentView: View {
                 content.add(worldAnchor)
                 worldAnchor.position.z = -2
                 worldAnchor.name = "ArrowAnchor"
-                if let cameraTransform = content.cameraTarget?.transform {
-                    arrowEntity.transform.translation = cameraTransform.translation
-                }
-                
-                // 姿勢更新コントローラー
               
             } update: { content in
+                if let cameraTransForm  = arSession.currentFrame?.camera.transform {
+                   guard let rotation = Pose3D(cameraTransForm)?.rotation else { return }
                 if let arrow = content.entities.first(where: { $0.name == "ArrowAnchor" }) {
-                    arrow.transform.rotation = simd_quatf(Carv2DataPair.shared.left.realityKitRotation)
+                    arrow.transform.rotation = simd_quatf(rotation).inverse * simd_quatf(Carv2DataPair.shared.left.realityKitRotation)
                 }
-                
+                }
             }
             .frame(height: 400)
             
