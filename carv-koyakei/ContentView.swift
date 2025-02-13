@@ -46,12 +46,12 @@ struct ContentView: View {
         
         let createArrowEntity = {
             // 矢印エンティティの生成
-            // メイン軸（青）
+            // メイン軸（青）Y軸
             let mainShaft = ModelEntity(
                 mesh: .generateCylinder(height: 0.5, radius: 0.03),
                 materials: [SimpleMaterial(color: .blue, isMetallic: true)]
             )
-            mainShaft.position.y = 0.5
+            mainShaft.position.y = 0.25
 
             // 矢先（赤）
             let arrowHead = ModelEntity(
@@ -65,14 +65,14 @@ struct ContentView: View {
                 mesh: .generateBox(size: [1, 0.02, 0.02]),
                 materials: [SimpleMaterial(color: .red, isMetallic: false)]
             )
-            xMarker.position.x = 0.1
+            xMarker.position.x = 0.2
 
             // 方向マーカー（Z軸）
             let zMarker = ModelEntity(
                 mesh: .generateBox(size: [0.02, 0.02, 1]),
                 materials: [SimpleMaterial(color: .green, isMetallic: false)]
             )
-            zMarker.position.z = 0.09
+            zMarker.position.z = 0.2
 
             // ベースプレート（方向判別用）
             let basePlate = ModelEntity(
@@ -105,6 +105,7 @@ struct ContentView: View {
                 let leftBootsAnchor = bootsAnchor()
                 leftBootsAnchor.position.x = -0.5
                 leftBootsAnchor.name = "LeftArrowAnchor"
+                // 左X マイナスがスキーの方向
                 let rightBootsAnchor = bootsAnchor()
                 rightBootsAnchor.position.x = 0.5
                 rightBootsAnchor.name = "RightArrowAnchor"
@@ -112,10 +113,10 @@ struct ContentView: View {
                 content.add(rightBootsAnchor)
             } update: { content in
                 if let arrow = content.entities.first(where: { $0.name == "LeftArrowAnchor" }) {
-                    arrow.setOrientation(simd_quatf(Carv2DataPair.shared.right.realityKitRotation3), relativeTo: nil)
+                    arrow.setOrientation(simd_quatf(Carv2DataPair.shared.left.leftRealityKitRotation), relativeTo: nil)
                 }
                 if let arrow = content.entities.first(where: { $0.name == "RightArrowAnchor" }) {
-                    arrow.setOrientation(simd_quatf(Carv2DataPair.shared.right.rightRealityKitRotation), relativeTo: nil)
+                    arrow.setOrientation(simd_quatf(Carv2DataPair.shared.right.rightRealityKitRotation) , relativeTo: nil)
                 }
             }
             .frame(height: 400)
