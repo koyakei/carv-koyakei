@@ -10,6 +10,9 @@ import ARKit
 struct ContentView: View {
     @State private var arSession = ARSession()
     @State private var locationManager = CLLocationManager()
+    @State private var parallelAngle = {
+        getSignedAngleBetweenQuaternions(q1: simd_quatf(Carv2DataPair.shared.left.leftRealityKitRotation), q2:  simd_quatf(Carv2DataPair.shared.right.rightRealityKitRotation) )
+    }
     func formatQuaternion(_ quat: simd_quatd) -> String {
         let components = [quat.real, quat.imag.x, quat.imag.y, quat.imag.z]
         
@@ -30,7 +33,7 @@ struct ContentView: View {
     @StateObject var carv2DataPair: Carv2DataPair = Carv2DataPair.shared
     var body: some View {
         VStack {
-            Text(formatQuaternion(Carv2DataPair.shared.left.attitude.quaternion))
+            Text(parallelAngle().description)
             Button(action: { ble.scan() }) {
                 Text("Scan")
             }
@@ -150,4 +153,38 @@ extension Rotation3D {
         let axis = quaternion.axis
         return (CGFloat(axis.x), CGFloat(axis.y), CGFloat(axis.z))
     }
+}
+import simd
+
+func getSignedAngleBetweenQuaternions(q1: simd_quatf, q2: simd_quatf) -> Float {
+    // -X軸方向の基準ベクトル
+    let minusX = simd_float3(-1, 0, 0)
+    
+    // 各クオータニオンで回転後のベクトルを取得
+    let v1 = q1.act(minusX)
+    let v2 = q2.act(minusX)
+    
+    // YZ平面への投影
+    let proj1 = simd_float3(0, v1.y, v1.z)
+    let proj2 = simd_float3(0, v2.y, v2.z)
+    
+    // 正規化
+    let norm1 = simd_normalize(proj1)
+    let norm2 = simd_normalize(proj2)
+    
+    // ゼロベクトルチェック
+    if norm1 == .zero || norm2 == .zero {
+        return 0
+    }
+    
+    // 内積と外積計算
+    let dot = simd_dot(norm1, norm2)
+    let cross = simd_cross(norm1, norm2)
+    
+    // 角度計算（符号付き）
+    let angleRad = atan2(cross.x, dot)
+    let angleDeg = angleRad * (180 / .pi)
+    
+    // 角度を-180°～180°に正規化
+    return angleDeg.truncatingRemainder(dividingBy: 360) - (angleDeg > 180 ? 360 : 0) + (angleDeg < -180 ? 360 : 0)
 }
