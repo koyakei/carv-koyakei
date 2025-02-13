@@ -91,20 +91,31 @@ struct ContentView: View {
             // 中央固定設定// カメラ前方1m
             return arrowEntity
         }
-        
+        let bootsAnchor = {
+            let arrowEntity = createArrowEntity()
+            let worldAnchor = AnchorEntity(.camera)
+            worldAnchor.addChild(arrowEntity)
+            worldAnchor.position.z = -2
+            return worldAnchor
+        }
         HStack {
             RealityView { content in
                 // カメラ設定（空間追跡有効化）
                 content.camera = .spatialTracking
-                let arrowEntity = createArrowEntity()
-                let worldAnchor = AnchorEntity(.camera)
-                worldAnchor.addChild(arrowEntity)
-                content.add(worldAnchor)
-                worldAnchor.position.z = -2
-                worldAnchor.name = "ArrowAnchor"
+                let leftBootsAnchor = bootsAnchor()
+                leftBootsAnchor.position.x = -0.5
+                leftBootsAnchor.name = "LeftArrowAnchor"
+                let rightBootsAnchor = bootsAnchor()
+                rightBootsAnchor.position.x = 0.5
+                rightBootsAnchor.name = "RightArrowAnchor"
+                content.add(leftBootsAnchor)
+                content.add(rightBootsAnchor)
             } update: { content in
-                if let arrow = content.entities.first(where: { $0.name == "ArrowAnchor" }) {
-                    arrow.setOrientation(simd_quatf(Carv2DataPair.shared.left.realityKitRotation), relativeTo: nil)
+                if let arrow = content.entities.first(where: { $0.name == "LeftArrowAnchor" }) {
+                    arrow.setOrientation(simd_quatf(Carv2DataPair.shared.right.realityKitRotation3), relativeTo: nil)
+                }
+                if let arrow = content.entities.first(where: { $0.name == "RightArrowAnchor" }) {
+                    arrow.setOrientation(simd_quatf(Carv2DataPair.shared.right.rightRealityKitRotation), relativeTo: nil)
                 }
             }
             .frame(height: 400)
@@ -123,65 +134,10 @@ extension simd_quatf {
         )
     }
 }
-// Carv2DataPairの拡張
-extension Carv2DataPair {
-    var rotationPublisher: AnyPublisher<Rotation3D, Never> {
-        $left.map(\.attitude).eraseToAnyPublisher()
-    }
-}
-
-
-
-
-
 
 
 #Preview {
     ContentView()
-}
-
-
-struct Arrow3DView: View {
-    var rotation: Rotation3D
-    
-    var body: some View {
-        ZStack {
-            // 3D矢印の本体
-            RoundedRectangle(cornerRadius: 8)
-                .fill(Color.blue)
-                .frame(width: 100, height: 20)
-                .offset(x: 40, y: 0)
-            
-            // 矢印の頭（3D用に調整）
-            Triangle()
-                .fill(Color.red)
-                .frame(width: 30, height: 20)
-                .offset(x: 60, y: 0)
-        }
-        .frame(width: 200, height: 200)
-        .rotation3DEffect(
-            rotation.angle,
-            axis: rotation.axis,
-            anchor: .center,
-            perspective: 0.5
-        )
-        .clipped()
-        .overlay(
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(Color.black, lineWidth: 1)
-        )
-    }
-}
-
-// 三角形シェイプのカスタム定義
-struct Triangle: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        path.move(to: CGPoint(x: rect.minX, y: rect.minY))
-        path.addLine(to: CGPoint(x: rect.maxX, y: rect.midY))
-        path.addLine(to: CGPoint(x: rect.minX, y: rect.maxY))
-        return path
-    }
 }
 
 extension Rotation3D {

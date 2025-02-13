@@ -34,28 +34,27 @@ class Carv2Data {
         
         // クォータニオン取得（CM → SIMD変換）
         let cmQuat = attitude.quaternion
-    let deviceQuat = simd_quatd(ix: -cmQuat.vector.z,
-                                iy: cmQuat.vector.x,
-                                iz: -cmQuat.vector.y,
-                                
-                                r: -cmQuat.vector.w)
+        let deviceQuat = simd_quatd(ix: cmQuat.vector.x,
+                                    iy: cmQuat.vector.y,
+                                    iz: cmQuat.vector.z,
+                                    
+                                    r: -cmQuat.vector.w)
         
     return Rotation3D( deviceQuat  * simd_quatd(angle: .pi / 2.0, axis: [0,1,0]))
         }
-    var realityKitRotation2: Rotation3D {
+    var rightRealityKitRotation: Rotation3D {
         let attitude = self.attitude
         
         // クォータニオン取得（CM → SIMD変換）
         let cmQuat = attitude.quaternion
-    let deviceQuat = simd_quatd(ix: -cmQuat.vector.x,
-                                iy: cmQuat.vector.y,
-                                iz: -cmQuat.vector.z,
-                                
-                                r: cmQuat.vector.w)
-        
-    return Rotation3D( deviceQuat)
-        }
-    var realityKitRotation: Rotation3D {
+        let deviceQuat = simd_quatd(ix: cmQuat.vector.z,
+                                    iy: cmQuat.vector.x,
+                                    iz: cmQuat.vector.y,
+                                    r: -cmQuat.vector.w)
+        return Rotation3D( deviceQuat)
+    }
+    
+    var leftRealityKitRotation: Rotation3D {
             let attitude = self.attitude
             
             // クォータニオン取得（CM → SIMD変換）
