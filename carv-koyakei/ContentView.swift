@@ -132,7 +132,6 @@ struct ContentView: View {
             .frame(height: 400)
         }.onAppear {
             conductor.start()
-            
             // 0.1秒間隔で角度を監視
             Timer.publish(every: 0.1, on: .main, in: .common)
                 .autoconnect()
@@ -142,6 +141,11 @@ struct ContentView: View {
                     var angle = getSignedAngleBetweenQuaternions(q1: q1, q2: q2)
                     
                     angle = angle.isNaN ? 0 : angle
+                    if angle.sign == .plus {
+                        conductor?.changeWaveFormToSin()
+                    } else {
+                        conductor?.changeWaveFormToTriangle()
+                    }
                     let step = Float(ceil(angle / 3))
                     let frequency = ToneStep.hight(step)
                     
