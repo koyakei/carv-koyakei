@@ -8,6 +8,9 @@ import Spatial
 import simd
 import ARKit
 struct ContentView: View {
+    @StateObject private var conductor = DynamicOscillatorConductor()
+    @State private var timer: Timer?
+    @State private var cancellables = Set<AnyCancellable>()
     @State private var arSession = ARSession()
     @State private var locationManager = CLLocationManager()
     @State private var parallelAngle = {
@@ -35,6 +38,9 @@ struct ContentView: View {
         VStack {
             Text("parallel angle")
             Text(parallelAngle().description)
+            Button(action: { conductor.data.isPlaying.toggle()}){
+                Text("start")
+            }
             Button(action: { ble.scan() }) {
                 Text("Scan")
             }
@@ -124,6 +130,29 @@ struct ContentView: View {
                 }
             }
             .frame(height: 400)
+        }.onAppear {
+            conductor.start()
+            
+            // 0.1秒間隔で角度を監視
+            Timer.publish(every: 0.1, on: .main, in: .common)
+                .autoconnect()
+                .sink { [weak conductor] _ in
+                    let q1 = simd_quatf(Carv2DataPair.shared.left.leftRealityKitRotation)
+                    let q2 = simd_quatf(Carv2DataPair.shared.right.rightRealityKitRotation)
+                    var angle = getSignedAngleBetweenQuaternions(q1: q1, q2: q2)
+                    
+                    angle = angle.isNaN ? 0 : angle
+                    let step = Float(ceil(angle / 3))
+                    let frequency = ToneStep.hight(step)
+                    
+                    conductor?.data.frequency = AUValue(frequency)
+                    conductor?.data.detuningOffset = AUValue(frequency)
+                }
+                .store(in: &cancellables)
+        }
+        .onDisappear {
+            timer?.invalidate()
+            conductor.stop()
         }
     }
    
