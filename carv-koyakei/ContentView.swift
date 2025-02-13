@@ -33,6 +33,7 @@ struct ContentView: View {
     @StateObject var carv2DataPair: Carv2DataPair = Carv2DataPair.shared
     var body: some View {
         VStack {
+            Text("parallel angle")
             Text(parallelAngle().description)
             Button(action: { ble.scan() }) {
                 Text("Scan")
