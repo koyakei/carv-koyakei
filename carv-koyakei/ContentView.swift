@@ -36,10 +36,9 @@ struct ContentView: View {
     @StateObject var carv2DataPair: Carv2DataPair = Carv2DataPair.shared
     var body: some View {
         VStack {
-            Text("parallel angle")
-            Text(parallelAngle().description)
+            Text("parallel angle \(ceil(parallelAngle()))")
             Button(action: { conductor.data.isPlaying.toggle()}){
-                Text("start")
+                conductor.data.isPlaying ? Text("stop paralell tone") : Text("start paralell tone")
             }
             Button(action: { ble.scan() }) {
                 Text("Scan")
@@ -109,27 +108,28 @@ struct ContentView: View {
             return worldAnchor
         }
         HStack {
-            RealityView { content in
-                // カメラ設定（空間追跡有効化）
-                content.camera = .spatialTracking
-                let leftBootsAnchor = bootsAnchor()
-                leftBootsAnchor.position.x = -0.5
-                leftBootsAnchor.name = "LeftArrowAnchor"
-                // 左X マイナスがスキーの方向
-                let rightBootsAnchor = bootsAnchor()
-                rightBootsAnchor.position.x = 0.5
-                rightBootsAnchor.name = "RightArrowAnchor"
-                content.add(leftBootsAnchor)
-                content.add(rightBootsAnchor)
-            } update: { content in
-                if let arrow = content.entities.first(where: { $0.name == "LeftArrowAnchor" }) {
-                    arrow.setOrientation(simd_quatf(Carv2DataPair.shared.left.leftRealityKitRotation), relativeTo: nil)
-                }
-                if let arrow = content.entities.first(where: { $0.name == "RightArrowAnchor" }) {
-                    arrow.setOrientation(simd_quatf(Carv2DataPair.shared.right.rightRealityKitRotation) , relativeTo: nil)
-                }
-            }
-            .frame(height: 400)
+            //ARView
+//            RealityView { content in
+//                // カメラ設定（空間追跡有効化）
+//                content.camera = .spatialTracking
+//                let leftBootsAnchor = bootsAnchor()
+//                leftBootsAnchor.position.x = -0.5
+//                leftBootsAnchor.name = "LeftArrowAnchor"
+//                // 左X マイナスがスキーの方向
+//                let rightBootsAnchor = bootsAnchor()
+//                rightBootsAnchor.position.x = 0.5
+//                rightBootsAnchor.name = "RightArrowAnchor"
+//                content.add(leftBootsAnchor)
+//                content.add(rightBootsAnchor)
+//            } update: { content in
+//                if let arrow = content.entities.first(where: { $0.name == "LeftArrowAnchor" }) {
+//                    arrow.setOrientation(simd_quatf(Carv2DataPair.shared.left.leftRealityKitRotation), relativeTo: nil)
+//                }
+//                if let arrow = content.entities.first(where: { $0.name == "RightArrowAnchor" }) {
+//                    arrow.setOrientation(simd_quatf(Carv2DataPair.shared.right.rightRealityKitRotation) , relativeTo: nil)
+//                }
+//            }
+//            .frame(height: 400)
         }.onAppear {
             conductor.start()
             // 0.1秒間隔で角度を監視
