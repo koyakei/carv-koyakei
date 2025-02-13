@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		221E10B32D571635003B5AAF /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 221E10B22D57162D003B5AAF /* README.md */; };
+		2259D29A2D5DDCDE007658AB /* SoundpipeAudioKit in Frameworks */ = {isa = PBXBuildFile; productRef = 2259D2992D5DDCDE007658AB /* SoundpipeAudioKit */; };
+		2259D29D2D5DDCE8007658AB /* AudioKitUI in Frameworks */ = {isa = PBXBuildFile; productRef = 2259D29C2D5DDCE8007658AB /* AudioKitUI */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -82,6 +84,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2259D29D2D5DDCE8007658AB /* AudioKitUI in Frameworks */,
+				2259D29A2D5DDCDE007658AB /* SoundpipeAudioKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -143,6 +147,8 @@
 			);
 			name = "carv-koyakei";
 			packageProductDependencies = (
+				2259D2992D5DDCDE007658AB /* SoundpipeAudioKit */,
+				2259D29C2D5DDCE8007658AB /* AudioKitUI */,
 			);
 			productName = "carv-koyakei";
 			productReference = 22A73C732D4241AB00C1BF1C /* carv-koyakei.app */;
@@ -226,6 +232,10 @@
 			);
 			mainGroup = 22A73C6A2D4241AB00C1BF1C;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				2259D2982D5DDCDE007658AB /* XCRemoteSwiftPackageReference "SoundpipeAudioKit" */,
+				2259D29B2D5DDCE8007658AB /* XCRemoteSwiftPackageReference "AudioKitUI" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 22A73C742D4241AB00C1BF1C /* Products */;
 			projectDirPath = "";
@@ -637,6 +647,38 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		2259D2982D5DDCDE007658AB /* XCRemoteSwiftPackageReference "SoundpipeAudioKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AudioKit/SoundpipeAudioKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.6.1;
+			};
+		};
+		2259D29B2D5DDCE8007658AB /* XCRemoteSwiftPackageReference "AudioKitUI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AudioKit/AudioKitUI.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.3.7;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		2259D2992D5DDCDE007658AB /* SoundpipeAudioKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2259D2982D5DDCDE007658AB /* XCRemoteSwiftPackageReference "SoundpipeAudioKit" */;
+			productName = SoundpipeAudioKit;
+		};
+		2259D29C2D5DDCE8007658AB /* AudioKitUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2259D29B2D5DDCE8007658AB /* XCRemoteSwiftPackageReference "AudioKitUI" */;
+			productName = AudioKitUI;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 22A73C6B2D4241AB00C1BF1C /* Project object */;
 }
