@@ -16,9 +16,13 @@ struct ContentView: View {
     @State private var parallelAngle = {
         getSignedAngleBetweenQuaternions(q1: simd_quatf(Carv2DataPair.shared.left.leftRealityKitRotation), q2:  simd_quatf(Carv2DataPair.shared.right.rightRealityKitRotation) )
     }
+    @State private var yawingRotationAngle : Float = 0
     @State private var parallelAngle2 : Double = 0
     private let leftAnchorName: String = "leftAnchor"
     private let rightAnchorName: String = "rightAnchor"
+    func diffA() -> Float {
+        ceil(Float(Carv2DataPair.shared.right.angularVelocity.y - Carv2DataPair.shared.left.angularVelocity.y) * 10)
+    }
     func formatQuaternion(_ quat: simd_quatd) -> String {
         let components = [quat.real, quat.imag.x, quat.imag.y, quat.imag.z]
         
@@ -59,6 +63,7 @@ struct ContentView: View {
     @StateObject var carv2DataPair: Carv2DataPair = Carv2DataPair.shared
     var body: some View {
         VStack {
+            Text("paralell rotation angle \(diffA())")
             Text("parallel angle \(ceil(parallelAngle()))")
             Text("parallel angle2 \(ceil(parallelAngle2))")
             Button(action: { conductor.data.isPlaying.toggle()}){
@@ -150,63 +155,75 @@ struct ContentView: View {
         }
         HStack {
             //ARView
-            RealityView { content in
-                // カメラ設定（空間追跡有効化）
-                content.camera = .virtual
-                let leftBootsAnchor = bootsAnchor()
-                leftBootsAnchor.position.x = -0.5
-                leftBootsAnchor.name = leftAnchorName
-                // 左X マイナスがスキーの方向
-                let rightBootsAnchor = bootsAnchor()
-                rightBootsAnchor.position.x = 0.5
-                rightBootsAnchor.name = rightAnchorName
-                content.add(leftBootsAnchor)
-                content.add(rightBootsAnchor)
-            } update: { content in
-                
-                guard let arrowLeft = content.entities.first(where: { $0.name == leftAnchorName }) else { return }
-                let cameraAlignment = simd_quatf(angle: .pi/2, axis: [0, 0, 1])
-                let finalQuat = cameraAlignment * simd_quatf(Carv2DataPair.shared.left.realityKitRotation3)
-//                arrowLeft.transform.rotation = simd_quatf(Carv2DataPair.shared.left.realityKitRotation3)
-                arrowLeft.setOrientation(convertSensorQuaternion(simd_quatf(Carv2DataPair.shared.left.realityKitRotation3)), relativeTo: nil)
-//                arrowLeft.setOrientation(worldUpOrientation , relativeTo: nil)
-                
-                guard let arrowRight = content.entities.first(where: { $0.name == rightAnchorName })else  { return }
-                    let worldUpOrientation2 = simd_quatf(
-                        angle: -0.0, // 追加回転不要
-                        axis: [0, 0, 1] // Y軸基準
-                    )
-                
-                arrowRight.setOrientation(convertSensorQuaternion(simd_quatf(Carv2DataPair.shared.left.realityKitRotation4)), relativeTo: nil)
-//                arrowRight.transform.rotation = simd_quatf(Carv2DataPair.shared.left.realityKitRotation4)
-//                arrowRight.setOrientation(simd_quatf(Carv2DataPair.shared.right.rightRealityKitRotation) * worldUpOrientation2, relativeTo: nil)
-                DispatchQueue.main.async {
-                    parallelAngle2 = Double(getSignedAngleBetweenQuaternions2(q1: arrowLeft.orientation(relativeTo: nil), q2: arrowRight.orientation(relativeTo: nil))) //Modifying state during view update, this will cause undefined behavior.
-                }
-
-            }
-            .frame(height: 400)
+//            RealityView { content in
+//                // カメラ設定（空間追跡有効化）
+//                content.camera = .virtual
+//                let leftBootsAnchor = bootsAnchor()
+//                leftBootsAnchor.position.x = -0.5
+//                leftBootsAnchor.name = leftAnchorName
+//                // 左X マイナスがスキーの方向
+//                let rightBootsAnchor = bootsAnchor()
+//                rightBootsAnchor.position.x = 0.5
+//                rightBootsAnchor.name = rightAnchorName
+//                content.add(leftBootsAnchor)
+//                content.add(rightBootsAnchor)
+//            } update: { content in
+//                
+//                guard let arrowLeft = content.entities.first(where: { $0.name == leftAnchorName }) else { return }
+//                let cameraAlignment = simd_quatf(angle: .pi/2, axis: [0, 0, 1])
+//                let finalQuat = cameraAlignment * simd_quatf(Carv2DataPair.shared.left.realityKitRotation3)
+////                arrowLeft.transform.rotation = simd_quatf(Carv2DataPair.shared.left.realityKitRotation3)
+//                arrowLeft.setOrientation(convertSensorQuaternion(simd_quatf(Carv2DataPair.shared.left.realityKitRotation3)), relativeTo: nil)
+////                arrowLeft.setOrientation(worldUpOrientation , relativeTo: nil)
+//                
+//                guard let arrowRight = content.entities.first(where: { $0.name == rightAnchorName })else  { return }
+//                    let worldUpOrientation2 = simd_quatf(
+//                        angle: -0.0, // 追加回転不要
+//                        axis: [0, 0, 1] // Y軸基準
+//                    )
+//                
+//                arrowRight.setOrientation(convertSensorQuaternion(simd_quatf(Carv2DataPair.shared.left.realityKitRotation4)), relativeTo: nil)
+////                arrowRight.transform.rotation = simd_quatf(Carv2DataPair.shared.left.realityKitRotation4)
+////                arrowRight.setOrientation(simd_quatf(Carv2DataPair.shared.right.rightRealityKitRotation) * worldUpOrientation2, relativeTo: nil)
+//                DispatchQueue.main.async {
+//                    parallelAngle2 = Double(getSignedAngleBetweenQuaternions2(q1: arrowLeft.orientation(relativeTo: nil), q2: arrowRight.orientation(relativeTo: nil))) //Modifying state during view update, this will cause undefined behavior.
+//                }
+//
+//            }
+//            .frame(height: 400)
         }.onAppear {
             conductor.start()
             // 0.1秒間隔で角度を監視
+//            Timer.publish(every: 0.1, on: .main, in: .common)
+//                .autoconnect()
+//                .sink { [weak conductor] _ in
+//                    let q1 = simd_quatf(Carv2DataPair.shared.left.leftRealityKitRotation)
+//                    let q2 = simd_quatf(Carv2DataPair.shared.right.rightRealityKitRotation)
+//                    var angle = getSignedAngleBetweenQuaternions(q1: q1, q2: q2)
+//                    
+//                    angle = angle.isNaN ? 0 : angle
+//                    if angle.sign == .plus {
+//                        conductor?.changeWaveFormToSin()
+//                    } else {
+//                        conductor?.changeWaveFormToTriangle()
+//                    }
+//                    let step = Float(ceil(angle / 3))
+//                    let frequency = ToneStep.hight(step)
+//                    
+//                    conductor?.data.frequency = AUValue(frequency)
+//                    conductor?.data.detuningOffset = AUValue(frequency)
+//                }
+//                .store(in: &cancellables)
             Timer.publish(every: 0.1, on: .main, in: .common)
                 .autoconnect()
                 .sink { [weak conductor] _ in
-                    let q1 = simd_quatf(Carv2DataPair.shared.left.leftRealityKitRotation)
-                    let q2 = simd_quatf(Carv2DataPair.shared.right.rightRealityKitRotation)
-                    var angle = getSignedAngleBetweenQuaternions(q1: q1, q2: q2)
-                    
-                    angle = angle.isNaN ? 0 : angle
-                    if angle.sign == .plus {
+                    conductor?.data.frequency = AUValue(ToneStep.hight(diffA()))
+                    if diffA() > 0 {
                         conductor?.changeWaveFormToSin()
                     } else {
                         conductor?.changeWaveFormToTriangle()
                     }
-                    let step = Float(ceil(angle / 3))
-                    let frequency = ToneStep.hight(step)
-                    
-                    conductor?.data.frequency = AUValue(frequency)
-                    conductor?.data.detuningOffset = AUValue(frequency)
+//                    conductor?.data.detuningOffset = AUValue(frequency)
                 }
                 .store(in: &cancellables)
         }

@@ -32,6 +32,7 @@ extension simd_quatf{
 class Carv2Data {
     var attitude: Rotation3D
     var acceleration: SIMD3<Float>
+    var angularVelocity : SIMD3<Float>
     static let rightCharactaristicUUID = UUID(uuidString: "85A29A4C-09C3-C632-858A-3387339C67CF")
     static let leftCharactaristicUUID = UUID(uuidString:  "850D8BCF-3B03-1322-F51C-DD38E961FC1A")
 
@@ -110,23 +111,22 @@ class Carv2Data {
     }
     public init(rightData data: Data) {
         let motionSensorData = Carv2Data.int16ToFloat(data: data)
-        attitude = Rotation3D(quaternion: simd_quatd(ix: motionSensorData.attitude.vector.x,
-                                          iy: motionSensorData.attitude.vector.y,
-                                          iz: motionSensorData.attitude.vector.z,
-                                          r: motionSensorData.attitude.vector.w))
+        attitude = motionSensorData.attitude
                      acceleration = motionSensorData.acceleration
+        angularVelocity = motionSensorData.angularVelocity
     }
     
     public init(leftData data: Data){
         let motionSensorData = Carv2Data.int16ToFloat(data: data)
         attitude = motionSensorData.attitude
         acceleration = motionSensorData.acceleration
-//        print("yaw: \(Angle2D(radians: attitude.eulerAngles(order: .xyz).angles.x).degrees), pitch: \(Angle2D(radians: attitude.eulerAngles(order: .xyz).angles.y).degrees), roll: \(Angle2D(radians: attitude.eulerAngles(order: .xyz).angles.z).degrees)" )
+        angularVelocity = motionSensorData.angularVelocity
     }
     private var cancellables = Set<AnyCancellable>()
     public init () {
         attitude = .identity
         acceleration = .zero
+        angularVelocity = .zero
     }
 }
 

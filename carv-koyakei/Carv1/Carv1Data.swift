@@ -36,7 +36,7 @@ public class Carv1Data :ObservableObject{
         let ax = Float(intbyte[i+4])  / 32768.0  * 16 * 9.8
         let ay = Float(intbyte[i+5])  / 32768.0  * 16 * 9.8
         let az = Float(intbyte[i+6])  / 32768.0  * 16 * 9.8
-        return MotionSensorData(attitude: Rotation3D.init(simd_quatf(ix: quatx, iy: quaty, iz: quatz, r: quatw)), acceleration:  SIMD3<Float>(x: ax, y: ay, z: az))
+        return MotionSensorData(attitude: Rotation3D.init(simd_quatf(ix: quatx, iy: quaty, iz: quatz, r: quatw)), acceleration:  SIMD3<Float>(x: ax, y: ay, z: az), angularVelocity: .zero)
     }
     public init(rightData data: Data) {
         let motionSensorData = Carv1Data.int16ToFloat(data: data)
