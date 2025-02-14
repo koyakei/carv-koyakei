@@ -7,26 +7,6 @@ import RealityKit
 import Spatial
 import simd
 import ARKit
-class AppDelegate: NSObject, UIApplicationDelegate {
-    func application(_ application: UIApplication,
-                   didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-        configureAudioSession()
-        return true
-    }
-    
-    private func configureAudioSession() {
-        do {
-            try AVAudioSession.sharedInstance().setCategory(
-                .playback,
-                mode: .default,
-                options: [.mixWithOthers, .allowAirPlay]
-            )
-            try AVAudioSession.sharedInstance().setActive(true)
-        } catch {
-            print("AVAudioSession設定エラー: \(error)")
-        }
-    }
-}
 struct ContentView: View {
     @StateObject private var conductor = DynamicOscillatorConductor()
     @State private var timer: Timer?
@@ -36,7 +16,7 @@ struct ContentView: View {
     @State private var parallelAngle = {
         getSignedAngleBetweenQuaternions(q1: simd_quatf(Carv2DataPair.shared.left.leftRealityKitRotation), q2:  simd_quatf(Carv2DataPair.shared.right.rightRealityKitRotation) )
     }
-    @State private var yawingRotationAngle : Float = 0
+    @ObservedObject var carv2DataPair = Carv2DataPair.shared // 値が更新されない
     @State private var parallelAngle2 : Double = 0
     private let leftAnchorName: String = "leftAnchor"
     private let rightAnchorName: String = "rightAnchor"
@@ -80,7 +60,7 @@ struct ContentView: View {
     @Environment(\.scenePhase) var scenePhase
     var body: some View {
         VStack {
-            Text("paralell rotation angle \(Carv2DataPair.shared.yawingAngulerRateDiffrential * 10)")
+            Text("paralell rotation angle \(carv2DataPair.yawingAngulerRateDiffrential * 10)")
             Text("parallel angle \(ceil(parallelAngle()))")
             Text("parallel angle2 \(ceil(parallelAngle2))")
             Button(action: { conductor.data.isPlaying.toggle()}){
@@ -210,35 +190,36 @@ struct ContentView: View {
 //            .frame(height: 400)
         }.onAppear {
             conductor.start()
-            Timer.publish(every: 0.1, on: .main, in: .common)
-                .autoconnect()
-                .sink { [weak conductor] _ in
-                    conductor?.data.frequency = AUValue(ToneStep.hight(ceil(Carv2DataPair.shared.yawingAngulerRateDiffrential * 10)))
-                    
-                    if (-1.0...1.0).contains(Carv2DataPair.shared.yawingAngulerRateDiffrential ) {
-                        conductor?.data.isPlaying = false
-                    } else {
-                        conductor?.data.isPlaying = true
-                    }
-                    if Carv2DataPair.shared.yawingAngulerRateDiffrential > 0 {
-                        conductor?.changeWaveFormToSin()
-                    } else {
-                        conductor?.changeWaveFormToTriangle()
-                    }
-                }
-                .store(in: &cancellables)
+            conductor.data.frequency = AUValue(440)
+//            Timer.publish(every: 2, on: .main, in: .common)
+//                .autoconnect()
+//                .sink { [weak conductor] _ in
+//                    conductor?.data.frequency = AUValue(ToneStep.hight(ceil(Carv2DataPair.shared.yawingAngulerRateDiffrential * 10)))
+//                    
+//                    if (-1.0...1.0).contains(Carv2DataPair.shared.yawingAngulerRateDiffrential ) {
+//                        conductor?.data.isPlaying = false
+//                    } else {
+//                        conductor?.data.isPlaying = true
+//                    }
+//                    if Carv2DataPair.shared.yawingAngulerRateDiffrential > 0 {
+//                        conductor?.changeWaveFormToSin()
+//                    } else {
+//                        conductor?.changeWaveFormToTriangle()
+//                    }
+//                }
+//                .store(in: &cancellables)
         }
         .onDisappear {
             timer?.invalidate()
             conductor.stop()
         }.onChange(of: scenePhase) {
-            if scenePhase == .background {
-                do {
-                    try AVAudioSession.sharedInstance().setActive(true)
-                } catch {
-                    print("バックグラウンドオーディオ維持失敗: \(error)")
-                }
-            }
+//            if scenePhase == .background {
+//                do {
+//                    try AVAudioSession.sharedInstance().setActive(true)
+//                } catch {
+//                    print("バックグラウンドオーディオ維持失敗: \(error)")
+//                }
+//            }
         }
     }
    

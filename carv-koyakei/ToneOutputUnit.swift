@@ -76,14 +76,16 @@ class DynamicOscillatorConductor: ObservableObject {
     func start() {
             osc.amplitude = 0.2
             do {
-                // バックグラウンド再生用のカテゴリ設定
                 try AVAudioSession.sharedInstance().setCategory(
-                    .playback,
-                    mode: .default,
-                    options: [.mixWithOthers, .allowAirPlay]
-                )
-                try engine.start()
-                try AVAudioSession.sharedInstance().setActive(true)
+                            .playAndRecord,
+                            mode: .videoRecording,
+                            options: [.mixWithOthers, .allowBluetooth, .defaultToSpeaker]
+                        )
+                        
+                        try AVAudioSession.sharedInstance().overrideOutputAudioPort(.speaker)
+                        try AVAudioSession.sharedInstance().setActive(true)
+                        
+                        try engine.start()
             } catch let err {
                 Log(err)
             }
