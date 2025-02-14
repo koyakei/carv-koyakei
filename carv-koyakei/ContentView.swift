@@ -7,6 +7,26 @@ import RealityKit
 import Spatial
 import simd
 import ARKit
+class AppDelegate: NSObject, UIApplicationDelegate {
+    func application(_ application: UIApplication,
+                   didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+        configureAudioSession()
+        return true
+    }
+    
+    private func configureAudioSession() {
+        do {
+            try AVAudioSession.sharedInstance().setCategory(
+                .playback,
+                mode: .default,
+                options: [.mixWithOthers, .allowAirPlay]
+            )
+            try AVAudioSession.sharedInstance().setActive(true)
+        } catch {
+            print("AVAudioSession設定エラー: \(error)")
+        }
+    }
+}
 struct ContentView: View {
     @StateObject private var conductor = DynamicOscillatorConductor()
     @State private var timer: Timer?
@@ -20,9 +40,6 @@ struct ContentView: View {
     @State private var parallelAngle2 : Double = 0
     private let leftAnchorName: String = "leftAnchor"
     private let rightAnchorName: String = "rightAnchor"
-    func diffA() -> Float {
-        ceil(Float(Carv2DataPair.shared.right.angularVelocity.y - Carv2DataPair.shared.left.angularVelocity.y) * 10)
-    }
     func formatQuaternion(_ quat: simd_quatd) -> String {
         let components = [quat.real, quat.imag.x, quat.imag.y, quat.imag.z]
         
@@ -61,9 +78,10 @@ struct ContentView: View {
     }
     @ObservedObject var ble = BluethoothCentralManager()
     @StateObject var carv2DataPair: Carv2DataPair = Carv2DataPair.shared
+    @Environment(\.scenePhase) var scenePhase
     var body: some View {
         VStack {
-            Text("paralell rotation angle \(diffA())")
+            Text("paralell rotation angle \(carv2DataPair.yawingAngulerRateDiffrential * 10)")
             Text("parallel angle \(ceil(parallelAngle()))")
             Text("parallel angle2 \(ceil(parallelAngle2))")
             Button(action: { conductor.data.isPlaying.toggle()}){
@@ -193,37 +211,21 @@ struct ContentView: View {
 //            .frame(height: 400)
         }.onAppear {
             conductor.start()
-            // 0.1秒間隔で角度を監視
-//            Timer.publish(every: 0.1, on: .main, in: .common)
-//                .autoconnect()
-//                .sink { [weak conductor] _ in
-//                    let q1 = simd_quatf(Carv2DataPair.shared.left.leftRealityKitRotation)
-//                    let q2 = simd_quatf(Carv2DataPair.shared.right.rightRealityKitRotation)
-//                    var angle = getSignedAngleBetweenQuaternions(q1: q1, q2: q2)
-//                    
-//                    angle = angle.isNaN ? 0 : angle
-//                    if angle.sign == .plus {
-//                        conductor?.changeWaveFormToSin()
-//                    } else {
-//                        conductor?.changeWaveFormToTriangle()
-//                    }
-//                    let step = Float(ceil(angle / 3))
-//                    let frequency = ToneStep.hight(step)
-//                    
-//                    conductor?.data.frequency = AUValue(frequency)
-//                    conductor?.data.detuningOffset = AUValue(frequency)
-//                }
-//                .store(in: &cancellables)
             Timer.publish(every: 0.1, on: .main, in: .common)
                 .autoconnect()
                 .sink { [weak conductor] _ in
-                    conductor?.data.frequency = AUValue(ToneStep.hight(diffA()))
-                    if diffA() > 0 {
+                    conductor?.data.frequency = AUValue(ToneStep.hight(ceil(carv2DataPair.yawingAngulerRateDiffrential * 10)))
+                    
+                    if (-1.0...1.0).contains(carv2DataPair.yawingAngulerRateDiffrential ) {
+                        conductor?.data.isPlaying = false
+                    } else {
+                        conductor?.data.isPlaying = true
+                    }
+                    if carv2DataPair.yawingAngulerRateDiffrential > 0 {
                         conductor?.changeWaveFormToSin()
                     } else {
                         conductor?.changeWaveFormToTriangle()
                     }
-//                    conductor?.data.detuningOffset = AUValue(frequency)
                 }
                 .store(in: &cancellables)
         }

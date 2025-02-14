@@ -6,7 +6,8 @@ import SwiftUI
      public static var shared: BluethoothCentralManager = .init()
      @Published var carvDeviceList: [CarvDevice] = []
      @Published var rotation3D: Rotation3D = .identity
-     @Published var carv2DataPair: Carv2DataPair = Carv2DataPair()
+     @Published var carv2DataPair: Carv2DataPair = Carv2DataPair.shared
+     
      var centralManager: CBCentralManager!
     static let targetServiceUUID = CBUUID(string: "2DFBFFFF-960D-4909-8D28-F353CB168E8A")
      @Published var carv2PeripheralLeft : Carv2PeripheralLeft?

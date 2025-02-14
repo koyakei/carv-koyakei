@@ -12,7 +12,7 @@ import SwiftUICore
 class Carv2DataPair : ObservableObject{
     @Published var left: Carv2Data = Carv2Data.init()
     @Published var right: Carv2Data = Carv2Data.init()
-    public static var shared: Carv2DataPair = .init()
+    public static let shared: Carv2DataPair = .init()
     var yawingSide: YawingSide = .straight
     static let periferalName = "CARV 2"
     func signedAngleBetweenUpVectors(q1: simd_quatd, q2: simd_quatd) -> Double {
@@ -24,6 +24,7 @@ class Carv2DataPair : ObservableObject{
         let sign = simd_dot(cross, baseUp) >= 0 ? 1.0 : -1.0
         return sign * angleBetweenUpVectors(q1: q1, q2: q2)
     }
+    var yawingAngulerRateDiffrential: Float { Float(right.angularVelocity.y - left.angularVelocity.y)}
     func angleBetweenUpVectors(q1: simd_quatd, q2: simd_quatd) -> Double {
         // 基準の上方向ベクトル
         let baseUp = simd_double3(0, 1, 0)
