@@ -77,11 +77,10 @@ struct ContentView: View {
         return coordinateConversion * sensorQuat * coordinateConversion.inverse
     }
     @ObservedObject var ble = BluethoothCentralManager()
-    @StateObject var carv2DataPair: Carv2DataPair = Carv2DataPair.shared
     @Environment(\.scenePhase) var scenePhase
     var body: some View {
         VStack {
-            Text("paralell rotation angle \(carv2DataPair.yawingAngulerRateDiffrential * 10)")
+            Text("paralell rotation angle \(Carv2DataPair.shared.yawingAngulerRateDiffrential * 10)")
             Text("parallel angle \(ceil(parallelAngle()))")
             Text("parallel angle2 \(ceil(parallelAngle2))")
             Button(action: { conductor.data.isPlaying.toggle()}){
@@ -214,14 +213,14 @@ struct ContentView: View {
             Timer.publish(every: 0.1, on: .main, in: .common)
                 .autoconnect()
                 .sink { [weak conductor] _ in
-                    conductor?.data.frequency = AUValue(ToneStep.hight(ceil(carv2DataPair.yawingAngulerRateDiffrential * 10)))
+                    conductor?.data.frequency = AUValue(ToneStep.hight(ceil(Carv2DataPair.shared.yawingAngulerRateDiffrential * 10)))
                     
-                    if (-1.0...1.0).contains(carv2DataPair.yawingAngulerRateDiffrential ) {
+                    if (-1.0...1.0).contains(Carv2DataPair.shared.yawingAngulerRateDiffrential ) {
                         conductor?.data.isPlaying = false
                     } else {
                         conductor?.data.isPlaying = true
                     }
-                    if carv2DataPair.yawingAngulerRateDiffrential > 0 {
+                    if Carv2DataPair.shared.yawingAngulerRateDiffrential > 0 {
                         conductor?.changeWaveFormToSin()
                     } else {
                         conductor?.changeWaveFormToTriangle()
@@ -232,6 +231,14 @@ struct ContentView: View {
         .onDisappear {
             timer?.invalidate()
             conductor.stop()
+        }.onChange(of: scenePhase) {
+            if scenePhase == .background {
+                do {
+                    try AVAudioSession.sharedInstance().setActive(true)
+                } catch {
+                    print("バックグラウンドオーディオ維持失敗: \(error)")
+                }
+            }
         }
     }
    
