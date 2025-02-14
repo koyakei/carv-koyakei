@@ -16,6 +16,9 @@ struct ContentView: View {
     @State private var parallelAngle = {
         getSignedAngleBetweenQuaternions(q1: simd_quatf(Carv2DataPair.shared.left.leftRealityKitRotation), q2:  simd_quatf(Carv2DataPair.shared.right.rightRealityKitRotation) )
     }
+    @State private var parallelAngle2 : Double = 0
+    private let leftAnchorName: String = "leftAnchor"
+    private let rightAnchorName: String = "rightAnchor"
     func formatQuaternion(_ quat: simd_quatd) -> String {
         let components = [quat.real, quat.imag.x, quat.imag.y, quat.imag.z]
         
@@ -32,11 +35,32 @@ struct ContentView: View {
         )
         """
     }
+    func createAxisLabel(text: String, color: UIColor) -> ModelEntity {
+        let textMesh = MeshResource.generateText(
+            text,
+            extrusionDepth: 0.01,
+            font: .systemFont(ofSize: 0.1),
+            containerFrame: .zero,
+            alignment: .center,
+            lineBreakMode: .byTruncatingTail
+        )
+        return ModelEntity(
+            mesh: textMesh,
+            materials: [SimpleMaterial(color: color, isMetallic: false)]
+        )
+    }
+    let coordinateConversion = simd_quatf(angle: -.pi/2, axis: [1, 0, 0])
+
+    // クオータニオン変換処理
+    func convertSensorQuaternion(_ sensorQuat: simd_quatf) -> simd_quatf {
+        return coordinateConversion * sensorQuat * coordinateConversion.inverse
+    }
     @ObservedObject var ble = BluethoothCentralManager()
     @StateObject var carv2DataPair: Carv2DataPair = Carv2DataPair.shared
     var body: some View {
         VStack {
             Text("parallel angle \(ceil(parallelAngle()))")
+            Text("parallel angle2 \(ceil(parallelAngle2))")
             Button(action: { conductor.data.isPlaying.toggle()}){
                 conductor.data.isPlaying ? Text("stop paralell tone") : Text("start paralell tone")
             }
@@ -96,7 +120,24 @@ struct ContentView: View {
             arrowEntity.addChild(xMarker)
             arrowEntity.addChild(zMarker)
             arrowEntity.addChild(basePlate)
-            
+            // Y軸ラベル（青）
+            let yLabel = createAxisLabel(text: "Y", color: .blue)
+            yLabel.position = [0, 0.6, 0]  // メインシャフト上部
+
+            // X軸ラベル（赤）
+            let xLabel = createAxisLabel(text: "X", color: .red)
+            xLabel.position = [0.3, 0, 0]  // Xマーカー右側
+            xLabel.transform.rotation = simd_quatf(angle: .pi/2, axis: [0, 1, 0])
+
+            // Z軸ラベル（緑）
+            let zLabel = createAxisLabel(text: "Z", color: .green)
+            zLabel.position = [0, 0, 0.3]  // Zマーカー前方
+            zLabel.transform.rotation = simd_quatf(angle: -.pi/2, axis: [1, 0, 0])
+
+            // ラベルをエンティティに追加
+            arrowEntity.addChild(yLabel)
+            arrowEntity.addChild(xLabel)
+            arrowEntity.addChild(zLabel)
             // 中央固定設定// カメラ前方1m
             return arrowEntity
         }
@@ -109,27 +150,42 @@ struct ContentView: View {
         }
         HStack {
             //ARView
-//            RealityView { content in
-//                // カメラ設定（空間追跡有効化）
-//                content.camera = .spatialTracking
-//                let leftBootsAnchor = bootsAnchor()
-//                leftBootsAnchor.position.x = -0.5
-//                leftBootsAnchor.name = "LeftArrowAnchor"
-//                // 左X マイナスがスキーの方向
-//                let rightBootsAnchor = bootsAnchor()
-//                rightBootsAnchor.position.x = 0.5
-//                rightBootsAnchor.name = "RightArrowAnchor"
-//                content.add(leftBootsAnchor)
-//                content.add(rightBootsAnchor)
-//            } update: { content in
-//                if let arrow = content.entities.first(where: { $0.name == "LeftArrowAnchor" }) {
-//                    arrow.setOrientation(simd_quatf(Carv2DataPair.shared.left.leftRealityKitRotation), relativeTo: nil)
-//                }
-//                if let arrow = content.entities.first(where: { $0.name == "RightArrowAnchor" }) {
-//                    arrow.setOrientation(simd_quatf(Carv2DataPair.shared.right.rightRealityKitRotation) , relativeTo: nil)
-//                }
-//            }
-//            .frame(height: 400)
+            RealityView { content in
+                // カメラ設定（空間追跡有効化）
+                content.camera = .virtual
+                let leftBootsAnchor = bootsAnchor()
+                leftBootsAnchor.position.x = -0.5
+                leftBootsAnchor.name = leftAnchorName
+                // 左X マイナスがスキーの方向
+                let rightBootsAnchor = bootsAnchor()
+                rightBootsAnchor.position.x = 0.5
+                rightBootsAnchor.name = rightAnchorName
+                content.add(leftBootsAnchor)
+                content.add(rightBootsAnchor)
+            } update: { content in
+                
+                guard let arrowLeft = content.entities.first(where: { $0.name == leftAnchorName }) else { return }
+                let cameraAlignment = simd_quatf(angle: .pi/2, axis: [0, 0, 1])
+                let finalQuat = cameraAlignment * simd_quatf(Carv2DataPair.shared.left.realityKitRotation3)
+//                arrowLeft.transform.rotation = simd_quatf(Carv2DataPair.shared.left.realityKitRotation3)
+                arrowLeft.setOrientation(convertSensorQuaternion(simd_quatf(Carv2DataPair.shared.left.realityKitRotation3)), relativeTo: nil)
+//                arrowLeft.setOrientation(worldUpOrientation , relativeTo: nil)
+                
+                guard let arrowRight = content.entities.first(where: { $0.name == rightAnchorName })else  { return }
+                    let worldUpOrientation2 = simd_quatf(
+                        angle: -0.0, // 追加回転不要
+                        axis: [0, 0, 1] // Y軸基準
+                    )
+                
+                arrowRight.setOrientation(convertSensorQuaternion(simd_quatf(Carv2DataPair.shared.left.realityKitRotation4)), relativeTo: nil)
+//                arrowRight.transform.rotation = simd_quatf(Carv2DataPair.shared.left.realityKitRotation4)
+//                arrowRight.setOrientation(simd_quatf(Carv2DataPair.shared.right.rightRealityKitRotation) * worldUpOrientation2, relativeTo: nil)
+                DispatchQueue.main.async {
+                    parallelAngle2 = Double(getSignedAngleBetweenQuaternions2(q1: arrowLeft.orientation(relativeTo: nil), q2: arrowRight.orientation(relativeTo: nil))) //Modifying state during view update, this will cause undefined behavior.
+                }
+
+            }
+            .frame(height: 400)
         }.onAppear {
             conductor.start()
             // 0.1秒間隔で角度を監視
@@ -189,6 +245,13 @@ extension Rotation3D {
     }
 }
 import simd
+
+func getSignedAngleBetweenQuaternions2(q1: simd_quatf, q2: simd_quatf) -> Double {
+    let dotProduct = simd_dot(q1.vector, q2.vector)
+    let angle = 2 * acos(min(abs(dotProduct), 1.0))
+    let degree = Angle(radians: Double(angle)).degrees
+    return dotProduct < 0 ? -degree : degree
+}
 
 func getSignedAngleBetweenQuaternions(q1: simd_quatf, q2: simd_quatf) -> Float {
     // -X軸方向の基準ベクトル

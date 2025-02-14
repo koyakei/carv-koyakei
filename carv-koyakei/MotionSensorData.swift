@@ -13,5 +13,5 @@ import SwiftUICore
 struct MotionSensorData{
     public let attitude: Rotation3D
     public let acceleration: SIMD3<Float>
-    public let angularVelocity: SIMD3<Float> = .zero
+    public let angularVelocity: SIMD3<Float>
 }
