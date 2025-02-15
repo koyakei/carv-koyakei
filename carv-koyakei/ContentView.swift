@@ -10,6 +10,7 @@ import ARKit
 struct ContentView: View {
     @StateObject private var conductor = DynamicOscillatorConductor()
     @State private var timer: Timer?
+    @State private var updateSubscription: AnyCancellable?
     @State private var cancellables = Set<AnyCancellable>()
     @State private var arSession = ARSession()
     @State private var locationManager = CLLocationManager()
@@ -190,36 +191,22 @@ struct ContentView: View {
 //            .frame(height: 400)
         }.onAppear {
             conductor.start()
-            conductor.data.frequency = AUValue(440)
-//            Timer.publish(every: 2, on: .main, in: .common)
-//                .autoconnect()
-//                .sink { [weak conductor] _ in
-//                    conductor?.data.frequency = AUValue(ToneStep.hight(ceil(Carv2DataPair.shared.yawingAngulerRateDiffrential * 10)))
-//                    
-//                    if (-1.0...1.0).contains(Carv2DataPair.shared.yawingAngulerRateDiffrential ) {
-//                        conductor?.data.isPlaying = false
-//                    } else {
-//                        conductor?.data.isPlaying = true
-//                    }
-//                    if Carv2DataPair.shared.yawingAngulerRateDiffrential > 0 {
-//                        conductor?.changeWaveFormToSin()
-//                    } else {
-//                        conductor?.changeWaveFormToTriangle()
-//                    }
-//                }
-//                .store(in: &cancellables)
         }
         .onDisappear {
             timer?.invalidate()
             conductor.stop()
-        }.onChange(of: scenePhase) {
-//            if scenePhase == .background {
-//                do {
-//                    try AVAudioSession.sharedInstance().setActive(true)
-//                } catch {
-//                    print("バックグラウンドオーディオ維持失敗: \(error)")
-//                }
-//            }
+        }.onChange(of: carv2DataPair.yawingAngulerRateDiffrential) {
+            conductor.data.frequency = AUValue(ToneStep.hight(ceil(carv2DataPair.yawingAngulerRateDiffrential * 10)))
+            if (-1.0...1.0).contains(carv2DataPair.yawingAngulerRateDiffrential ) {
+                conductor.data.isPlaying = false
+            } else {
+                conductor.data.isPlaying = true
+            }
+            if carv2DataPair.yawingAngulerRateDiffrential > 0 {
+                conductor.changeWaveFormToSin()
+            } else {
+                conductor.changeWaveFormToTriangle()
+            }
         }
     }
    
