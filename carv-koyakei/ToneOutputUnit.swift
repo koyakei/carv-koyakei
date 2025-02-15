@@ -77,11 +77,11 @@ class DynamicOscillatorConductor: ObservableObject {
             osc.amplitude = 0.2
             do {
                 try AVAudioSession.sharedInstance().setCategory(
-                            .playAndRecord,
-                            mode: .videoRecording,
-                            options: [.mixWithOthers, .allowBluetooth, .defaultToSpeaker]
+                    .playAndRecord,
+                    mode: .default,
+                    options: [  .allowBluetoothA2DP ]
                         )
-                        try AVAudioSession.sharedInstance().overrideOutputAudioPort(.speaker)
+                try AVAudioSession.sharedInstance().overrideOutputAudioPort(.speaker)
                         try AVAudioSession.sharedInstance().setActive(true)
                         try engine.start()
             } catch let err {

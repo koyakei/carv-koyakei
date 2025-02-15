@@ -17,8 +17,10 @@ struct ContentView: View {
     @State private var parallelAngle = {
         getSignedAngleBetweenQuaternions(q1: simd_quatf(Carv2DataPair.shared.left.leftRealityKitRotation), q2:  simd_quatf(Carv2DataPair.shared.right.rightRealityKitRotation) )
     }
+    
     @ObservedObject var carv2DataPair = Carv2DataPair.shared // 値が更新されない
     @State private var parallelAngle2 : Double = 0
+    @State private var diffTargetAngle : Float = 1.5
     private let leftAnchorName: String = "leftAnchor"
     private let rightAnchorName: String = "rightAnchor"
     func formatQuaternion(_ quat: simd_quatd) -> String {
@@ -64,6 +66,16 @@ struct ContentView: View {
             Text("paralell rotation angle \(carv2DataPair.yawingAngulerRateDiffrential * 10)")
             Text("parallel angle \(ceil(parallelAngle()))")
             Text("parallel angle2 \(ceil(parallelAngle2))")
+            Slider(
+                            value: $diffTargetAngle,
+                            in: 0.0...3.0,
+                            step: 0.05
+                        ) {
+                            Text("Adjustment")
+                        }
+                        
+                        Text("Current value: \(diffTargetAngle, specifier: "%.2f")")
+                            .padding()
             Button(action: { conductor.data.isPlaying.toggle()}){
                 conductor.data.isPlaying ? Text("stop paralell tone") : Text("start paralell tone")
             }
@@ -197,7 +209,7 @@ struct ContentView: View {
             conductor.stop()
         }.onChange(of: carv2DataPair.yawingAngulerRateDiffrential) {
             conductor.data.frequency = AUValue(ToneStep.hight(ceil(carv2DataPair.yawingAngulerRateDiffrential * 10)))
-            if (-1.0...1.0).contains(carv2DataPair.yawingAngulerRateDiffrential ) {
+            if (-diffTargetAngle...diffTargetAngle).contains(carv2DataPair.yawingAngulerRateDiffrential ) {
                 conductor.data.isPlaying = false
             } else {
                 conductor.data.isPlaying = true
