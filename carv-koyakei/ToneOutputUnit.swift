@@ -27,12 +27,15 @@ struct DynamicOscillatorData {
     var amplitude: AUValue = 0.1
     var rampDuration: AUValue = 0
     var detuningOffset: AUValue = 440
+    var balance: AUValue = 1.0
 }
 
 class DynamicOscillatorConductor: ObservableObject {
 
     let engine = AudioEngine()
-
+    var osc = DynamicOscillator()
+    var panner : Panner
+    
     func noteOn(note: MIDINoteNumber) {
         data.isPlaying = true
         data.frequency = note.midiNoteToFrequency()
@@ -67,10 +70,13 @@ class DynamicOscillatorConductor: ObservableObject {
         osc.setWaveform(Table(.sawtooth))
     }
 
-    var osc = DynamicOscillator()
+    
 
     init() {
-        engine.output = osc
+        let mixer = Mixer(osc)
+        mixer.volume = 1.0
+        panner = Panner(mixer)
+        engine.output = panner
     }
 
     func start() {

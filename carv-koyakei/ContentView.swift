@@ -215,8 +215,10 @@ struct ContentView: View {
                 conductor.data.isPlaying = true
             }
             if carv2DataPair.yawingAngulerRateDiffrential > 0 {
+                conductor.panner.pan = 1.0
                 conductor.changeWaveFormToSin()
             } else {
+                conductor.panner.pan = -1.0
                 conductor.changeWaveFormToTriangle()
             }
         }
