@@ -19,6 +19,11 @@ struct ToneStep{
         let min: Float = -24
         return base * pow(pow(2, num + min), 1/12)
     }
+    static func lowToHigh(_ num : Float) -> Float {
+        let base : Float = 440.0
+        let max: Float = 12
+        return base * pow(pow(2, max - num), 1/12)
+    }
 }
 
 struct DynamicOscillatorData {

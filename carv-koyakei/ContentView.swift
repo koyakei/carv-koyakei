@@ -208,7 +208,6 @@ struct ContentView: View {
             timer?.invalidate()
             conductor.stop()
         }.onChange(of: carv2DataPair.yawingAngulerRateDiffrential) {
-            conductor.data.frequency = AUValue(ToneStep.hight(ceil(carv2DataPair.yawingAngulerRateDiffrential * 10)))
             if (-diffTargetAngle...diffTargetAngle).contains(carv2DataPair.yawingAngulerRateDiffrential ) {
                 conductor.data.isPlaying = false
             } else {
@@ -216,10 +215,13 @@ struct ContentView: View {
             }
             if carv2DataPair.yawingAngulerRateDiffrential > 0 {
                 conductor.panner.pan = 1.0
+                conductor.data.frequency = AUValue(ToneStep.lowToHigh(ceil(carv2DataPair.yawingAngulerRateDiffrential * 10)))
+                    
                 conductor.changeWaveFormToSin()
             } else {
                 conductor.panner.pan = -1.0
                 conductor.changeWaveFormToTriangle()
+                conductor.data.frequency = AUValue(ToneStep.hight(ceil(carv2DataPair.yawingAngulerRateDiffrential * 10)))
             }
         }
     }
