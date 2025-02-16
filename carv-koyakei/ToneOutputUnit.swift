@@ -21,7 +21,7 @@ struct ToneStep{
     }
     static func lowToHigh(_ num : Float) -> Float {
         let base : Float = 440.0
-        let max: Float = 12
+        let max: Float = 22
         return base * pow(pow(2, max - num), 1/12)
     }
 }

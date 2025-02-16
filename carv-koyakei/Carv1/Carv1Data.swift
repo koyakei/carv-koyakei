@@ -20,12 +20,17 @@ import SwiftUICore
 public class Carv1Data :ObservableObject{
     @Published var attitude: Rotation3D
     @Published var acceleration: SIMD3<Float>
-    
+    @Published var pressure: [Float] = [Float](repeating: 0, count: 38)
+    @Published var calibrationPressure = [Float](repeating: 0, count: 38)
     static func int16ToFloat(data: Data) -> MotionSensorData {
-//        let intbyte : [Float] = data.withUnsafeBytes { rawBuffer in
-//            rawBuffer.bindMemory(to: Int16.self).map { Float($0 << 16)}
-//        }
-        let intbyte :[Int16] = data.withUnsafeBytes {
+        guard data.count >= 19 else {
+            fatalError("データ長が不足しています")
+        }
+        let pressures : [Int8] = data.subdata(in: 1..<19).withUnsafeBytes { rawBuffer in
+            rawBuffer.bindMemory(to: Int8.self).map { Int8($0)}
+        }
+        
+        let intbyte :[Int16] = data.dropFirst(51).withUnsafeBytes {
             Array(UnsafeBufferPointer<Int16>(start: $0.baseAddress?.assumingMemoryBound(to: Int16.self), count: data.count / MemoryLayout<Int16>.stride))
         }
         let i = 0
@@ -38,6 +43,11 @@ public class Carv1Data :ObservableObject{
         let az = Float(intbyte[i+6])  / 32768.0  * 16 * 9.8
         return MotionSensorData(attitude: Rotation3D.init(simd_quatf(ix: quatx, iy: quaty, iz: quatz, r: quatw)), acceleration:  SIMD3<Float>(x: ax, y: ay, z: az), angularVelocity: .zero)
     }
+    
+    func calibrateForce(){
+        self.calibrationPressure = self.pressure
+    }
+    
     public init(rightData data: Data) {
         let motionSensorData = Carv1Data.int16ToFloat(data: data)
         attitude = Rotation3D(quaternion: simd_quatd(ix: -motionSensorData.attitude.vector.x,

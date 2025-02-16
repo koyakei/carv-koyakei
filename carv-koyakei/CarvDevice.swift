@@ -101,15 +101,15 @@ func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CB
     //            print(data1.map{String(format: "%02hhx", $0)}.joined())
                 notificationHandler(data: data1)
         } else if characteristic.service?.peripheral?.name == Carv2DataPair.periferalName {
-            let data1 = value.dropFirst(1)
+            
             if peripheral.identifier == Carv2Data.rightCharactaristicUUID{
                 DispatchQueue.main.async {
-                    Carv2DataPair.shared.right = Carv2Data(rightData: data1)
+                    Carv2DataPair.shared.right = Carv2Data(rightData: value)
                 }
             }
             if peripheral.identifier == Carv2Data.leftCharactaristicUUID {
                 DispatchQueue.main.async {
-                    Carv2DataPair.shared.left = Carv2Data(leftData: data1)
+                    Carv2DataPair.shared.left = Carv2Data(leftData: value)
                 }
             }
         }

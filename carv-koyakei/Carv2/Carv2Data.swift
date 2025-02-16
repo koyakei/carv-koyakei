@@ -112,14 +112,14 @@ class Carv2Data {
         return MotionSensorData(attitude: Rotation3D.init(simd_quatf(ix: quatx, iy: quaty, iz: quatz, r: quatw)), acceleration:  SIMD3<Float>(x: ax, y: ay, z: az),angularVelocity: SIMD3<Float>(x: intbyte3[safe:0, default: 0], y: intbyte3[safe: 1, default: 0] , z: intbyte3[safe: 2,default: 0 ]))
     }
     public init(rightData data: Data) {
-        let motionSensorData = Carv2Data.int16ToFloat(data: data)
+        let motionSensorData = Carv2Data.int16ToFloat(data: data.dropFirst(1))
         attitude = motionSensorData.attitude
                      acceleration = motionSensorData.acceleration
         angularVelocity = motionSensorData.angularVelocity
     }
     
     public init(leftData data: Data){
-        let motionSensorData = Carv2Data.int16ToFloat(data: data)
+        let motionSensorData = Carv2Data.int16ToFloat(data: data.dropFirst(1))
         attitude = motionSensorData.attitude
         acceleration = motionSensorData.acceleration
         angularVelocity = motionSensorData.angularVelocity
