@@ -40,29 +40,17 @@
 		22A73CA52D424A3800C1BF1C /* Exceptions for "carv-koyakei" folder in "carv-koyakei" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				BluetoothManager.swift,
 				Info.plist,
 			);
 			target = 22A73C722D4241AB00C1BF1C /* carv-koyakei */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
-/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-		22A73CA82D4286CE00C1BF1C /* Exceptions for "carv-koyakei" folder in "Copy Bundle Resources" phase from "carv-koyakei" target */ = {
-			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
-			buildPhase = 22A73C712D4241AB00C1BF1C /* Resources */;
-			membershipExceptions = (
-				BluetoothManager.swift,
-			);
-		};
-/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		22A73C752D4241AB00C1BF1C /* carv-koyakei */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				22A73CA52D424A3800C1BF1C /* Exceptions for "carv-koyakei" folder in "carv-koyakei" target */,
-				22A73CA82D4286CE00C1BF1C /* Exceptions for "carv-koyakei" folder in "Copy Bundle Resources" phase from "carv-koyakei" target */,
 			);
 			path = "carv-koyakei";
 			sourceTree = "<group>";

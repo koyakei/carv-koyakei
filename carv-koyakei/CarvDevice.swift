@@ -15,6 +15,7 @@ class CarvDevice: NSObject, ObservableObject, Identifiable, CBPeripheralDelegate
     @Published var connectionState: CBPeripheralState
     @Published var services: [CBService] = []
     @Published var carv2DataPair: Carv2DataPair = Carv2DataPair.shared
+    @Published var carv1DataPair: Carv1DataPair = Carv1DataPair.shared
     init(peripheral: CBPeripheral, carv2DataPair: inout Carv2DataPair) {
         self.id = peripheral.identifier
         self.peripheral = peripheral
@@ -96,10 +97,12 @@ func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CB
     
     if let value = characteristic.value {
         if characteristic.service?.peripheral?.name == Carv1DataPair.periferalName{
-            // ここで受信したデータを処理します
-                let data1 = value.dropFirst(51)
-    //            print(data1.map{String(format: "%02hhx", $0)}.joined())
-                notificationHandler(data: data1)
+            if peripheral.identifier == Carv1Data.rightCharactaristicUUID {
+                Carv1DataPair.shared.right  = Carv1Data(rightData: value)
+            }
+            if peripheral.identifier == Carv1Data.leftCharactaristicUUID {
+                Carv1DataPair.shared.left  = Carv1Data(leftData: value)
+            }
         } else if characteristic.service?.peripheral?.name == Carv2DataPair.periferalName {
             
             if peripheral.identifier == Carv2Data.rightCharactaristicUUID{
@@ -125,51 +128,5 @@ func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CB
             print("通知状態更新: \(characteristic.isNotifying ? "有効" : "無効")")
                 
             }
-    
-    private func notificationHandler(data: Data) {
-            guard data.count >= 9 else { print("less 9")
-                return }
-            let intbyte :[Int16] = data.withUnsafeBytes {
-                Array(UnsafeBufferPointer<Int16>(start: $0.baseAddress?.assumingMemoryBound(to: Int16.self), count: data.count / MemoryLayout<Int16>.stride))
-            }
-            let i = 0
-            let quatx = Float(intbyte[i]) / 32768.0
-            let quaty = Float(intbyte[i+1])  / 32768.0
-            let quatz = Float(intbyte[i+2])  / 32768.0
-            let quatw = Float(intbyte[i+3])  / 32768.0
-            let ax = Float(intbyte[i+4])  / 32768.0  * 16 * 9.8
-            let ay = Float(intbyte[i+5])  / 32768.0  * 16 * 9.8
-            let az = Float(intbyte[i+6])  / 32768.0  * 16 * 9.8
-        let rotation2 = Rotation3D.init(simd_quatf(ix: Float(intbyte[i+7])  / 32768.0, iy: Float(intbyte[i+8])  / 32768.0, iz: Float(intbyte[i+9])  / 32768.0, r: Float(intbyte[i+10])  / 32768.0))
-        print("roll: \(Angle2D(radians: rotation2.eulerAngles(order: .xyz).angles.x).degrees), yaw: \(Angle2D(radians: rotation2.eulerAngles(order: .xyz).angles.y).degrees), pitch: \(Angle2D(radians: rotation2.eulerAngles(order: .xyz).angles.z).degrees)" )
-        }
-    
 
-    private func carv2dataHandler(data: Data) {
-        guard data.count >= 24 else { print("less 24")
-            return }
-        let intbyte :[Int16] = data.withUnsafeBytes {
-            Array(UnsafeBufferPointer<Int16>(start: $0.baseAddress?.assumingMemoryBound(to: Int16.self), count: data.count / MemoryLayout<Int16>.stride))
-        }
-        let i = 0
-        let quatx = Float(intbyte[i]) / 32768.0
-        let quaty = Float(intbyte[i+1])  / 32768.0
-        let quatz = Float(intbyte[i+2])  / 32768.0
-        let quatw = Float(intbyte[i+3])  / 32768.0
-        let ax = Float(intbyte[i+4])  / 32768.0  * 16 * 9.8
-        let ay = Float(intbyte[i+5])  / 32768.0  * 16 * 9.8
-        let az = Float(intbyte[i+6])  / 32768.0  * 16 * 9.8
-        let quatx2 = Float(intbyte[i+7]) / 32768.0
-        let quaty2 = Float(intbyte[i+8])  / 32768.0
-        let quatz2 = Float(intbyte[i+9])  / 32768.0
-        let quatw2 = Float(intbyte[i+10])  / 32768.0
-        let ax2 = Float(intbyte[i+11])  / 32768.0
-        let ay2 = Float(intbyte[i+12])  / 32768.0
-        let az2 = Float(intbyte[i+13])  / 32768.0
-        let rotation = Rotation3D.init(simd_quatf(ix: quatx, iy: quaty, iz: quatz, r: quatw))
-        let rotation2 = Rotation3D.init(simd_quatf(ix: Float(intbyte[i+8])  / 32768.0, iy: Float(intbyte[i+9])  / 32768.0, iz: Float(intbyte[i+10])  / 32768.0, r: Float(intbyte[i+11])  / 32768.0))
-//        print("ax: \(quatx2), ay: \(quatx2), az: \(quatx2), quatw: \(quatw2),ax: \(ax2), ay: \(ay2), az: \(az2)")
-        print("ax: \(ax2), ay: \(ay2), az: \(az2), roll: \(Angle2D(radians: rotation.eulerAngles(order: .xyz).angles.x).degrees), yaw: \(Angle2D(radians: rotation.eulerAngles(order: .xyz).angles.y).degrees), pitch: \(Angle2D(radians: rotation.eulerAngles(order: .xyz).angles.z).degrees)" )
-//        print("ax: \(ax2), ay: \(ay2), az: \(az2), roll: \(Angle2D(radians: rotation2.eulerAngles(order: .xyz).angles.x).degrees), yaw: \(Angle2D(radians: rotation2.eulerAngles(order: .xyz).angles.y).degrees), pitch: \(Angle2D(radians: rotation2.eulerAngles(order: .xyz).angles.z).degrees)" )
-    }
 }

@@ -15,3 +15,10 @@ struct MotionSensorData{
     public let acceleration: SIMD3<Float>
     public let angularVelocity: SIMD3<Float>
 }
+
+struct Carv1MotionSensorData{
+    public let attitude: Rotation3D
+    public let acceleration: SIMD3<Float>
+    public let angularVelocity: SIMD3<Float>
+    public var pressures: [UInt8]
+}

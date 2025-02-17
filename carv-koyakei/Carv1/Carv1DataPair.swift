@@ -17,11 +17,18 @@ import simd
 import SwiftUICore
 
 public class Carv1DataPair :ObservableObject{
-    @Published var left: Carv2Data = Carv2Data.init()
-    @Published var right: Carv2Data = Carv2Data.init()
+    @Published var left: Carv1Data = Carv1Data.init()
+    @Published var right: Carv1Data = Carv1Data.init()
     var yawingSide: YawingSide = .straight
     static let periferalName = "⛷CARV"
+    public static let shared: Carv1DataPair = .init()
     
+    static var leftCalibrationPressure = [UInt8](repeating: 0, count: 38)
+    static var rightCalibrationPressure = [UInt8](repeating: 0, count: 38)
+    func calibrateForce () {
+        Carv1DataPair.leftCalibrationPressure = left.rawPressure
+        Carv1DataPair.rightCalibrationPressure = right.rawPressure
+    }
     func signedAngleBetweenUpVectors(q1: simd_quatd, q2: simd_quatd) -> Double {
         let baseUp = simd_double3(0, 1, 0)
         let rotatedUp1 = q1.act(baseUp)

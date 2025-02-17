@@ -50,6 +50,7 @@ private func addDevice(_ peripheral: CBPeripheral) {
             self.carvDeviceList.append(newDevice)
         }
     }
+    
 }
 
 // MARK: - CBCentralManagerDelegate

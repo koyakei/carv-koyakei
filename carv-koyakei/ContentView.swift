@@ -19,6 +19,7 @@ struct ContentView: View {
     }
     
     @ObservedObject var carv2DataPair = Carv2DataPair.shared // 値が更新されない
+    @ObservedObject var carv1DataPair = Carv1DataPair.shared
     @State private var parallelAngle2 : Double = 0
     @State private var diffTargetAngle : Float = 1.5
     private let leftAnchorName: String = "leftAnchor"
@@ -77,6 +78,12 @@ struct ContentView: View {
     ]
     var body: some View {
         VStack {
+            Button(action: {
+                Carv1DataPair.shared.calibrateForce()
+            }){
+                Text("Calibrate")
+            }
+            
             Text("paralell rotation angle \(carv2DataPair.yawingAngulerRateDiffrential * 10)")
             Text("parallel angle \(ceil(parallelAngle()))")
             Text("parallel angle2 \(ceil(parallelAngle2))")
@@ -101,7 +108,7 @@ struct ContentView: View {
             }
             .padding()
             List(ble.carvDeviceList) { device in
-                device.id == Carv2Data.leftCharactaristicUUID ? Text("Left") : Text("Right")
+                
                 DeviceRow(device: device, ble: ble)
             }
         }
@@ -187,9 +194,8 @@ struct ContentView: View {
                         let size = min(geometry.size.width, geometry.size.height)
                         let x = point.x * size
                         let y = point.y * size
-                        
                         Circle()
-                            .fill(Color(white: Double(index) / Double(points.count - 1)))
+                            .fill(Color(white: (Double(carv1DataPair.left.pressure[index]) / 60.0) ))
                             .frame(width: size * 0.03, height: size * 0.03)
                             .position(x: x, y: y)
                     }
@@ -205,11 +211,7 @@ struct ContentView: View {
                         let size = min(geometry.size.width, geometry.size.height)
                         let x = point.x * size
                         let y = point.y * size
-                        
-                        Circle()
-                            .fill(Color(white: Double(index) / Double(points.count - 1)))
-                            .frame(width: size * 0.03, height: size * 0.03)
-                            .position(x: x, y: y)
+                        Text(carv1DataPair.left.pressure[index].hex).position(x: x, y: y)
                     }
                 }
             }

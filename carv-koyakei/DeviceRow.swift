@@ -11,6 +11,11 @@ struct DeviceRow: View {
     let ble: BluethoothCentralManager
     
     var body: some View {
+        
+        if (device.id == Carv2Data.leftCharactaristicUUID || device.id == Carv2Data.leftCharactaristicUUID){
+            Text("Left")
+        }
+        if (device.id == Carv2Data.rightCharactaristicUUID || device.id == Carv2Data.rightCharactaristicUUID){Text("Right")}
         VStack(alignment: .leading) {
             Text(device.id.uuidString)
                 .font(.headline)
