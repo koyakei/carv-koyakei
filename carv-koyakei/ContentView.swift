@@ -182,11 +182,12 @@ struct ContentView: View {
         }
         let bootsAnchor = {
             let arrowEntity = createArrowEntity()
-            let worldAnchor = AnchorEntity(.world(transform: .init()))
+            let worldAnchor = AnchorEntity(.camera)
+            arrowEntity.name = leftAnchorName
             worldAnchor.addChild(arrowEntity)
-            
-            arrowEntity.position.z = -2
-            return arrowEntity
+            worldAnchor.position.z = -2
+            worldAnchor.name = "worldAnchor"
+            return worldAnchor
         }
 //        HStack{
 //            GeometryReader { geometry in
@@ -226,45 +227,21 @@ struct ContentView: View {
             RealityView { content in
                 // カメラ設定（空間追跡有効化）
                 content.camera = .spatialTracking
-                let leftBootsAnchor = bootsAnchor()
-                leftBootsAnchor.position.x = -0.5
-                leftBootsAnchor.position.y = -0.5
-                leftBootsAnchor.name = leftAnchorName
-                // 左X マイナスがスキーの方向
-                let rightBootsAnchor = bootsAnchor()
-                rightBootsAnchor.position.x = 0.5
-                rightBootsAnchor.position.y = -0.5
-                rightBootsAnchor.name = rightAnchorName
-                content.add(leftBootsAnchor)
-                content.add(rightBootsAnchor)
-                
-                let leftBootsAnchor2 = bootsAnchor()
-                leftBootsAnchor2.position.x = -0.5
-                leftBootsAnchor2.position.y = 0.5
-                leftBootsAnchor2.name = leftAnchorName2
-                // 左X マイナスがスキーの方向
-                let rightBootsAnchor2 = bootsAnchor()
-                rightBootsAnchor2.position.x = 0.5
-                rightBootsAnchor2.position.y = 0.5
-                rightBootsAnchor2.name = rightAnchorName2
-                content.add(leftBootsAnchor2)
-                content.add(rightBootsAnchor2)
-                
+                let arrowEntity = createArrowEntity()
+                let worldAnchor = AnchorEntity(.camera)
+                arrowEntity.name = leftAnchorName
+                worldAnchor.addChild(arrowEntity)
+                worldAnchor.position.z = -2
+                worldAnchor.name = "worldAnchor"
+                content.add(worldAnchor)
             } update: { content in
-                guard let arrowLeft2 = content.entities.first(where: { $0.name == leftAnchorName2 }) else { return }
-                arrowLeft2.setOrientation(simd_quatf(Carv2DataPair.shared.right.attitude
-                ), relativeTo: nil)
-                
-                guard let arrowRight2 = content.entities.first(where: { $0.name == rightAnchorName2 })else  { return }
-                arrowRight2.setOrientation(
-                    simd_quatf(Carv2DataPair.shared.right.realityKitRotation3
-                                                                 ), relativeTo: nil)
-                guard let arrowLeft = content.entities.first(where: { $0.name == leftAnchorName }) else { return }
+                guard let arrowLeft = content.entities.first(where: {$0.name == "worldAnchor"})?.children.first(where: { $0.name == leftAnchorName }) else { print("sdfa")
+                    return }
                 arrowLeft.setOrientation(
                     simd_quatf(Carv2DataPair.shared.right.realityKitRotation3
                                                                  ), relativeTo: nil)
                 
-                guard let arrowRight = content.entities.first(where: { $0.name == rightAnchorName })else  { return }
+                guard let arrowRight = content.entities.first(where: {$0.name == "worldAnchor"})?.children.first(where: { $0.name == rightAnchorName })else  { return }
                 arrowRight.setOrientation(
                     simd_quatf(Carv2DataPair.shared.right.realityKitRotation3
                                                                  ), relativeTo: nil)
