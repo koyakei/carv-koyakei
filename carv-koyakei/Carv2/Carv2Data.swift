@@ -34,57 +34,47 @@ class Carv2Data {
     var acceleration: SIMD3<Float>
     var angularVelocity : SIMD3<Float>
     // ipad
-//    static let rightCharactaristicUUID = UUID(uuidString: "85A29A4C-09C3-C632-858A-3387339C67CF")
-//    static let leftCharactaristicUUID = UUID(uuidString:  "850D8BCF-3B03-1322-F51C-DD38E961FC1A")
+    static let rightCharactaristicUUID = UUID(uuidString: "85A29A4C-09C3-C632-858A-3387339C67CF")
+    static let leftCharactaristicUUID = UUID(uuidString:  "850D8BCF-3B03-1322-F51C-DD38E961FC1A")
     // iphone
-    static let rightCharactaristicUUID = UUID(uuidString: "85E2946B-0D18-FA01-E1C9-0393EDD9013A")
-    static let leftCharactaristicUUID = UUID(uuidString:  "57089C67-2275-E220-B6D3-B16E2639EFD6")
+//    static let rightCharactaristicUUID = UUID(uuidString: "85E2946B-0D18-FA01-E1C9-0393EDD9013A")
+//    static let leftCharactaristicUUID = UUID(uuidString:  "57089C67-2275-E220-B6D3-B16E2639EFD6")
     var realityKitRotation4: Rotation3D {
         let attitude = self.attitude
-        // クォータニオン取得（CM → SIMD変換）
         let cmQuat = attitude.quaternion
-        let deviceQuat = simd_quatd(ix: cmQuat.vector.x,
-                                    iy: cmQuat.vector.y,
-                                    iz: cmQuat.vector.z,
-                                    r: cmQuat.vector.w)
-        return Rotation3D( deviceQuat)
+        let deviceQuat = simd_quatd(ix: -cmQuat.vector.z,
+                                    iy: -cmQuat.vector.x,
+                                    iz: -cmQuat.vector.y,
+                                    r: cmQuat.vector.w).normalized
+    return Rotation3D( deviceQuat)
     }
     
     var realityKitRotation3: Rotation3D {
         let attitude = self.attitude
-        
-        // クォータニオン取得（CM → SIMD変換）
         let cmQuat = attitude.quaternion
-        let deviceQuat = simd_quatd(ix: cmQuat.vector.x,
-                                    iy: cmQuat.vector.z,
+        let deviceQuat = simd_quatd(ix: cmQuat.vector.z,
+                                    iy: -cmQuat.vector.x,
                                     iz: cmQuat.vector.y,
-                                    
-                                    r: cmQuat.vector.w)
-        
+                                    r: cmQuat.vector.w).normalized
     return Rotation3D( deviceQuat)
         }
     var rightRealityKitRotation: Rotation3D {
         let attitude = self.attitude
-        
-        // クォータニオン取得（CM → SIMD変換）
         let cmQuat = attitude.quaternion
-    let deviceQuat = simd_quatd(ix: cmQuat.vector.z,
-                                iy: cmQuat.vector.x,
-                                iz: cmQuat.vector.y,
-                                r: -cmQuat.vector.w)
-        
-    return Rotation3D( deviceQuat)
-        }
+        let deviceQuat = simd_quatd(ix: cmQuat.vector.z,
+                                    iy: -cmQuat.vector.y,
+                                    iz: cmQuat.vector.x,
+                                    r: cmQuat.vector.w).normalized
+        return Rotation3D( deviceQuat)
+    }
     var leftRealityKitRotation: Rotation3D {
-            let attitude = self.attitude
-            // クォータニオン取得（CM → SIMD変換）
-            let cmQuat = attitude.quaternion
-        let deviceQuat = simd_quatd(ix: -cmQuat.vector.z,
-                                    iy: cmQuat.vector.x,
-                                    iz: -cmQuat.vector.y,
-                                    r: -cmQuat.vector.w)
-        
-        return Rotation3D( deviceQuat  )
+        let attitude = self.attitude
+        let cmQuat = attitude.quaternion
+        let deviceQuat = simd_quatd(ix: cmQuat.vector.z,
+                                    iy: -cmQuat.vector.x,
+                                    iz: cmQuat.vector.y,
+                                    r: cmQuat.vector.w).normalized
+    return Rotation3D( deviceQuat)
         }
     
 //                                        x: cmQuat.imag.z, y: -cmQuat.imag.y, z: -cmQuat.imag.x)
@@ -109,7 +99,8 @@ class Carv2Data {
                         count: count
                     )).map { Float32($0) }
                 }
-        return MotionSensorData(attitude: Rotation3D.init(simd_quatf(ix: quatx, iy: quaty, iz: quatz, r: quatw)), acceleration:  SIMD3<Float>(x: ax, y: ay, z: az),angularVelocity: SIMD3<Float>(x: intbyte3[safe:0, default: 0], y: intbyte3[safe: 1, default: 0] , z: intbyte3[safe: 2,default: 0 ]))
+        
+        return MotionSensorData(attitude: Rotation3D.init(simd_quatf(vector: simd_float4(quatx, quaty, quatz, quatw))), acceleration:  SIMD3<Float>(x: ax, y: ay, z: az),angularVelocity: SIMD3<Float>(x: intbyte3[safe:0, default: 0], y: intbyte3[safe: 1, default: 0] , z: intbyte3[safe: 2,default: 0 ]))
     }
     public init(rightData data: Data) {
         let motionSensorData = Carv2Data.int16ToFloat(data: data.dropFirst(1))

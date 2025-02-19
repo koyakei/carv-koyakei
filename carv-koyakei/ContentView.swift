@@ -7,6 +7,8 @@ import RealityKit
 import Spatial
 import simd
 import ARKit
+let manager = OrientationManager()
+
 struct ContentView: View {
     @StateObject private var conductor = DynamicOscillatorConductor()
     @State private var timer: Timer?
@@ -24,6 +26,8 @@ struct ContentView: View {
     @State private var diffTargetAngle : Float = 1.5
     private let leftAnchorName: String = "leftAnchor"
     private let rightAnchorName: String = "rightAnchor"
+    private let leftAnchorName2: String = "leftAnchor2"
+    private let rightAnchorName2: String = "rightAnchor2"
     func formatQuaternion(_ quat: simd_quatd) -> String {
         let components = [quat.real, quat.imag.x, quat.imag.y, quat.imag.z]
         
@@ -78,31 +82,31 @@ struct ContentView: View {
     ]
     var body: some View {
         VStack {
-            Button(action: {
-                Carv1DataPair.shared.calibrateForce()
-            }){
-                Text("Calibrate")
-            }
-            
-            Text("paralell rotation angle \(carv2DataPair.yawingAngulerRateDiffrential * 10)")
-            Text("parallel angle \(ceil(parallelAngle()))")
-            Text("parallel angle2 \(ceil(parallelAngle2))")
-            Slider(
-                            value: $diffTargetAngle,
-                            in: 0.0...3.0,
-                            step: 0.05
-                        ) {
-                            Text("Adjustment")
-                        }
-                        
-                        Text("Current value: \(diffTargetAngle, specifier: "%.2f")")
-                            .padding()
-            Button(action: { conductor.data.isPlaying.toggle()}){
-                conductor.data.isPlaying ? Text("stop paralell tone") : Text("start paralell tone")
-            }
-            Button(action: { ble.scan() }) {
-                Text("Scan")
-            }
+//            Button(action: {
+//                Carv1DataPair.shared.calibrateForce()
+//            }){
+//                Text("Calibrate")
+//            }
+//            Text(formatQuaternion(carv2DataPair.left.attitude.quaternion))
+//            Text("paralell rotation angle \(carv2DataPair.yawingAngulerRateDiffrential * 10)")
+//            Text("parallel angle \(ceil(parallelAngle()))")
+//            Text("parallel angle2 \(ceil(parallelAngle2))")
+//            Slider(
+//                            value: $diffTargetAngle,
+//                            in: 0.0...3.0,
+//                            step: 0.05
+//                        ) {
+//                            Text("Adjustment")
+//                        }
+//                        
+//                        Text("Current value: \(diffTargetAngle, specifier: "%.2f")")
+//                            .padding()
+//            Button(action: { conductor.data.isPlaying.toggle()}){
+//                conductor.data.isPlaying ? Text("stop paralell tone") : Text("start paralell tone")
+//            }
+//            Button(action: { ble.scan() }) {
+//                Text("Scan")
+//            }
             Button(action: { ble.retrieveAndConnect() }) {
                 Text("Retrieve and Connect")
             }
@@ -167,8 +171,7 @@ struct ContentView: View {
 
             // Z軸ラベル（緑）
             let zLabel = createAxisLabel(text: "Z", color: .green)
-            zLabel.position = [0, 0, 0.3]  // Zマーカー前方
-            zLabel.transform.rotation = simd_quatf(angle: -.pi/2, axis: [1, 0, 0])
+            zLabel.position = [0, 0, 0.3]
 
             // ラベルをエンティティに追加
             arrowEntity.addChild(yLabel)
@@ -179,84 +182,102 @@ struct ContentView: View {
         }
         let bootsAnchor = {
             let arrowEntity = createArrowEntity()
-            let worldAnchor = AnchorEntity(.camera)
+            let worldAnchor = AnchorEntity(.world(transform: .init()))
             worldAnchor.addChild(arrowEntity)
-            worldAnchor.position.z = -2
-            return worldAnchor
+            
+            arrowEntity.position.z = -2
+            return arrowEntity
         }
-        HStack{
-            GeometryReader { geometry in
-                ZStack {
-                    Color.blue // 背景色
-                    
-                    ForEach(0..<points.count, id: \.self) { index in
-                        let point = points[index]
-                        let size = min(geometry.size.width, geometry.size.height)
-                        let x = point.x * size
-                        let y = point.y * size
-                        Circle()
-                            .fill(Color(white: (Double(carv1DataPair.left.pressure[index]) / 60.0) ))
-                            .frame(width: size * 0.03, height: size * 0.03)
-                            .position(x: x, y: y)
-                    }
-                }
-            }
-            .edgesIgnoringSafeArea(.all)
-            GeometryReader { geometry in
-                ZStack {
-                    Color.blue // 背景色
-                    
-                    ForEach(0..<points.count, id: \.self) { index in
-                        let point = points[index]
-                        let size = min(geometry.size.width, geometry.size.height)
-                        let x = point.x * size
-                        let y = point.y * size
-                        Text(carv1DataPair.left.pressure[index].hex).position(x: x, y: y)
-                    }
-                }
-            }
-            .edgesIgnoringSafeArea(.all)
-        }
+//        HStack{
+//            GeometryReader { geometry in
+//                ZStack {
+//                    Color.blue // 背景色
+//                    
+//                    ForEach(0..<points.count, id: \.self) { index in
+//                        let point = points[index]
+//                        let size = min(geometry.size.width, geometry.size.height)
+//                        let x = point.x * size
+//                        let y = point.y * size
+//                        Circle()
+//                            .fill(Color(white: (Double(carv1DataPair.left.pressure[index]) / 60.0) ))
+//                            .frame(width: size * 0.03, height: size * 0.03)
+//                            .position(x: x, y: y)
+//                    }
+//                }
+//            }
+//            .edgesIgnoringSafeArea(.all)
+//            GeometryReader { geometry in
+//                ZStack {
+//                    Color.blue // 背景色
+//                    
+//                    ForEach(0..<points.count, id: \.self) { index in
+//                        let point = points[index]
+//                        let size = min(geometry.size.width, geometry.size.height)
+//                        let x = point.x * size
+//                        let y = point.y * size
+//                        Text(carv1DataPair.left.pressure[index].hex).position(x: x, y: y)
+//                    }
+//                }
+//            }
+//            .edgesIgnoringSafeArea(.all)
+//        }
         HStack {
             //ARView
-//            RealityView { content in
-//                // カメラ設定（空間追跡有効化）
-//                content.camera = .virtual
-//                let leftBootsAnchor = bootsAnchor()
-//                leftBootsAnchor.position.x = -0.5
-//                leftBootsAnchor.name = leftAnchorName
-//                // 左X マイナスがスキーの方向
-//                let rightBootsAnchor = bootsAnchor()
-//                rightBootsAnchor.position.x = 0.5
-//                rightBootsAnchor.name = rightAnchorName
-//                content.add(leftBootsAnchor)
-//                content.add(rightBootsAnchor)
-//            } update: { content in
-//                
-//                guard let arrowLeft = content.entities.first(where: { $0.name == leftAnchorName }) else { return }
-//                let cameraAlignment = simd_quatf(angle: .pi/2, axis: [0, 0, 1])
-//                let finalQuat = cameraAlignment * simd_quatf(Carv2DataPair.shared.left.realityKitRotation3)
-////                arrowLeft.transform.rotation = simd_quatf(Carv2DataPair.shared.left.realityKitRotation3)
-//                arrowLeft.setOrientation(convertSensorQuaternion(simd_quatf(Carv2DataPair.shared.left.realityKitRotation3)), relativeTo: nil)
-////                arrowLeft.setOrientation(worldUpOrientation , relativeTo: nil)
-//                
-//                guard let arrowRight = content.entities.first(where: { $0.name == rightAnchorName })else  { return }
-//                    let worldUpOrientation2 = simd_quatf(
-//                        angle: -0.0, // 追加回転不要
-//                        axis: [0, 0, 1] // Y軸基準
-//                    )
-//                
-//                arrowRight.setOrientation(convertSensorQuaternion(simd_quatf(Carv2DataPair.shared.left.realityKitRotation4)), relativeTo: nil)
-////                arrowRight.transform.rotation = simd_quatf(Carv2DataPair.shared.left.realityKitRotation4)
-////                arrowRight.setOrientation(simd_quatf(Carv2DataPair.shared.right.rightRealityKitRotation) * worldUpOrientation2, relativeTo: nil)
-//                DispatchQueue.main.async {
-//                    parallelAngle2 = Double(getSignedAngleBetweenQuaternions2(q1: arrowLeft.orientation(relativeTo: nil), q2: arrowRight.orientation(relativeTo: nil))) //Modifying state during view update, this will cause undefined behavior.
-//                }
-//
-//            }
-//            .frame(height: 400)
+            RealityView { content in
+                // カメラ設定（空間追跡有効化）
+                content.camera = .spatialTracking
+                let leftBootsAnchor = bootsAnchor()
+                leftBootsAnchor.position.x = -0.5
+                leftBootsAnchor.position.y = -0.5
+                leftBootsAnchor.name = leftAnchorName
+                // 左X マイナスがスキーの方向
+                let rightBootsAnchor = bootsAnchor()
+                rightBootsAnchor.position.x = 0.5
+                rightBootsAnchor.position.y = -0.5
+                rightBootsAnchor.name = rightAnchorName
+                content.add(leftBootsAnchor)
+                content.add(rightBootsAnchor)
+                
+                let leftBootsAnchor2 = bootsAnchor()
+                leftBootsAnchor2.position.x = -0.5
+                leftBootsAnchor2.position.y = 0.5
+                leftBootsAnchor2.name = leftAnchorName2
+                // 左X マイナスがスキーの方向
+                let rightBootsAnchor2 = bootsAnchor()
+                rightBootsAnchor2.position.x = 0.5
+                rightBootsAnchor2.position.y = 0.5
+                rightBootsAnchor2.name = rightAnchorName2
+                content.add(leftBootsAnchor2)
+                content.add(rightBootsAnchor2)
+                
+            } update: { content in
+                guard let arrowLeft2 = content.entities.first(where: { $0.name == leftAnchorName2 }) else { return }
+                arrowLeft2.setOrientation(simd_quatf(Carv2DataPair.shared.right.attitude
+                ), relativeTo: nil)
+                
+                guard let arrowRight2 = content.entities.first(where: { $0.name == rightAnchorName2 })else  { return }
+                arrowRight2.setOrientation(
+                    simd_quatf(Carv2DataPair.shared.right.realityKitRotation3
+                                                                 ), relativeTo: nil)
+                guard let arrowLeft = content.entities.first(where: { $0.name == leftAnchorName }) else { return }
+                arrowLeft.setOrientation(
+                    simd_quatf(Carv2DataPair.shared.right.realityKitRotation3
+                                                                 ), relativeTo: nil)
+                
+                guard let arrowRight = content.entities.first(where: { $0.name == rightAnchorName })else  { return }
+                arrowRight.setOrientation(
+                    simd_quatf(Carv2DataPair.shared.right.realityKitRotation3
+                                                                 ), relativeTo: nil)
+               
+                DispatchQueue.main.async {
+                    parallelAngle2 = Double(getSignedAngleBetweenQuaternions2(q1: arrowLeft.orientation(relativeTo: nil), q2: arrowRight.orientation(relativeTo: nil)))
+                }
+
+            }
+            .frame(height: 800)
         }.onAppear {
             conductor.start()
+            manager.startUpdates()
         }
         .onDisappear {
             timer?.invalidate()
