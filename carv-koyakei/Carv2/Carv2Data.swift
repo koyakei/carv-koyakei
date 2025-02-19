@@ -62,10 +62,10 @@ class Carv2Data {
         let attitude = self.attitude
         let cmQuat = attitude.quaternion
         let deviceQuat = simd_quatd(ix: cmQuat.vector.z,
-                                    iy: -cmQuat.vector.y,
-                                    iz: cmQuat.vector.x,
+                                    iy: -cmQuat.vector.x,
+                                    iz: cmQuat.vector.y,
                                     r: cmQuat.vector.w).normalized
-        return Rotation3D( deviceQuat)
+    return Rotation3D( deviceQuat)
     }
     var leftRealityKitRotation: Rotation3D {
         let attitude = self.attitude

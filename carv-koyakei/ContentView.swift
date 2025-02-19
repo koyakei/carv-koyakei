@@ -243,14 +243,15 @@ struct ContentView: View {
                 guard let arrowLeft = content.entities.first(where: {$0.name == "worldAnchor"})?.children.first(where: { $0.name == leftAnchorName }) else {
                     return }
                 arrowLeft.setOrientation(
-                    simd_quatf(Carv2DataPair.shared.left.realityKitRotation3
+                    simd_quatf(Carv2DataPair.shared.left.rightRealityKitRotation
                                                                  ), relativeTo: nil)
                 
                 guard let arrowRight = content.entities.first(where: {$0.name == "worldAnchor"})?.children.first(where: { $0.name == rightAnchorName })else  { return }
                 arrowRight.setOrientation(
-                    simd_quatf(Carv2DataPair.shared.right.realityKitRotation3
-                                                                 ), relativeTo: nil)
-               
+                    simd_quatf(Carv2DataPair.shared.right.rightRealityKitRotation
+                              ) , relativeTo: nil)
+                
+                
                 DispatchQueue.main.async {
                     parallelAngle2 = Double(getSignedAngleBetweenQuaternions2(q1: arrowLeft.orientation(relativeTo: nil), q2: arrowRight.orientation(relativeTo: nil)))
                 }
