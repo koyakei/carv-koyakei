@@ -227,18 +227,23 @@ struct ContentView: View {
             RealityView { content in
                 // カメラ設定（空間追跡有効化）
                 content.camera = .spatialTracking
-                let arrowEntity = createArrowEntity()
                 let worldAnchor = AnchorEntity(.camera)
-                arrowEntity.name = leftAnchorName
+                let arrowEntity = createArrowEntity()
+                arrowEntity.name = rightAnchorName
+                arrowEntity.position.x = 0.5
                 worldAnchor.addChild(arrowEntity)
+                let arrowEntityleft = createArrowEntity()
+                arrowEntityleft.name = leftAnchorName
+                arrowEntityleft.position.x = -0.5
+                worldAnchor.addChild(arrowEntityleft)
                 worldAnchor.position.z = -2
                 worldAnchor.name = "worldAnchor"
                 content.add(worldAnchor)
             } update: { content in
-                guard let arrowLeft = content.entities.first(where: {$0.name == "worldAnchor"})?.children.first(where: { $0.name == leftAnchorName }) else { print("sdfa")
+                guard let arrowLeft = content.entities.first(where: {$0.name == "worldAnchor"})?.children.first(where: { $0.name == leftAnchorName }) else {
                     return }
                 arrowLeft.setOrientation(
-                    simd_quatf(Carv2DataPair.shared.right.realityKitRotation3
+                    simd_quatf(Carv2DataPair.shared.left.realityKitRotation3
                                                                  ), relativeTo: nil)
                 
                 guard let arrowRight = content.entities.first(where: {$0.name == "worldAnchor"})?.children.first(where: { $0.name == rightAnchorName })else  { return }
