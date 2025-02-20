@@ -11,39 +11,16 @@ let manager = OrientationManager()
 
 struct ContentView: View {
     @StateObject private var conductor = DynamicOscillatorConductor()
-    @State private var timer: Timer?
-    @State private var updateSubscription: AnyCancellable?
-    @State private var cancellables = Set<AnyCancellable>()
-    @State private var arSession = ARSession()
-    @State private var locationManager = CLLocationManager()
     @State private var parallelAngle = {
         getSignedAngleBetweenQuaternions(q1: simd_quatf(Carv2DataPair.shared.left.leftRealityKitRotation), q2:  simd_quatf(Carv2DataPair.shared.right.rightRealityKitRotation) )
     }
     
-    @ObservedObject var carv2DataPair = Carv2DataPair.shared // 値が更新されない
+    @ObservedObject var carv2DataPair = Carv2DataPair.shared
     @ObservedObject var carv1DataPair = Carv1DataPair.shared
     @State private var parallelAngle2 : Double = 0
     @State private var diffTargetAngle : Float = 1.5
     private let leftAnchorName: String = "leftAnchor"
     private let rightAnchorName: String = "rightAnchor"
-    private let leftAnchorName2: String = "leftAnchor2"
-    private let rightAnchorName2: String = "rightAnchor2"
-    func formatQuaternion(_ quat: simd_quatd) -> String {
-        let components = [quat.real, quat.imag.x, quat.imag.y, quat.imag.z]
-        
-        let rounded = components.map { value in
-            String(format: "%.1f", round(value * 10) / 10)  // 四捨五入処理
-        }
-        
-        return """
-        simd_quatd(
-            real: \(rounded[0]),
-            ix: \(rounded[1]),
-            iy: \(rounded[2]),
-            iz: \(rounded[3])
-        )
-        """
-    }
     func createAxisLabel(text: String, color: UIColor) -> ModelEntity {
         let textMesh = MeshResource.generateText(
             text,
@@ -58,14 +35,8 @@ struct ContentView: View {
             materials: [SimpleMaterial(color: color, isMetallic: false)]
         )
     }
-    let coordinateConversion = simd_quatf(angle: -.pi/2, axis: [1, 0, 0])
-
-    // クオータニオン変換処理
-    func convertSensorQuaternion(_ sensorQuat: simd_quatf) -> simd_quatf {
-        return coordinateConversion * sensorQuat * coordinateConversion.inverse
-    }
+    
     @ObservedObject var ble = BluethoothCentralManager()
-    @Environment(\.scenePhase) var scenePhase
     let points: [(x: CGFloat, y: CGFloat)] = [
         (0.4, 0.1),(0.5, 0.1),
         (0.35, 0.15),(0.5, 0.15),(0.6, 0.15),
@@ -87,7 +58,10 @@ struct ContentView: View {
 //            }){
 //                Text("Calibrate")
 //            }
-//            Text(formatQuaternion(carv2DataPair.left.attitude.quaternion))
+            HStack{
+                Text(carv2DataPair.left.attitude.quaternion.formatQuaternion)
+                Text(carv2DataPair.right.attitude.quaternion.formatQuaternion)
+            }
 //            Text("paralell rotation angle \(carv2DataPair.yawingAngulerRateDiffrential * 10)")
 //            Text("parallel angle \(ceil(parallelAngle()))")
 //            Text("parallel angle2 \(ceil(parallelAngle2))")
@@ -180,15 +154,6 @@ struct ContentView: View {
             // 中央固定設定// カメラ前方1m
             return arrowEntity
         }
-        let bootsAnchor = {
-            let arrowEntity = createArrowEntity()
-            let worldAnchor = AnchorEntity(.camera)
-            arrowEntity.name = leftAnchorName
-            worldAnchor.addChild(arrowEntity)
-            worldAnchor.position.z = -2
-            worldAnchor.name = "worldAnchor"
-            return worldAnchor
-        }
 //        HStack{
 //            GeometryReader { geometry in
 //                ZStack {
@@ -250,8 +215,6 @@ struct ContentView: View {
                 arrowRight.setOrientation(
                     simd_quatf(Carv2DataPair.shared.right.rightRealityKitRotation
                               ) , relativeTo: nil)
-                
-                
                 DispatchQueue.main.async {
                     parallelAngle2 = Double(getSignedAngleBetweenQuaternions2(q1: arrowLeft.orientation(relativeTo: nil), q2: arrowRight.orientation(relativeTo: nil)))
                 }
@@ -263,7 +226,6 @@ struct ContentView: View {
             manager.startUpdates()
         }
         .onDisappear {
-            timer?.invalidate()
             conductor.stop()
         }.onChange(of: carv2DataPair.yawingAngulerRateDiffrential) {
             if (-diffTargetAngle...diffTargetAngle).contains(carv2DataPair.yawingAngulerRateDiffrential ) {
@@ -302,16 +264,6 @@ extension simd_quatf {
     ContentView()
 }
 
-extension Rotation3D {
-    var angle: Angle {
-        Angle(radians: quaternion.angle) // クォータニオンの角度をAngleに変換
-    }
-    
-    var axis: (x: CGFloat, y: CGFloat, z: CGFloat) {
-        let axis = quaternion.axis
-        return (CGFloat(axis.x), CGFloat(axis.y), CGFloat(axis.z))
-    }
-}
 import simd
 
 func getSignedAngleBetweenQuaternions2(q1: simd_quatf, q2: simd_quatf) -> Double {
@@ -322,12 +274,9 @@ func getSignedAngleBetweenQuaternions2(q1: simd_quatf, q2: simd_quatf) -> Double
 }
 
 func getSignedAngleBetweenQuaternions(q1: simd_quatf, q2: simd_quatf) -> Float {
-    // -X軸方向の基準ベクトル
-    let minusX = simd_float3(-1, 0, 0)
-    
     // 各クオータニオンで回転後のベクトルを取得
-    let v1 = q1.act(minusX)
-    let v2 = q2.act(minusX)
+    let v1 = q1.act(simd_float3(-1, 0, 0)) // 左右のブーツでｘ軸の向きが真逆なので、
+    let v2 = q2.act(simd_float3(1, 0, 0))
     
     // YZ平面への投影
     let proj1 = simd_float3(0, v1.y, v1.z)

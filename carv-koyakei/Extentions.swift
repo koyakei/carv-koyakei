@@ -26,3 +26,23 @@ enum Endianness {
     case little
     case big
 }
+
+import simd
+extension simd_quatd {
+    var formatQuaternion: String {
+        let components = [self.real, self.imag.x, self.imag.y, self.imag.z]
+        
+        let rounded = components.map { value in
+            String(format: "%.1f", round(value * 10) / 10)  // 四捨五入処理
+        }
+        
+        return """
+        simd_quatd(
+            real: \(rounded[0]),
+            ix: \(rounded[1]),
+            iy: \(rounded[2]),
+            iz: \(rounded[3])
+        )
+        """
+    }
+}
