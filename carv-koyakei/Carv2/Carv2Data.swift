@@ -33,12 +33,8 @@ class Carv2Data {
     var attitude: Rotation3D
     var acceleration: SIMD3<Float>
     var angularVelocity : SIMD3<Float>
-    // ipad
-    static let rightCharactaristicUUID = UUID(uuidString: "85A29A4C-09C3-C632-858A-3387339C67CF")
-    static let leftCharactaristicUUID = UUID(uuidString:  "850D8BCF-3B03-1322-F51C-DD38E961FC1A")
-    // iphone
-//    static let rightCharactaristicUUID = UUID(uuidString: "85E2946B-0D18-FA01-E1C9-0393EDD9013A")
-//    static let leftCharactaristicUUID = UUID(uuidString:  "57089C67-2275-E220-B6D3-B16E2639EFD6")
+    let recordetTime: TimeInterval = Date.now.timeIntervalSince1970
+  
     var realityKitRotation4: Rotation3D {
         let attitude = self.attitude
         let cmQuat = attitude.quaternion

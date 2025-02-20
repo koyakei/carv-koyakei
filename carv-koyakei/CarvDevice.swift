@@ -97,20 +97,20 @@ func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CB
     
     if let value = characteristic.value {
         if characteristic.service?.peripheral?.name == Carv1DataPair.periferalName{
-            if peripheral.identifier == Carv1Data.rightCharactaristicUUID {
+            if peripheral.identifier == Carv2DataPair.rightCharactaristicUUID {
                 Carv1DataPair.shared.right  = Carv1Data(rightData: value)
             }
-            if peripheral.identifier == Carv1Data.leftCharactaristicUUID {
+            if peripheral.identifier == Carv2DataPair.leftCharactaristicUUID {
                 Carv1DataPair.shared.left  = Carv1Data(leftData: value)
             }
         } else if characteristic.service?.peripheral?.name == Carv2DataPair.periferalName {
             
-            if peripheral.identifier == Carv2Data.rightCharactaristicUUID{
+            if peripheral.identifier == Carv2DataPair.rightCharactaristicUUID{
                 DispatchQueue.main.async {
                     Carv2DataPair.shared.right = Carv2Data(rightData: value)
                 }
             }
-            if peripheral.identifier == Carv2Data.leftCharactaristicUUID {
+            if peripheral.identifier == Carv2DataPair.leftCharactaristicUUID {
                 DispatchQueue.main.async {
                     Carv2DataPair.shared.left = Carv2Data(leftData: value)
                 }

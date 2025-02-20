@@ -427,7 +427,9 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "carv-koyakei/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "つかう";
 				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "ｐつかう";
 				INFOPLIST_KEY_NSCameraUsageDescription = AR;
@@ -473,7 +475,9 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "carv-koyakei/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "つかう";
 				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "ｐつかう";
 				INFOPLIST_KEY_NSCameraUsageDescription = AR;

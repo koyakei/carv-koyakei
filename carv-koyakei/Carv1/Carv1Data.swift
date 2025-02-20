@@ -18,12 +18,7 @@ import simd
 import SwiftUICore
 
 public class Carv1Data :ObservableObject{
-    // ipad
-    static let rightCharactaristicUUID = UUID(uuidString: "8359EA93-4503-E6E0-4B65-65E281678DC3")
-    static let leftCharactaristicUUID = UUID(uuidString:  "50556BC5-022C-57BC-6A90-9EA9EC7DACA7")
-//    // iphone
-//    static let rightCharactaristicUUID = UUID(uuidString: "85E2946B-0D18-FA01-E1C9-0393EDD9013A")
-//    static let leftCharactaristicUUID = UUID(uuidString:  "57089C67-2275-E220-B6D3-B16E2639EFD6")
+  
     @Published var attitude: Rotation3D
     @Published var acceleration: SIMD3<Float>
     @Published var pressure: [UInt8] = [UInt8](repeating: 0xff, count: 38)

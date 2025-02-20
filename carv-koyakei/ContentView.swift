@@ -11,16 +11,15 @@ let manager = OrientationManager()
 
 struct ContentView: View {
     @StateObject private var conductor = DynamicOscillatorConductor()
-    @State private var parallelAngle = {
-        getSignedAngleBetweenQuaternions(q1: simd_quatf(Carv2DataPair.shared.left.leftRealityKitRotation), q2:  simd_quatf(Carv2DataPair.shared.right.rightRealityKitRotation) )
-    }
     
     @ObservedObject var carv2DataPair = Carv2DataPair.shared
     @ObservedObject var carv1DataPair = Carv1DataPair.shared
     @State private var parallelAngle2 : Double = 0
     @State private var diffTargetAngle : Float = 1.5
+    private let  csvExporter = CSVExporter()
     private let leftAnchorName: String = "leftAnchor"
     private let rightAnchorName: String = "rightAnchor"
+    @State private var csvRecording = false
     func createAxisLabel(text: String, color: UIColor) -> ModelEntity {
         let textMesh = MeshResource.generateText(
             text,
@@ -59,11 +58,26 @@ struct ContentView: View {
 //                Text("Calibrate")
 //            }
             HStack{
+                Button(action: {
+                    csvExporter.open( CSVExporter.makeFilePath(fileAlias: "carv2_raw_data"))
+                }){
+                    Text("Start CSV")
+                }
+                Button(action: {
+                    self.csvExporter.close()
+                }){
+                    Text("Stop CSV")
+                }
+            }.onChange(of: Carv2DataPair.shared.left.attitude.quaternion) {
+                csvExporter.write(Carv2DataPair.shared.left)
+                
+            }
+            
+            HStack{
                 Text(carv2DataPair.left.attitude.quaternion.formatQuaternion)
                 Text(carv2DataPair.right.attitude.quaternion.formatQuaternion)
             }
 //            Text("paralell rotation angle \(carv2DataPair.yawingAngulerRateDiffrential * 10)")
-//            Text("parallel angle \(ceil(parallelAngle()))")
 //            Text("parallel angle2 \(ceil(parallelAngle2))")
 //            Slider(
 //                            value: $diffTargetAngle,
@@ -210,13 +224,13 @@ struct ContentView: View {
                 arrowLeft.setOrientation(
                     simd_quatf(Carv2DataPair.shared.left.rightRealityKitRotation
                                                                  ), relativeTo: nil)
-                
                 guard let arrowRight = content.entities.first(where: {$0.name == "worldAnchor"})?.children.first(where: { $0.name == rightAnchorName })else  { return }
                 arrowRight.setOrientation(
                     simd_quatf(Carv2DataPair.shared.right.rightRealityKitRotation
                               ) , relativeTo: nil)
                 DispatchQueue.main.async {
-                    parallelAngle2 = Double(getSignedAngleBetweenQuaternions2(q1: arrowLeft.orientation(relativeTo: nil), q2: arrowRight.orientation(relativeTo: nil)))
+                    parallelAngle2 = Double(
+                        arrowLeft.orientation(relativeTo: nil).getSignedAngleBetweenQuaternions2(q2: arrowRight.orientation(relativeTo: nil)))
                 }
 
             }
@@ -248,57 +262,11 @@ struct ContentView: View {
    
 }
 
-extension simd_quatf {
-    init(from double4: SIMD4<Double>) {
-        self.init(
-            ix: Float(double4.x),
-            iy: Float(double4.y),
-            iz: Float(double4.z),
-            r: Float(double4.w)
-        )
-    }
-}
 
 
 #Preview {
     ContentView()
 }
 
-import simd
 
-func getSignedAngleBetweenQuaternions2(q1: simd_quatf, q2: simd_quatf) -> Double {
-    let dotProduct = simd_dot(q1.vector, q2.vector)
-    let angle = 2 * acos(min(abs(dotProduct), 1.0))
-    let degree = Angle(radians: Double(angle)).degrees
-    return dotProduct < 0 ? -degree : degree
-}
 
-func getSignedAngleBetweenQuaternions(q1: simd_quatf, q2: simd_quatf) -> Float {
-    // 各クオータニオンで回転後のベクトルを取得
-    let v1 = q1.act(simd_float3(-1, 0, 0)) // 左右のブーツでｘ軸の向きが真逆なので、
-    let v2 = q2.act(simd_float3(1, 0, 0))
-    
-    // YZ平面への投影
-    let proj1 = simd_float3(0, v1.y, v1.z)
-    let proj2 = simd_float3(0, v2.y, v2.z)
-    
-    // 正規化
-    let norm1 = simd_normalize(proj1)
-    let norm2 = simd_normalize(proj2)
-    
-    // ゼロベクトルチェック
-    if norm1 == .zero || norm2 == .zero {
-        return 0
-    }
-    
-    // 内積と外積計算
-    let dot = simd_dot(norm1, norm2)
-    let cross = simd_cross(norm1, norm2)
-    
-    // 角度計算（符号付き）
-    let angleRad = atan2(cross.x, dot)
-    let angleDeg = angleRad * (180 / .pi)
-    
-    // 角度を-180°～180°に正規化
-    return angleDeg.truncatingRemainder(dividingBy: 360) - (angleDeg > 180 ? 360 : 0) + (angleDeg < -180 ? 360 : 0)
-}

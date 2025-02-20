@@ -12,10 +12,10 @@ struct DeviceRow: View {
     
     var body: some View {
         
-        if (device.id == Carv2Data.leftCharactaristicUUID || device.id == Carv2Data.leftCharactaristicUUID){
+        if (device.id == Carv2DataPair.leftCharactaristicUUID || device.id == Carv2DataPair.leftCharactaristicUUID){
             Text("Left")
         }
-        if (device.id == Carv2Data.rightCharactaristicUUID || device.id == Carv2Data.rightCharactaristicUUID){Text("Right")}
+        if (device.id == Carv2DataPair.rightCharactaristicUUID || device.id == Carv2DataPair.rightCharactaristicUUID){Text("Right")}
         VStack(alignment: .leading) {
             Text(device.id.uuidString)
                 .font(.headline)

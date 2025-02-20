@@ -10,7 +10,6 @@ import SwiftUI
      
      var centralManager: CBCentralManager!
     static let targetServiceUUID = CBUUID(string: "2DFBFFFF-960D-4909-8D28-F353CB168E8A")
-     @Published var carv2PeripheralLeft : Carv2PeripheralLeft?
 override init() {
     super.init()
     centralManager = CBCentralManager(delegate: self, queue: nil)
@@ -42,7 +41,7 @@ func disconnect(carvDevice: CarvDevice) {
 }
 
 private func addDevice(_ peripheral: CBPeripheral) {
-    if !carvDeviceList.contains(where: { $0.id == Carv2Data.leftCharactaristicUUID &&
+    if !carvDeviceList.contains(where: { $0.id == Carv2DataPair.leftCharactaristicUUID &&
         $0.peripheral.name == Carv2DataPair.periferalName
     }) {
         let newDevice = CarvDevice(peripheral: peripheral,carv2DataPair: &carv2DataPair)

@@ -15,48 +15,16 @@ class Carv2DataPair : ObservableObject{
     public static let shared: Carv2DataPair = .init()
     var yawingSide: YawingSide = .straight
     static let periferalName = "CARV 2"
-    func signedAngleBetweenUpVectors(q1: simd_quatd, q2: simd_quatd) -> Double {
-        let baseUp = simd_double3(0, 1, 0)
-        let rotatedUp1 = q1.act(baseUp)
-        let rotatedUp2 = q2.act(baseUp)
-        
-        let cross = simd_cross(rotatedUp1, rotatedUp2)
-        let sign = simd_dot(cross, baseUp) >= 0 ? 1.0 : -1.0
-        return sign * angleBetweenUpVectors(q1: q1, q2: q2)
-    }
+    // ipad
+    static let rightCharactaristicUUID = UUID(uuidString: "85A29A4C-09C3-C632-858A-3387339C67CF")
+    static let leftCharactaristicUUID = UUID(uuidString:  "850D8BCF-3B03-1322-F51C-DD38E961FC1A")
+    // iphone
+//    static let rightCharactaristicUUID = UUID(uuidString: "85E2946B-0D18-FA01-E1C9-0393EDD9013A")
+//    static let leftCharactaristicUUID = UUID(uuidString:  "57089C67-2275-E220-B6D3-B16E2639EFD6")
+
     var yawingAngulerRateDiffrential: Float { Float(right.angularVelocity.y - left.angularVelocity.y)}
-    func angleBetweenUpVectors(q1: simd_quatd, q2: simd_quatd) -> Double {
-        // 基準の上方向ベクトル
-        let baseUp = simd_double3(0, 1, 0)
-        
-        // 各クォータニオンで回転後の上方向ベクトルを取得
-        let rotatedUp1 = q1.act(baseUp)
-        let rotatedUp2 = q2.act(baseUp)
-        
-        // 内積から角度を計算（0〜πラジアン）
-        let dot = simd_dot(rotatedUp1, rotatedUp2)
-        return acos(dot)
-    }
-    
-    var yawingDiffrencial: Double {
-        return signedAngleBetweenUpVectors(q1: left.attitude.quaternion, q2: right.attitude.quaternion)
-//        let angle1 = yRotationAngle(from: left.attitude.quaternion)
-//        let angle2 = yRotationAngle(from: right.attitude.quaternion)
-//            let delta = angle2 - angle1
-//
-//            // 角度差を[-π, π)の範囲に正規化
-//            return atan2(sin(delta), cos(delta))
-//        let baseYAxis = simd_double3(1, 0, 0)
-//
-//            // 各クォータニオンで回転させたY軸ベクトルを計算
-//        let yAxis1 = left.attitude.quaternion.act(baseYAxis)
-//            let yAxis2 = right.attitude.quaternion.act(baseYAxis)
-//
-//            // ベクトルの内積から角度を計算
-//            let dotProduct = simd_dot(yAxis1, yAxis2)
-////            let clampedDot = min(max(dotProduct, -1.0), 1.0) // 数値誤差対策
-//            return acos(dotProduct)
-    }
+
+
     
     
 }

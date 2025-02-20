@@ -22,22 +22,19 @@ public class Carv1DataPair :ObservableObject{
     var yawingSide: YawingSide = .straight
     static let periferalName = "⛷CARV"
     public static let shared: Carv1DataPair = .init()
-    
+    // ipad
+    static let rightCharactaristicUUID = UUID(uuidString: "8359EA93-4503-E6E0-4B65-65E281678DC3")
+    static let leftCharactaristicUUID = UUID(uuidString:  "50556BC5-022C-57BC-6A90-9EA9EC7DACA7")
+//    // iphone
+//    static let rightCharactaristicUUID = UUID(uuidString: "85E2946B-0D18-FA01-E1C9-0393EDD9013A")
+//    static let leftCharactaristicUUID = UUID(uuidString:  "57089C67-2275-E220-B6D3-B16E2639EFD6")
     static var leftCalibrationPressure = [UInt8](repeating: 0, count: 38)
     static var rightCalibrationPressure = [UInt8](repeating: 0, count: 38)
     func calibrateForce () {
         Carv1DataPair.leftCalibrationPressure = left.rawPressure
         Carv1DataPair.rightCalibrationPressure = right.rawPressure
     }
-    func signedAngleBetweenUpVectors(q1: simd_quatd, q2: simd_quatd) -> Double {
-        let baseUp = simd_double3(0, 1, 0)
-        let rotatedUp1 = q1.act(baseUp)
-        let rotatedUp2 = q2.act(baseUp)
-        
-        let cross = simd_cross(rotatedUp1, rotatedUp2)
-        let sign = simd_dot(cross, baseUp) >= 0 ? 1.0 : -1.0
-        return sign * angleBetweenUpVectors(q1: q1, q2: q2)
-    }
+    
     func angleBetweenUpVectors(q1: simd_quatd, q2: simd_quatd) -> Double {
         // 基準の上方向ベクトル
         let baseUp = simd_double3(0, 1, 0)
@@ -51,9 +48,7 @@ public class Carv1DataPair :ObservableObject{
         return acos(dot)
     }
     
-    var yawingDiffrencial: Double {
-        return signedAngleBetweenUpVectors(q1: left.attitude.quaternion, q2: right.attitude.quaternion)
-    }
+   
     
     
 }
