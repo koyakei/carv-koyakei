@@ -52,7 +52,6 @@ class CSVExporter {
             header += "rotation_x,"
             header += "rotation_y,"
             header += "rotation_z,"
-            header += "time interval"
             header += "\n"
             file.write(header.data(using: .utf8)!)
             self.file = file
@@ -86,9 +85,9 @@ class CSVExporter {
         text += "\(motion.acceleration.x),"
         text += "\(motion.acceleration.y),"
         text += "\(motion.acceleration.z),"
-        text += "\(Angle2D(radians: motion.attitude.eulerAngles(order: .xyz).angles.x)),"
-        text += "\(Angle2D(radians: motion.attitude.eulerAngles(order: .xyz).angles.y)),"
-        text += "\(Angle2D(radians: motion.attitude.eulerAngles(order: .xyz).angles.z)),"
+        text += "\(Angle2D(radians: motion.attitude.eulerAngles(order: .xyz).angles.x).degrees),"
+        text += "\(Angle2D(radians: motion.attitude.eulerAngles(order: .xyz).angles.y).degrees),"
+        text += "\(Angle2D(radians: motion.attitude.eulerAngles(order: .xyz).angles.z).degrees),"
         text += "\(motion.attitude.vector.x),"
         text += "\(motion.attitude.vector.y),"
         text += "\(motion.attitude.vector.z),"
