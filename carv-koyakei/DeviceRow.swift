@@ -35,6 +35,7 @@ struct DeviceRow: View {
                         Text("Subscribe")
                     }
                 }
+                    
             }
             
             if !device.services.isEmpty {

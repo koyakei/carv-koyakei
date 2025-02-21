@@ -24,6 +24,7 @@ class CarvDevice: NSObject, ObservableObject, Identifiable, CBPeripheralDelegate
         super.init()
         self.peripheral.delegate = self
     }
+    
     // 特性発見メソッドを実装
         public func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
             if let error = error {
@@ -107,12 +108,15 @@ func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CB
             
             if peripheral.identifier == Carv2DataPair.rightCharactaristicUUID{
                 DispatchQueue.main.async {
-                    Carv2DataPair.shared.right = Carv2Data(rightData: value)
+                    
+                    let res = Carv2DataPair.shared.receive(right: Carv2Data(rightData: value)) // この戻り値をCSVに出力したい。どうすればいいのか？
+                    
                 }
             }
             if peripheral.identifier == Carv2DataPair.leftCharactaristicUUID {
                 DispatchQueue.main.async {
-                    Carv2DataPair.shared.left = Carv2Data(leftData: value)
+                    let res = Carv2DataPair.shared.receive(left: Carv2Data(rightData: value)) // この戻り値をCSVに出力したい。どうすればいいのか？
+                    
                 }
             }
         }

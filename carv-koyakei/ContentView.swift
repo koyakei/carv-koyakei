@@ -11,12 +11,11 @@ let manager = OrientationManager()
 
 struct ContentView: View {
     @StateObject private var conductor = DynamicOscillatorConductor()
-    
     @ObservedObject var carv2DataPair = Carv2DataPair.shared
     @ObservedObject var carv1DataPair = Carv1DataPair.shared
     @State private var parallelAngle2 : Double = 0
     @State private var diffTargetAngle : Float = 1.5
-    private let  csvExporter = CSVExporter()
+    
     private let leftAnchorName: String = "leftAnchor"
     private let rightAnchorName: String = "rightAnchor"
     @State private var csvRecording = false
@@ -58,25 +57,20 @@ struct ContentView: View {
 //                Text("Calibrate")
 //            }
             HStack{
-                Button(action: {
-                    csvExporter.open( CSVExporter.makeFilePath(fileAlias: "carv2_raw_data"))
-                }){
-                    Text("Start CSV")
-                }
-                Button(action: {
-                    self.csvExporter.close()
-                }){
-                    Text("Stop CSV")
-                }
-            }.onChange(of: Carv2DataPair.shared.left.attitude.quaternion) {
-                csvExporter.write(Carv2DataPair.shared.left)
-                
-            }
-            
-            HStack{
                 Text(carv2DataPair.left.attitude.quaternion.formatQuaternion)
                 Text(carv2DataPair.right.attitude.quaternion.formatQuaternion)
             }
+            Button(action: {
+                ble.carv2DataPair.startCSVRecording()
+            }){
+                Text("start csv")
+            }
+            Button(action: {
+                ble.carv2DataPair.stopCSVRecording()
+            }){
+                Text("stop csv")
+            }
+            
 //            Text("paralell rotation angle \(carv2DataPair.yawingAngulerRateDiffrential * 10)")
 //            Text("parallel angle2 \(ceil(parallelAngle2))")
 //            Slider(

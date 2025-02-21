@@ -100,6 +100,19 @@ class CSVExporter {
         file.write(text.data(using: .utf8)!)
         sample += 1
     }
+    
+    func write(_ motion: Carv2AnalyzedDataPair) {
+        guard let file = self.file else { return }
+        var text = ""
+        let format = DateFormatter()
+            format.dateFormat = "HH:mm:ss.SSS"
+        format.timeZone = .current
+       
+        text += "\n"
+        file.write(text.data(using: .utf8)!)
+        sample += 1
+    }
+    
     func close() {
         guard let file = self.file else { return }
         file.closeFile()
