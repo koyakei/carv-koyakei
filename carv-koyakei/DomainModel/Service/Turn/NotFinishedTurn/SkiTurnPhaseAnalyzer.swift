@@ -13,16 +13,7 @@ import CoreMotion
 import Spatial
 
 
-extension simd_quatd {
-    
-    public static func + (lhs: simd_quatd, rhs: simd_quatf) -> simd_quatf{
-        return simd_quatf(  lhs) + rhs
-    }
-    
-    public static func - (lhs: simd_quatd, rhs: simd_quatf) -> simd_quatf{
-        return simd_quatf(  lhs) - rhs
-    }
-}
+
 
 extension simd_quatf {
     public init(_ val: simd_quatd){

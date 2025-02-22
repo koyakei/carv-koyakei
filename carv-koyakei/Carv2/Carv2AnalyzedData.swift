@@ -12,11 +12,30 @@ struct Carv2AnalyzedData {
     var acceleration: SIMD3<Float>
     var angularVelocity : SIMD3<Float>
     let recordetTime: TimeInterval = Date.now.timeIntervalSince1970
-    let turnPercentageByAngle: Float // 100%
-//    let turnNumber: Int
+
 }
 
 struct Carv2AnalyzedDataPair {
-    let left: Carv2AnalyzedData
-    let right: Carv2AnalyzedData
+    var left: Carv2AnalyzedData
+    var right: Carv2AnalyzedData
+    var yawingSide: TurnYawingSide {
+        get{
+            switch unitedYawingAngle {
+            case -.infinity..<Float(Angle2D(degrees: -1).radians):
+                return TurnYawingSide.RightYawing
+            case Float(Angle2D(degrees: 1).radians)...Float.infinity:
+                return TurnYawingSide.LeftYawing
+            default:
+                return TurnYawingSide.Straight
+            }
+        }
+    }
+    var unitedAttitude: simd_quatf {
+        (left.attitude.quaternion + right.attitude.quaternion).normalized.simd_quatf
+    }
+    var percentageOfTurns: Float
+    var unitedYawingAngle : Float {
+        left.angularVelocity.y + right.angularVelocity.y
+    }
+    var numberOfTurns: Int 
 }
