@@ -18,7 +18,6 @@ struct ContentView: View {
     
     private let leftAnchorName: String = "leftAnchor"
     private let rightAnchorName: String = "rightAnchor"
-    @State private var csvRecording = false
     func createAxisLabel(text: String, color: UIColor) -> ModelEntity {
         let textMesh = MeshResource.generateText(
             text,

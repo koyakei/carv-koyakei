@@ -13,7 +13,7 @@ class Carv2DataPair : ObservableObject{
     static let periferalName = "CARV 2"
     @Published var left:  Carv2Data = Carv2Data.init()
     @Published var right: Carv2Data = Carv2Data.init()
-    @State private var isRecordingCSV = false
+    private var isRecordingCSV = false
     private let  csvExporter = CSVExporter()
     private var numberOfTurn : Int = 0
     public static let shared: Carv2DataPair = .init()
@@ -31,7 +31,7 @@ class Carv2DataPair : ObservableObject{
     }
     var leftSingleTurnSequence: [Carv2AnalyzedData] = []
     var rightSingleTurnSequence: [Carv2AnalyzedData] = []
-    var analyzedDataPair : Carv2AnalyzedDataPair = .init(left: .init(attitude: .identity, acceleration: .one, angularVelocity: .one), right: .init(attitude: .identity, acceleration: .one, angularVelocity: .one),percentageOfTurns: .zero, numberOfTurns: .zero)
+    var analyzedDataPair : Carv2AnalyzedDataPair = .init(left: .init(attitude: .identity, acceleration: .one, angularVelocity: .one), right: .init(attitude: .identity, acceleration: .one, angularVelocity: .one),percentageOfTurns: .zero, numberOfTurns: .zero, recordetTime: Date.now.timeIntervalSince1970)
     var turnSideChangingPeriodFinder: TurnSideChangingPeriodFinder =
             TurnSideChangingPeriodFinder.init()
     var turnSwitchingDirectionFinder: TurnSwitchingDirectionFinder = TurnSwitchingDirectionFinder.init()
@@ -52,9 +52,9 @@ class Carv2DataPair : ObservableObject{
     }
     
     func startCSVRecording() {
+        isRecordingCSV = true
         csvExporter.open( CSVExporter.makeFilePath(fileAlias: "carv2_raw_data"))
         numberOfTurn = 0
-        isRecordingCSV = true
     }
     func stopCSVRecording() {
         csvExporter.close()
@@ -76,6 +76,7 @@ class Carv2DataPair : ObservableObject{
         analyzedDataPair.left = Carv2AnalyzedData(attitude: data.attitude, acceleration: data.acceleration, angularVelocity: data.angularVelocity)
         analyzedDataPair.numberOfTurns = numberOfTurn
         analyzedDataPair.percentageOfTurns = Float(turnPhasePercantageByAngle)
+        analyzedDataPair.recordetTime = data.recordetTime
         if isRecordingCSV {
             csvExporter.write(analyzedDataPair)
         }
@@ -96,6 +97,7 @@ class Carv2DataPair : ObservableObject{
         analyzedDataPair.right = Carv2AnalyzedData(attitude: data.attitude, acceleration: data.acceleration, angularVelocity: data.angularVelocity)
         analyzedDataPair.numberOfTurns = numberOfTurn
         analyzedDataPair.percentageOfTurns = Float(turnPhasePercantageByAngle)
+        analyzedDataPair.recordetTime = data.recordetTime
         if isRecordingCSV {
             csvExporter.write(analyzedDataPair)
         }

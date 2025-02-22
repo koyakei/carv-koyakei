@@ -37,5 +37,6 @@ struct Carv2AnalyzedDataPair {
     var unitedYawingAngle : Float {
         left.angularVelocity.y + right.angularVelocity.y
     }
-    var numberOfTurns: Int 
+    var numberOfTurns: Int
+    var recordetTime: TimeInterval
 }
