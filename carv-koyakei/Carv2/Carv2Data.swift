@@ -98,16 +98,22 @@ class Carv2Data {
         
         return MotionSensorData(attitude: Rotation3D.init(simd_quatf(vector: simd_float4(quatx, quaty, quatz, quatw))), acceleration:  SIMD3<Float>(x: ax, y: ay, z: az),angularVelocity: SIMD3<Float>(x: intbyte3[safe:0, default: 0], y: intbyte3[safe: 1, default: 0] , z: intbyte3[safe: 2,default: 0 ]))
     }
+    
     public init(rightData data: Data) {
         let motionSensorData = Carv2Data.int16ToFloat(data: data.dropFirst(1))
-        attitude = motionSensorData.attitude
-                     acceleration = motionSensorData.acceleration
+        attitude = motionSensorData.attitude.invertXYRotation()
+            .rotated(by: Rotation3D(angle: Angle2D(degrees: -180), axis: RotationAxis3D(x: 0, y: 1, z: 0)))
+//            .rotated(by: Rotation3D(angle: Angle2D(degrees: -180), axis: RotationAxis3D(x: 0, y: 0, z: 1)))
+            .rotated(by: Rotation3D(angle: Angle2D(degrees: -180), axis: RotationAxis3D(x: 1, y: 0, z: 0)))
+        acceleration = motionSensorData.acceleration
         angularVelocity = motionSensorData.angularVelocity
     }
     
     public init(leftData data: Data){
         let motionSensorData = Carv2Data.int16ToFloat(data: data.dropFirst(1))
+       
         attitude = motionSensorData.attitude
+            
         acceleration = motionSensorData.acceleration
         angularVelocity = motionSensorData.angularVelocity
     }
@@ -121,3 +127,12 @@ class Carv2Data {
 
 
 
+extension Rotation3D {
+    func invertXYRotation() -> Rotation3D {
+        var modifiedQuat = self.quaternion
+//        modifiedQuat.vector.x *= -1  // X軸回転反転
+        modifiedQuat.vector.y *= -1  // Y軸回転反転
+        modifiedQuat.vector.z *= -1
+        return Rotation3D(modifiedQuat.normalized)
+    }
+}

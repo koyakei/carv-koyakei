@@ -107,17 +107,17 @@ func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CB
         } else if characteristic.service?.peripheral?.name == Carv2DataPair.periferalName {
             
             if peripheral.identifier == Carv2DataPair.rightCharactaristicUUID{
-                DispatchQueue.main.async {
+                
                     
                     let res = self.carv2DataPair.receive(right: Carv2Data(rightData: value)) // この戻り値をCSVに出力したい。どうすればいいのか？
                     
-                }
+                
             }
             if peripheral.identifier == Carv2DataPair.leftCharactaristicUUID {
-                DispatchQueue.main.async {
-                    let res = self.carv2DataPair.receive(left: Carv2Data(rightData: value)) // この戻り値をCSVに出力したい。どうすればいいのか？
+                
+                let res = self.carv2DataPair.receive(left: Carv2Data(leftData: value)) // この戻り値をCSVに出力したい。どうすればいいのか？
                     
-                }
+                
             }
         }
         
