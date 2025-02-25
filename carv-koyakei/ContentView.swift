@@ -59,6 +59,30 @@ struct ContentView: View {
                 Text(carv2DataPair.left.attitude.quaternion.formatQuaternion)
                 Text(carv2DataPair.right.attitude.quaternion.formatQuaternion)
             }
+            HStack{
+                VStack{
+                    
+                    Text(String(Int(
+                                Angle2D(radians: carv2DataPair.left.attitude.eulerAngles(order: .xyz).angles.x).degrees)))
+                    
+                    Text(String(Int(
+                                Angle2D(radians: carv2DataPair.left.attitude.eulerAngles(order: .xyz).angles.y).degrees)))
+                    
+                    Text(String(Int(
+                                Angle2D(radians: carv2DataPair.left.attitude.eulerAngles(order: .xyz).angles.z).degrees)))
+                }
+                VStack{
+                    
+                    Text(String(Int(
+                                Angle2D(radians: carv2DataPair.right.attitude.eulerAngles(order: .xyz).angles.x).degrees)))
+                    
+                    Text(String(Int(
+                                Angle2D(radians: carv2DataPair.right.attitude.eulerAngles(order: .xyz).angles.y).degrees)))
+                    
+                    Text(String(Int(
+                                Angle2D(radians: carv2DataPair.right.attitude.eulerAngles(order: .xyz).angles.z).degrees)))
+                }
+            }
             Button(action: {
                 ble.carv2DataPair.startCSVRecording()
             }){

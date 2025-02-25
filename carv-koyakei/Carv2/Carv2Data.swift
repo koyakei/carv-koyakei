@@ -48,10 +48,12 @@ class Carv2Data {
     var realityKitRotation3: Rotation3D {
         let attitude = self.attitude
         let cmQuat = attitude.quaternion
-        let deviceQuat = simd_quatd(ix: cmQuat.vector.z,
-                                    iy: -cmQuat.vector.x,
-                                    iz: cmQuat.vector.y,
-                                    r: cmQuat.vector.w).normalized
+            var modifiedQuat = cmQuat
+        
+        let deviceQuat = simd_quatd(ix: modifiedQuat.vector.z,
+                                    iy: -modifiedQuat.vector.x,
+                                    iz: modifiedQuat.vector.y,
+                                    r: modifiedQuat.vector.w).normalized
     return Rotation3D( deviceQuat)
         }
     var rightRealityKitRotation: Rotation3D {
@@ -101,10 +103,10 @@ class Carv2Data {
     
     public init(rightData data: Data) {
         let motionSensorData = Carv2Data.int16ToFloat(data: data.dropFirst(1))
-        attitude = motionSensorData.attitude.invertXYRotation()
-            .rotated(by: Rotation3D(angle: Angle2D(degrees: -180), axis: RotationAxis3D(x: 0, y: 1, z: 0)))
-//            .rotated(by: Rotation3D(angle: Angle2D(degrees: -180), axis: RotationAxis3D(x: 0, y: 0, z: 1)))
-            .rotated(by: Rotation3D(angle: Angle2D(degrees: -180), axis: RotationAxis3D(x: 1, y: 0, z: 0)))
+        attitude = motionSensorData.attitude.invertXYRotation().rotated(by: Rotation3D(angle: Angle2D(degrees: 180), axis: RotationAxis3D(x: 0, y: 1, z: 0)))
+//            .rotated(by: Rotation3D(angle: Angle2D(degrees: -180), axis: RotationAxis3D(x: 0, y: 1, z: 0)))
+//            .rotated(by: Rotation3D(angle: Angle2D(degrees: 90), axis: RotationAxis3D(x: 0, y: 0, z: 1)))
+//            .rotated(by: Rotation3D(angle: Angle2D(degrees: -180), axis: RotationAxis3D(x: 1, y: 0, z: 0)))
         acceleration = motionSensorData.acceleration
         angularVelocity = motionSensorData.angularVelocity
     }
@@ -130,9 +132,10 @@ class Carv2Data {
 extension Rotation3D {
     func invertXYRotation() -> Rotation3D {
         var modifiedQuat = self.quaternion
-//        modifiedQuat.vector.x *= -1  // X軸回転反転
+        modifiedQuat.vector.x *= -1  // X軸回転反転
         modifiedQuat.vector.y *= -1  // Y軸回転反転
         modifiedQuat.vector.z *= -1
+        modifiedQuat.vector.w *= -1
         return Rotation3D(modifiedQuat.normalized)
     }
 }
