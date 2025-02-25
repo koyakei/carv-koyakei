@@ -239,7 +239,7 @@ struct ContentView: View {
                 guard let arrowLeft = content.entities.first(where: {$0.name == "worldAnchor"})?.children.first(where: { $0.name == leftAnchorName }) else {
                     return }
                 arrowLeft.setOrientation(
-                    simd_quatf(Carv2DataPair.shared.left.rightRealityKitRotation
+                    simd_quatf(Carv2DataPair.shared.left.leftRealityKitRotation
                                                                  ), relativeTo: nil)
                 guard let arrowRight = content.entities.first(where: {$0.name == "worldAnchor"})?.children.first(where: { $0.name == rightAnchorName })else  { return }
                 arrowRight.setOrientation(

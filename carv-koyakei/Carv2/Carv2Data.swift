@@ -46,7 +46,7 @@ class Carv2Data {
     }
     
     var realityKitRotation3: Rotation3D {
-        let attitude = self.attitude
+        let attitude = self.attitude.invertXYRotation().rotated(by: Rotation3D(angle: Angle2D(degrees: 180), axis: RotationAxis3D(x: 0, y: 1, z: 0)))
         let cmQuat = attitude.quaternion
             var modifiedQuat = cmQuat
         
@@ -54,7 +54,8 @@ class Carv2Data {
                                     iy: -modifiedQuat.vector.x,
                                     iz: modifiedQuat.vector.y,
                                     r: modifiedQuat.vector.w).normalized
-    return Rotation3D( deviceQuat)
+        
+    return Rotation3D(deviceQuat)
         }
     var rightRealityKitRotation: Rotation3D {
         let attitude = self.attitude
@@ -63,7 +64,7 @@ class Carv2Data {
                                     iy: -cmQuat.vector.x,
                                     iz: cmQuat.vector.y,
                                     r: cmQuat.vector.w).normalized
-    return Rotation3D( deviceQuat)
+    return Rotation3D( deviceQuat).rotated(by: Rotation3D(angle: Angle2D(degrees: -90), axis: RotationAxis3D(x: 0, y: 1, z: 0)))
     }
     var leftRealityKitRotation: Rotation3D {
         let attitude = self.attitude
@@ -104,9 +105,6 @@ class Carv2Data {
     public init(rightData data: Data) {
         let motionSensorData = Carv2Data.int16ToFloat(data: data.dropFirst(1))
         attitude = motionSensorData.attitude.invertXYRotation().rotated(by: Rotation3D(angle: Angle2D(degrees: 180), axis: RotationAxis3D(x: 0, y: 1, z: 0)))
-//            .rotated(by: Rotation3D(angle: Angle2D(degrees: -180), axis: RotationAxis3D(x: 0, y: 1, z: 0)))
-//            .rotated(by: Rotation3D(angle: Angle2D(degrees: 90), axis: RotationAxis3D(x: 0, y: 0, z: 1)))
-//            .rotated(by: Rotation3D(angle: Angle2D(degrees: -180), axis: RotationAxis3D(x: 1, y: 0, z: 0)))
         acceleration = motionSensorData.acceleration
         angularVelocity = motionSensorData.angularVelocity
     }
