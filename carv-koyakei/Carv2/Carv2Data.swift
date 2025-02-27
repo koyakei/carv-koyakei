@@ -10,53 +10,14 @@ import Spatial
 import simd
 import SwiftUICore
 import Combine
-extension Array {
-    subscript(safe index: Int, default defaultValue: @autoclosure () -> Element) -> Element {
-        guard index >= 0, index < endIndex else {
-            return defaultValue()
-        }
-        return self[index]
-    }
-}
-extension simd_quatf{
-    init (deviceQuat: simd_quatd){
-        self.init(
-            ix: Float(0),
-            iy: Float(-deviceQuat.axis.y),
-            iz: Float(deviceQuat.axis.z),
-            r: Float(deviceQuat.angle)
-        )
-    }
-}
+
    
 class Carv2Data {
     var attitude: Rotation3D
     var acceleration: SIMD3<Float>
     var angularVelocity : SIMD3<Float>
     let recordetTime: TimeInterval = Date.now.timeIntervalSince1970
-  
-    var realityKitRotation4: Rotation3D {
-        let attitude = self.attitude
-        let cmQuat = attitude.quaternion
-        let deviceQuat = simd_quatd(ix: -cmQuat.vector.z,
-                                    iy: -cmQuat.vector.x,
-                                    iz: -cmQuat.vector.y,
-                                    r: cmQuat.vector.w).normalized
-    return Rotation3D( deviceQuat)
-    }
     
-    var realityKitRotation3: Rotation3D {
-        let attitude = self.attitude.invertXYRotation().rotated(by: Rotation3D(angle: Angle2D(degrees: 180), axis: RotationAxis3D(x: 0, y: 1, z: 0)))
-        let cmQuat = attitude.quaternion
-            var modifiedQuat = cmQuat
-        
-        let deviceQuat = simd_quatd(ix: modifiedQuat.vector.z,
-                                    iy: -modifiedQuat.vector.x,
-                                    iz: modifiedQuat.vector.y,
-                                    r: modifiedQuat.vector.w).normalized
-        
-    return Rotation3D(deviceQuat)
-        }
     var rightRealityKitRotation: Rotation3D {
         let attitude = self.attitude
         let cmQuat = attitude.quaternion
@@ -64,8 +25,9 @@ class Carv2Data {
                                     iy: -cmQuat.vector.x,
                                     iz: cmQuat.vector.y,
                                     r: cmQuat.vector.w).normalized
-    return Rotation3D( deviceQuat).rotated(by: Rotation3D(angle: Angle2D(degrees: -90), axis: RotationAxis3D(x: 0, y: 1, z: 0)))
+        return Rotation3D( deviceQuat).rotated(by: Rotation3D(angle: Angle2D(degrees: -90), axis: RotationAxis3D(x: 0, y: 1, z: 0)))
     }
+    
     var leftRealityKitRotation: Rotation3D {
         let attitude = self.attitude
         let cmQuat = attitude.quaternion
@@ -73,10 +35,8 @@ class Carv2Data {
                                     iy: -cmQuat.vector.x,
                                     iz: cmQuat.vector.y,
                                     r: cmQuat.vector.w).normalized
-    return Rotation3D( deviceQuat)
-        }
-    
-//                                        x: cmQuat.imag.z, y: -cmQuat.imag.y, z: -cmQuat.imag.x)
+        return Rotation3D( deviceQuat)
+    }
     static private func int16ToFloat(data: Data) -> MotionSensorData {
 
         let intbyte :[Int16] = data.withUnsafeBytes {
@@ -111,13 +71,10 @@ class Carv2Data {
     
     public init(leftData data: Data){
         let motionSensorData = Carv2Data.int16ToFloat(data: data.dropFirst(1))
-       
         attitude = motionSensorData.attitude
-            
         acceleration = motionSensorData.acceleration
         angularVelocity = motionSensorData.angularVelocity
     }
-    private var cancellables = Set<AnyCancellable>()
     public init () {
         attitude = .identity
         acceleration = .zero

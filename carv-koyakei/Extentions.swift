@@ -95,3 +95,21 @@ extension simd_quatf {
     }
 }
 
+extension Array {
+    subscript(safe index: Int, default defaultValue: @autoclosure () -> Element) -> Element {
+        guard index >= 0, index < endIndex else {
+            return defaultValue()
+        }
+        return self[index]
+    }
+}
+extension simd_quatf{
+    init (deviceQuat: simd_quatd){
+        self.init(
+            ix: Float(0),
+            iy: Float(-deviceQuat.axis.y),
+            iz: Float(deviceQuat.axis.z),
+            r: Float(deviceQuat.angle)
+        )
+    }
+}

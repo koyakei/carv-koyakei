@@ -47,7 +47,9 @@ class Carv2DataPair : ObservableObject{
     var oneTurnDiffreentialFinder: OneTurnDiffrentialFinder = OneTurnDiffrentialFinder.init()
 
     var yawingAngulerRateDiffrential: Float { Float(right.angularVelocity.y - left.angularVelocity.y)}
-    var rollingAngulerRateDiffrential: Float { Float(right.angularVelocity.x - left.angularVelocity.x)}
+    // ローリングの方向を　realitykit 用の変換コードを一つの行列変換で表現したやつを掛けて揃えなきゃいけないんだけど、やってない。
+    // ここでサボると加速度の変換がおかしなことになる。
+    var rollingAngulerRateDiffrential: Float { Float(right.angularVelocity.x + left.angularVelocity.x)}
     // ２つのヨーイング角速度を合計したもの　最新のフレームのみなのか？それとも平均でいくのか？　とりあえず最新フレーム
     var unitedYawingAngle : Float {
         left.angularVelocity.y + right.angularVelocity.y
@@ -108,19 +110,6 @@ class Carv2DataPair : ObservableObject{
 }
 
 
-struct TurnSideChangingPeriodFinder {
-    var lastSwitchedTurnSideTimeStamp: TimeInterval = Date.now.timeIntervalSince1970
-    
-
-    mutating func handle
-    (currentTimeStampSince1970: TimeInterval, isTurnSwitching: Bool) -> TimeInterval {
-        let period = currentTimeStampSince1970 - lastSwitchedTurnSideTimeStamp
-       if (isTurnSwitching)  {
-            lastSwitchedTurnSideTimeStamp = currentTimeStampSince1970
-        }
-        return period
-    }
-}
 
 
     
