@@ -7,14 +7,9 @@
 
 import SwiftUI
 import RealityKit
-import simd
-import AudioKit
-import Combine
 
 struct ARBootsView: View {
     @ObservedObject var carv2DataPair = Carv2DataPair.shared
-    @ObservedObject var conductor = DynamicOscillatorConductor()
-    @State var diffTargetAngle: Double = 2.0
     let leftAnchorName = "leftAnchor"
     let rightAnchorName = "rightAnchor"
     @State var parallelAngle2: Double = 0
@@ -129,30 +124,8 @@ struct ARBootsView: View {
                     parallelAngle2 = Double(
                         arrowLeft.orientation(relativeTo: nil).getSignedAngleBetweenQuaternions2(q2: arrowRight.orientation(relativeTo: nil)))
                 }
-                
             }
             .frame(height: 800)
-        }.onAppear {
-            conductor.start()
-        }
-        .onDisappear {
-            conductor.stop()
-        }.onChange(of: carv2DataPair.yawingAngulerRateDiffrential) {
-            if (-diffTargetAngle...diffTargetAngle).contains(Double(carv2DataPair.yawingAngulerRateDiffrential) ) {
-                conductor.data.isPlaying = false
-            } else {
-                conductor.data.isPlaying = true
-            }
-            if carv2DataPair.yawingAngulerRateDiffrential > 0 {
-                conductor.panner.pan = 1.0
-                conductor.data.frequency = AUValue(ToneStep.lowToHigh(ceil(carv2DataPair.yawingAngulerRateDiffrential * 10)))
-                
-                conductor.changeWaveFormToSin()
-            } else {
-                conductor.panner.pan = -1.0
-                conductor.changeWaveFormToTriangle()
-                conductor.data.frequency = AUValue(ToneStep.hight(ceil(carv2DataPair.yawingAngulerRateDiffrential * 10)))
-            }
         }
     }
 }
