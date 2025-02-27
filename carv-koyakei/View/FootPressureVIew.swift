@@ -23,6 +23,11 @@ struct FootPressureView: View {
         (0.5, 0.9)
     ]
     var body: some View {
+                    Button(action: {
+                        Carv1DataPair.shared.calibrateForce()
+                    }){
+                        Text("Calibrate")
+                    }
         HStack{
             GeometryReader { geometry in
                 ZStack {

@@ -47,6 +47,7 @@ class Carv2DataPair : ObservableObject{
     var oneTurnDiffreentialFinder: OneTurnDiffrentialFinder = OneTurnDiffrentialFinder.init()
 
     var yawingAngulerRateDiffrential: Float { Float(right.angularVelocity.y - left.angularVelocity.y)}
+    var rollingAngulerRateDiffrential: Float { Float(right.angularVelocity.x - left.angularVelocity.x)}
     // ２つのヨーイング角速度を合計したもの　最新のフレームのみなのか？それとも平均でいくのか？　とりあえず最新フレーム
     var unitedYawingAngle : Float {
         left.angularVelocity.y + right.angularVelocity.y

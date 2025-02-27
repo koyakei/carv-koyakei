@@ -13,14 +13,14 @@ struct HomeView: View {
     @ObservedObject var ble = BluethoothCentralManager()
     @ObservedObject var carv2DataPair = Carv2DataPair.shared
     @ObservedObject var conductor = DynamicOscillatorConductor()
-    @State var diffTargetAngle: Double = 2.0
+    
+    @State var diffYawingTargetAngle: Double = 2.0
+    @State var yawingBeep: Bool = false
+    
+    @State var rollingBeep: Bool = false
+    @State var diffRollingTargetAngle: Double = 2.0
     var body: some View {
         VStack {
-            //            Button(action: {
-            //                Carv1DataPair.shared.calibrateForce()
-            //            }){
-            //                Text("Calibrate")
-            //            }
             HStack{
                 Text(carv2DataPair.left.attitude.quaternion.formatQuaternion)
                 Text(carv2DataPair.right.attitude.quaternion.formatQuaternion)
@@ -63,26 +63,49 @@ struct HomeView: View {
             }
             //            Text("paralell rotation angle \(carv2DataPair.yawingAngulerRateDiffrential * 10)")
             //            Text("parallel angle2 \(ceil(parallelAngle2))")
-            Slider(
-                value: $diffTargetAngle,
-                in: 0.0...3.0,
-                step: 0.05
-            ) {
-                Text("Adjustment")
+            HStack{
+                Button(action: {
+                    yawingBeep.toggle()}){
+                        Text("yawing beep \(yawingBeep ? "on" : "off")")
+                    }
+                Text("Current value: \(diffYawingTargetAngle, specifier: "%.2f")")
+                    .padding()
             }
-            
-            Text("Current value: \(diffTargetAngle, specifier: "%.2f")")
+            if yawingBeep {
+                    Slider(
+                        value: $diffYawingTargetAngle,
+                        in: 0.0...4.0,
+                        step: 0.2
+                    ) {
+                    Text("Yaw Adjustment")
+                }
+            }
+            HStack{
+                Button(action: {
+                    rollingBeep.toggle()}){
+                        Text("rolling beep \(yawingBeep ? "on" : "off")")
+                    }
+                Text("Current value: \(diffRollingTargetAngle, specifier: "%.2f")")
+                    .padding()
+            }
+            if rollingBeep {
+                Slider(
+                    value: $diffRollingTargetAngle,
+                    in: 0.0...4.0,
+                    step: 0.2
+                ) {
+                    Text("Rolling Adjustment")
+                }
+            }
+            HStack{
+                Button(action: { ble.scan() }) {
+                    Text("Scan")
+                }
+                Button(action: { ble.retrieveAndConnect() }) {
+                    Text("Retrieve and Connect")
+                }
                 .padding()
-            //            Button(action: { conductor.data.isPlaying.toggle()}){
-            //                conductor.data.isPlaying ? Text("stop paralell tone") : Text("start paralell tone")
-            //            }
-                        Button(action: { ble.scan() }) {
-                            Text("Scan")
-                        }
-            Button(action: { ble.retrieveAndConnect() }) {
-                Text("Retrieve and Connect")
             }
-            .padding()
             List(ble.carvDeviceList) { device in
                 
                 DeviceRow(device: device, ble: ble)
@@ -93,19 +116,38 @@ struct HomeView: View {
         .onDisappear {
             conductor.stop()
         }.onChange(of: carv2DataPair.yawingAngulerRateDiffrential) {
-            if (-diffTargetAngle...diffTargetAngle).contains(Double(carv2DataPair.yawingAngulerRateDiffrential) ) {
-                conductor.data.isPlaying = false
-            } else {
-                conductor.data.isPlaying = true
+            if yawingBeep {
+                if (-diffYawingTargetAngle...diffYawingTargetAngle).contains(Double(carv2DataPair.yawingAngulerRateDiffrential) ) {
+                    conductor.data.isPlaying = false
+                } else {
+                    conductor.data.isPlaying = true
+                }
+                if carv2DataPair.yawingAngulerRateDiffrential > 0 {
+                    conductor.panner.pan = 1.0
+                    conductor.data.frequency = AUValue(ToneStep.lowToHigh(ceil(carv2DataPair.yawingAngulerRateDiffrential * 10)))
+                    conductor.changeWaveFormToSin()
+                } else {
+                    conductor.panner.pan = -1.0
+                    conductor.changeWaveFormToTriangle()
+                    conductor.data.frequency = AUValue(ToneStep.hight(ceil(carv2DataPair.yawingAngulerRateDiffrential * 10)))
+                }
             }
-            if carv2DataPair.yawingAngulerRateDiffrential > 0 {
-                conductor.panner.pan = 1.0
-                conductor.data.frequency = AUValue(ToneStep.lowToHigh(ceil(carv2DataPair.yawingAngulerRateDiffrential * 10))) 
-                conductor.changeWaveFormToSin()
-            } else {
-                conductor.panner.pan = -1.0
-                conductor.changeWaveFormToTriangle()
-                conductor.data.frequency = AUValue(ToneStep.hight(ceil(carv2DataPair.yawingAngulerRateDiffrential * 10)))
+        }.onChange(of: carv2DataPair.rollingAngulerRateDiffrential) {
+            if rollingBeep {
+                if (-diffRollingTargetAngle...diffRollingTargetAngle).contains(Double(carv2DataPair.rollingAngulerRateDiffrential) ) {
+                    conductor.data.isPlaying = false
+                } else {
+                    conductor.data.isPlaying = true
+                }
+                if carv2DataPair.rollingAngulerRateDiffrential > 0 {
+                    conductor.panner.pan = 1.0
+                    conductor.data.frequency = AUValue(ToneStep.lowToHigh(ceil(carv2DataPair.rollingAngulerRateDiffrential * 10)))
+                    conductor.changeWaveFormToSin()
+                } else {
+                    conductor.panner.pan = -1.0
+                    conductor.changeWaveFormToTriangle()
+                    conductor.data.frequency = AUValue(ToneStep.hight(ceil(carv2DataPair.rollingAngulerRateDiffrential * 10)))
+                }
             }
         }
     }

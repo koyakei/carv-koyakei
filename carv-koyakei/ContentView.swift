@@ -16,9 +16,12 @@ struct ContentView: View {
                             Text("AR")
                         }
                 }
-        
+            FootPressureView()
+                .tabItem {
+                    Image(systemName: "person.fill")
+                    Text("pressure")
+            }
     }
-   
 }
 
 #Preview {
