@@ -26,6 +26,9 @@ struct HomeView: View {
                 Text(carv2DataPair.right.attitude.quaternion.formatQuaternion)
             }
             HStack{
+                Text(String(format: "%.1f",carv2DataPair.parallelAngleByAttitude))
+            }
+            HStack{
                 VStack{
                     
                     Text(String(Int(

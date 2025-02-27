@@ -12,7 +12,6 @@ struct ARBootsView: View {
     @ObservedObject var carv2DataPair = Carv2DataPair.shared
     let leftAnchorName = "leftAnchor"
     let rightAnchorName = "rightAnchor"
-    @State var parallelAngle2: Double = 0
     private static func createAxisLabel(text: String, color: UIColor) -> ModelEntity {
         let textMesh = MeshResource.generateText(
             text,
@@ -96,7 +95,6 @@ struct ARBootsView: View {
     var body: some View {
         HStack {
             RealityView { content in
-                // カメラ設定（空間追跡有効化）
                 content.camera = .spatialTracking
                 let worldAnchor = AnchorEntity(.camera)
                 let arrowEntity = createArrowEntity()
@@ -120,12 +118,7 @@ struct ARBootsView: View {
                 arrowRight.setOrientation(
                     simd_quatf(Carv2DataPair.shared.right.rightRealityKitRotation
                               ) , relativeTo: nil)
-                DispatchQueue.main.async {
-                    parallelAngle2 = Double(
-                        arrowLeft.orientation(relativeTo: nil).getSignedAngleBetweenQuaternions2(q2: arrowRight.orientation(relativeTo: nil)))
-                }
             }
-            .frame(height: 800)
         }
     }
 }

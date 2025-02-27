@@ -66,6 +66,9 @@ class Carv2DataPair : ObservableObject{
         numberOfTurn = 0
     }
     
+//     同じやつをここに移植
+    lazy var  parallelAngleByAttitude = Double(
+                    left.leftRealityKitRotation.quaternion.simd_quatf.getSignedAngleBetweenQuaternions2(q2: right.rightRealityKitRotation.quaternion.simd_quatf))
     func receive(left data: Carv2Data)  -> Carv2AnalyzedDataPair {
         self.left = data
         let isTurnSwitching: Bool = turnSwitchingTimingFinder.handle(zRotationAngle: Double(unitedYawingAngle), timeInterval: data.recordetTime)
