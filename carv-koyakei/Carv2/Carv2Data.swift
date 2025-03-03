@@ -35,7 +35,7 @@ class Carv2Data {
                                     iy: -cmQuat.vector.x,
                                     iz: cmQuat.vector.y,
                                     r: cmQuat.vector.w).normalized
-        return Rotation3D( deviceQuat)
+        return Rotation3D( deviceQuat).rotated(by: Rotation3D(angle: Angle2D(degrees: -180), axis: RotationAxis3D(x: 0, y: 1, z: 0)))
     }
     static private func int16ToFloat(data: Data) -> MotionSensorData {
 

@@ -7,9 +7,11 @@
 
 import SwiftUI
 import RealityKit
+import Charts
 
 struct ARBootsView: View {
     @ObservedObject var carv2DataPair = Carv2DataPair.shared
+    @StateObject private var chartDataManager = ChartDataManager()
     let leftAnchorName = "leftAnchor"
     let rightAnchorName = "rightAnchor"
     private static func createAxisLabel(text: String, color: UIColor) -> ModelEntity {
@@ -119,6 +121,73 @@ struct ARBootsView: View {
                     simd_quatf(Carv2DataPair.shared.right.rightRealityKitRotation
                               ) , relativeTo: nil)
             }
+            chartOverlay
+                            .background(
+                                VisualEffectBlur(blurStyle: .systemUltraThinMaterial)
+                                    .opacity(0.9)
+                                    .cornerRadius(12)
+                            )
+                            .padding(.trailing, 20)
+                            .padding(.top, 50)
         }
+    }
+    
+    private var chartOverlay: some View {
+        VStack(alignment: .leading) {
+            Text("リアルタイム回転角度")
+                .font(.caption.bold())
+                .foregroundStyle(.secondary)
+            
+            Chart(chartDataManager.dataPoints) { data in
+                LineMark(
+                    x: .value("時間", data.timestamp),
+                    y: .value("角度", data.value)
+                )
+                .interpolationMethod(.catmullRom)
+                .foregroundStyle(.blue)
+                
+                AreaMark(
+                    x: .value("時間", data.timestamp),
+                    y: .value("角度", data.value)
+                )
+                .foregroundStyle(LinearGradient(
+                    colors: [.blue.opacity(0.2), .clear],
+                    startPoint: .top,
+                    endPoint: .bottom
+                ))
+            }
+            .chartXAxis {
+                AxisMarks(values: .automatic) { value in
+                    AxisGridLine()
+                    AxisTick()
+                    AxisValueLabel(format: Decimal.FormatStyle.number.precision(.fractionLength(0)))
+                }
+            }
+            .chartYScale(domain: 0...(.pi))
+            .chartYAxis {
+                AxisMarks(position: .leading, values: .stride(by: Double.pi/2)) { value in
+                    AxisGridLine()
+                    AxisTick()
+                    AxisValueLabel {
+                        if let doubleValue = value.as(Double.self) {
+                            Text("\(doubleValue, format: .number.precision(.fractionLength(2)))π")
+                        }
+                    }
+                }
+            }
+            .frame(width: 300, height: 150)
+        }
+    }
+}
+
+struct VisualEffectBlur: UIViewRepresentable {
+    var blurStyle: UIBlurEffect.Style
+    
+    func makeUIView(context: Context) -> UIVisualEffectView {
+        return UIVisualEffectView(effect: UIBlurEffect(style: blurStyle))
+    }
+    
+    func updateUIView(_ uiView: UIVisualEffectView, context: Context) {
+        uiView.effect = UIBlurEffect(style: blurStyle)
     }
 }
