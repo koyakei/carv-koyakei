@@ -8,13 +8,14 @@
 import SwiftUI
 import RealityKit
 import Charts
+import AVFoundation
 
 struct ARBootsView: View {
     @ObservedObject var carv2DataPair = Carv2DataPair.shared
     @StateObject private var chartDataManager = ChartDataManager()
-    @State private var currentScale: CGFloat = 1.0
-    @State private var initialScale: CGFloat = 1.0
-    
+    @State private var currentScale: CGFloat = 3.0
+    @State private var initialScale: CGFloat = 3.0
+    let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back)
     let leftAnchorName = "leftAnchor"
     let rightAnchorName = "rightAnchor"
     private static func createAxisLabel(text: String, color: UIColor) -> ModelEntity {
@@ -32,6 +33,21 @@ struct ARBootsView: View {
         )
     }
     
+    func zoomIn() {
+        do {
+            try device?.lockForConfiguration()
+            let targetZoom: CGFloat = 3.0
+            let duration: TimeInterval = 0.25
+            
+            // レート計算（変化量/時間）
+            let rate = (targetZoom - (device?.videoZoomFactor ?? 0)) / duration
+            device?.ramp(toVideoZoomFactor: targetZoom, withRate: Float(rate))
+            
+            device?.unlockForConfiguration()
+        } catch {
+            print("ズーム設定エラー: \(error)")
+        }
+    }
     
     let createArrowEntity = {
         // 矢印エンティティの生成
@@ -126,14 +142,17 @@ struct ARBootsView: View {
             }
             .gesture(magnificationGesture)
             .overlay(alignment: .bottom){
-                chartOverlay
-                                .background(
-                                    VisualEffectBlur(blurStyle: .systemUltraThinMaterial)
-                                        .opacity(0.9)
-                                        .cornerRadius(12)
-                                )
-                                .padding(.horizontal, 20)
-                                .padding(.bottom, 10)
+                Button(action: zoomIn){
+                    Text("zoom")
+                }
+//                chartOverlay
+//                                .background(
+//                                    VisualEffectBlur(blurStyle: .systemUltraThinMaterial)
+//                                        .opacity(0.9)
+//                                        .cornerRadius(12)
+//                                )
+//                                .padding(.horizontal, 20)
+//                                .padding(.bottom, 10)
             }
             
                             
