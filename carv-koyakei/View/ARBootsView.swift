@@ -12,6 +12,9 @@ import Charts
 struct ARBootsView: View {
     @ObservedObject var carv2DataPair = Carv2DataPair.shared
     @StateObject private var chartDataManager = ChartDataManager()
+    @State private var currentScale: CGFloat = 1.0
+    @State private var initialScale: CGFloat = 1.0
+    
     let leftAnchorName = "leftAnchor"
     let rightAnchorName = "rightAnchor"
     private static func createAxisLabel(text: String, color: UIColor) -> ModelEntity {
@@ -120,7 +123,9 @@ struct ARBootsView: View {
                 arrowRight.setOrientation(
                     simd_quatf(Carv2DataPair.shared.right.rightRealityKitRotation
                               ) , relativeTo: nil)
-            }.overlay(alignment: .bottom){
+            }
+            .gesture(magnificationGesture)
+            .overlay(alignment: .bottom){
                 chartOverlay
                                 .background(
                                     VisualEffectBlur(blurStyle: .systemUltraThinMaterial)
@@ -134,6 +139,16 @@ struct ARBootsView: View {
                             
         }
     }
+    private var magnificationGesture: some Gesture {
+            MagnificationGesture()
+                .onChanged { value in
+                    let newScale = self.initialScale * value
+                    self.currentScale = min(max(newScale, 0.3), 3.0)
+                }
+                .onEnded { _ in
+                    self.initialScale = self.currentScale
+                }
+        }
     
     private var chartOverlay: some View {
         VStack(alignment: .leading) {
