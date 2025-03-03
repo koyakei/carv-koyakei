@@ -95,7 +95,7 @@ struct ARBootsView: View {
     }
     
     var body: some View {
-        HStack {
+        ZStack {
             RealityView { content in
                 content.camera = .spatialTracking
                 let worldAnchor = AnchorEntity(.camera)
@@ -120,15 +120,18 @@ struct ARBootsView: View {
                 arrowRight.setOrientation(
                     simd_quatf(Carv2DataPair.shared.right.rightRealityKitRotation
                               ) , relativeTo: nil)
+            }.overlay(alignment: .bottom){
+                chartOverlay
+                                .background(
+                                    VisualEffectBlur(blurStyle: .systemUltraThinMaterial)
+                                        .opacity(0.9)
+                                        .cornerRadius(12)
+                                )
+                                .padding(.horizontal, 20)
+                                .padding(.bottom, 10)
             }
-            chartOverlay
-                            .background(
-                                VisualEffectBlur(blurStyle: .systemUltraThinMaterial)
-                                    .opacity(0.9)
-                                    .cornerRadius(12)
-                            )
-                            .padding(.trailing, 20)
-                            .padding(.top, 50)
+            
+                            
         }
     }
     
@@ -190,4 +193,8 @@ struct VisualEffectBlur: UIViewRepresentable {
     func updateUIView(_ uiView: UIVisualEffectView, context: Context) {
         uiView.effect = UIBlurEffect(style: blurStyle)
     }
+}
+
+#Preview {
+    ARBootsView(carv2DataPair: Carv2DataPair())
 }
