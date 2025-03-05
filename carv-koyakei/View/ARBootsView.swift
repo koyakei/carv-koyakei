@@ -8,14 +8,13 @@
 import SwiftUI
 import RealityKit
 import Charts
-import AVFoundation
 
 struct ARBootsView: View {
     @ObservedObject var carv2DataPair = Carv2DataPair.shared
-    @StateObject private var chartDataManager = ChartDataManager()
+    @StateObject private var cameraManager = CameraManager()
+    var carv2AnalyzedDataPairManager = Carv2AnalyzedDataPairManager.shared
     @State private var currentScale: CGFloat = 3.0
     @State private var initialScale: CGFloat = 3.0
-    let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back)
     let leftAnchorName = "leftAnchor"
     let rightAnchorName = "rightAnchor"
     private static func createAxisLabel(text: String, color: UIColor) -> ModelEntity {
@@ -31,22 +30,6 @@ struct ARBootsView: View {
             mesh: textMesh,
             materials: [SimpleMaterial(color: color, isMetallic: false)]
         )
-    }
-    
-    func zoomIn() {
-        do {
-            try device?.lockForConfiguration()
-            let targetZoom: CGFloat = 3.0
-            let duration: TimeInterval = 0.25
-            
-            // レート計算（変化量/時間）
-            let rate = (targetZoom - (device?.videoZoomFactor ?? 0)) / duration
-            device?.ramp(toVideoZoomFactor: targetZoom, withRate: Float(rate))
-            
-            device?.unlockForConfiguration()
-        } catch {
-            print("ズーム設定エラー: \(error)")
-        }
     }
     
     let createArrowEntity = {
@@ -142,17 +125,14 @@ struct ARBootsView: View {
             }
             .gesture(magnificationGesture)
             .overlay(alignment: .bottom){
-                Button(action: zoomIn){
-                    Text("zoom")
-                }
-//                chartOverlay
-//                                .background(
-//                                    VisualEffectBlur(blurStyle: .systemUltraThinMaterial)
-//                                        .opacity(0.9)
-//                                        .cornerRadius(12)
-//                                )
-//                                .padding(.horizontal, 20)
-//                                .padding(.bottom, 10)
+                chartOverlay
+                                .background(
+                                    VisualEffectBlur(blurStyle: .systemUltraThinMaterial)
+                                        .opacity(0.9)
+                                        .cornerRadius(12)
+                                )
+                                .padding(.horizontal, 20)
+                                .padding(.bottom, 10)
             }
             
                             
@@ -161,58 +141,65 @@ struct ARBootsView: View {
     private var magnificationGesture: some Gesture {
             MagnificationGesture()
                 .onChanged { value in
-                    let newScale = self.initialScale * value
-                    self.currentScale = min(max(newScale, 0.3), 3.0)
+                    cameraManager.handleZoomChange(scale: value)
                 }
                 .onEnded { _ in
-                    self.initialScale = self.currentScale
+                    cameraManager.resetZoomTracking()
                 }
         }
     
+    // 外足のロール角度を重ねて表示
     private var chartOverlay: some View {
         VStack(alignment: .leading) {
-            Text("リアルタイム回転角度")
-                .font(.caption.bold())
-                .foregroundStyle(.secondary)
-            
-            Chart(chartDataManager.dataPoints) { data in
-                LineMark(
-                    x: .value("時間", data.timestamp),
-                    y: .value("角度", data.value)
-                )
-                .interpolationMethod(.catmullRom)
-                .foregroundStyle(.blue)
-                
-                AreaMark(
-                    x: .value("時間", data.timestamp),
-                    y: .value("角度", data.value)
-                )
-                .foregroundStyle(LinearGradient(
-                    colors: [.blue.opacity(0.2), .clear],
-                    startPoint: .top,
-                    endPoint: .bottom
-                ))
-            }
-            .chartXAxis {
-                AxisMarks(values: .automatic) { value in
-                    AxisGridLine()
-                    AxisTick()
-                    AxisValueLabel(format: Decimal.FormatStyle.number.precision(.fractionLength(0)))
-                }
-            }
-            .chartYScale(domain: 0...(.pi))
-            .chartYAxis {
-                AxisMarks(position: .leading, values: .stride(by: Double.pi/2)) { value in
-                    AxisGridLine()
-                    AxisTick()
-                    AxisValueLabel {
-                        if let doubleValue = value.as(Double.self) {
-                            Text("\(doubleValue, format: .number.precision(.fractionLength(2)))π")
+            Text("ロール角比較")
+                        .font(.caption.bold())
+                        .foregroundStyle(.secondary)
+                    
+                    Chart {
+                        // 前回ターン（青い折れ線）
+                        ForEach(carv2AnalyzedDataPairManager.beforeTurn) { data in
+                            PointMark(
+                                x: .value("フェーズ", data.percentageOfTurns),
+                                y: .value("角度", data.outsideSki.rollAngle)
+                            )
+                            .interpolationMethod(.catmullRom)
+                            .foregroundStyle(.blue)
+                        }
+                        
+                        // 現在ターン（赤いポイント）
+                        ForEach(carv2AnalyzedDataPairManager.currentTurn) { data in
+                            PointMark(
+                                x: .value("フェーズ", data.percentageOfTurns),
+                                y: .value("角度", data.outsideSki.rollAngle)
+                            )
+                            .interpolationMethod(.catmullRom)
+                            .foregroundStyle(.blue)
                         }
                     }
-                }
-            }
-            .frame(width: 300, height: 150)
+                    .chartXScale(domain: 0...1)
+                    .chartXAxis {
+                        AxisMarks(values: [0, 0.2, 0.4, 0.6, 0.8, 1.0]) { value in
+                            AxisGridLine()
+                            AxisTick()
+                            AxisValueLabel {
+                                if let doubleValue = value.as(Double.self) {
+                                    Text("\(doubleValue, format: .number.precision(.fractionLength(2)))")
+                                }
+                            }
+                        }
+                    }
+                    .chartYAxis {
+                        AxisMarks(position: .leading, values: .stride(by: Double.pi/2)) { value in
+                            AxisGridLine()
+                            AxisTick()
+                            AxisValueLabel {
+                                if let doubleValue = value.as(Double.self) {
+                                    Text("\(doubleValue, format: .number.precision(.fractionLength(2)))π")
+                                }
+                            }
+                        }
+                    }
+                    .frame(width: 300, height: 150)
         }
     }
 }

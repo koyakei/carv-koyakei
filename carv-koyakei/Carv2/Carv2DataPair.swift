@@ -24,6 +24,7 @@ class Carv2DataPair : ObservableObject{
     private let  csvExporter = CSVExporter()
     private var numberOfTurn : Int = 0
     public static let shared: Carv2DataPair = .init()
+    
     var yawingSide: TurnYawingSide {
         get{
             switch unitedYawingAngle {
@@ -36,9 +37,10 @@ class Carv2DataPair : ObservableObject{
             }
         }
     }
+    
     var leftSingleTurnSequence: [Carv2AnalyzedData] = []
     var rightSingleTurnSequence: [Carv2AnalyzedData] = []
-    var analyzedDataPair : Carv2AnalyzedDataPair = .init(left: .init(attitude: .identity, acceleration: .one, angularVelocity: .one), right: .init(attitude: .identity, acceleration: .one, angularVelocity: .one),percentageOfTurns: .zero, numberOfTurns: .zero, recordetTime: Date.now.timeIntervalSince1970)
+    var analyzedDataPair : Carv2AnalyzedDataPair = .init(left: .init(attitude: .identity, acceleration: .one, angularVelocity: .one), right: .init(attitude: .identity, acceleration: .one, angularVelocity: .one), isTurnSwitching: false,percentageOfTurns: .zero, numberOfTurns: .zero, recordetTime: Date.now.timeIntervalSince1970)
     var turnSideChangingPeriodFinder: TurnSideChangingPeriodFinder =
             TurnSideChangingPeriodFinder.init()
     var turnSwitchingDirectionFinder: TurnSwitchingDirectionFinder = TurnSwitchingDirectionFinder.init()
@@ -84,6 +86,7 @@ class Carv2DataPair : ObservableObject{
         analyzedDataPair.numberOfTurns = numberOfTurn
         analyzedDataPair.percentageOfTurns = Float(turnPhasePercantageByAngle)
         analyzedDataPair.recordetTime = data.recordetTime
+        analyzedDataPair.isTurnSwitching = isTurnSwitching
         if isRecordingCSV {
             csvExporter.write(analyzedDataPair)
         }
@@ -105,6 +108,7 @@ class Carv2DataPair : ObservableObject{
         analyzedDataPair.numberOfTurns = numberOfTurn
         analyzedDataPair.percentageOfTurns = Float(turnPhasePercantageByAngle)
         analyzedDataPair.recordetTime = data.recordetTime
+        analyzedDataPair.isTurnSwitching = isTurnSwitching
         if isRecordingCSV {
             csvExporter.write(analyzedDataPair)
         }
