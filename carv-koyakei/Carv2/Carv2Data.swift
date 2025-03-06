@@ -68,14 +68,15 @@ class Carv2Data {
     }
     
     var rightRealityKitRotation: Rotation3D {
-        let p = ProjectiveTransform3D(scale: Size3D(vector: [-1,-1,-1]),rotation: Rotation3D(simd_quatd(real: -1, imag: [-1.0,-1.0,1.0]).normalized))
-        return Rotation3D.init(simd_quatd(vector:p.matrix.inverse * attitude.vector))
+        let p = ProjectiveTransform3D(scale: Size3D(vector: [-1,-1,-1]),rotation: Rotation3D(simd_quatd(real: 1, imag: [-1.0,-1.0,1.0]).normalized))
+        return Rotation3D.init(simd_quatd(vector:p.matrix * attitude.vector)).rotated(by: Rotation3D(angle: Angle2D(radians: .pi/2), axis: RotationAxis3D(vector: [0,1,0])))
     }
     
     var leftRealityKitRotation: Rotation3D {
-        let p = ProjectiveTransform3D(scale: Size3D(vector: [-1,-1,-1]),rotation: Rotation3D(simd_quatd(real: 1, imag: [1.0,1.0,-1.0]).normalized))
-        return Rotation3D.init(simd_quatd(vector:p.matrix.inverse * attitude.vector)).rotated(by: Rotation3D(angle: Angle2D(radians: .pi), axis: RotationAxis3D(x: 0, y: 1, z: 0)))
+        let p = ProjectiveTransform3D(scale: Size3D(vector: [-1,-1,-1]),rotation: Rotation3D(simd_quatd(real: 1, imag: [-1.0,1.0,-1.0]).normalized))
+        return Rotation3D.init(simd_quatd(vector:p.matrix * attitude.vector)).rotated(by: Rotation3D(angle: Angle2D(radians: .pi), axis: RotationAxis3D(vector: [1,0,0])))
     }
+  
     
     static private func int16ToFloat(data: Data) -> MotionSensorData {
 
@@ -104,7 +105,7 @@ class Carv2Data {
     
     public init(rightData data: Data) {
         let motionSensorData = Carv2Data.int16ToFloat(data: data.dropFirst(1))
-        attitude = motionSensorData.attitude.invertXYRotation().rotated(by: Rotation3D(angle: Angle2D(degrees: 180), axis: RotationAxis3D(x: 0, y: 1, z: 0)))
+        attitude = motionSensorData.attitude
         acceleration = motionSensorData.acceleration
         angularVelocity = motionSensorData.angularVelocity
     }
