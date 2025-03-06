@@ -123,15 +123,3 @@ class Carv2Data {
     }
 }
 
-
-
-extension Rotation3D {
-    func invertXYRotation() -> Rotation3D {
-        var modifiedQuat = self.quaternion
-        modifiedQuat.vector.x *= -1  // X軸回転反転
-        modifiedQuat.vector.y *= -1  // Y軸回転反転
-        modifiedQuat.vector.z *= -1
-        modifiedQuat.vector.w *= -1
-        return Rotation3D(modifiedQuat.normalized)
-    }
-}
