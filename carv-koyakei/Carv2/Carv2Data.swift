@@ -13,30 +13,70 @@ import Combine
 
    
 class Carv2Data {
+    // クォータニオンから回転行列への変換
+    func quaternionToRotationMatrix(_ q: simd_quatf) -> matrix_float3x3 {
+        let norm = simd_normalize(q)
+        let x = norm.vector.x
+        let y = norm.vector.y
+        let z = norm.vector.z
+        let w = norm.vector.w
+        
+        return matrix_float3x3(rows: [
+            simd_float3(
+                1 - 2*y*y - 2*z*z,
+                2*x*y + 2*z*w,
+                2*x*z - 2*y*w
+            ),
+            simd_float3(
+                2*x*y - 2*z*w,
+                1 - 2*x*x - 2*z*z,
+                2*y*z + 2*x*w
+            ),
+            simd_float3(
+                2*x*z + 2*y*w,
+                2*y*z - 2*x*w,
+                1 - 2*x*x - 2*y*y
+            )
+        ])
+    }
+    func convertToWorldAcceleration(sensorAccel: SIMD3<Float>,
+                                   quaternion: simd_quatf) -> SIMD3<Float> {
+        let rotationMatrix = quaternionToRotationMatrix(quaternion)
+        let worldAccel = rotationMatrix * sensorAccel
+        
+        // センサー特性に応じた符号反転（必要に応じて調整）
+        return SIMD3<Float>(-worldAccel.x, -worldAccel.y, -worldAccel.z)
+    }
+    
     var attitude: Rotation3D
     var acceleration: SIMD3<Float>
     var angularVelocity : SIMD3<Float>
     let recordetTime: TimeInterval = Date.now.timeIntervalSince1970
+    var leftRealityKitAcceleration : Vector3D {
+        let v = simd_dot(
+            simd_quatf(from:  (simd_quatd(angle: 0, axis: [0,0,1]) * leftRealityKitRotation.quaternion
+                              ).vector).axis
+            ,
+                simd_float3(acceleration.x, acceleration.y,
+                                 acceleration.z)
+        )
+        return Vector3D(x: v, y: 0, z: 0)
+//        Vector3D(acceleration).applying(AffineTransform3D(rotation: leftRealityKitRotation.inverse))
+    }
+    var leftRealityKitAngularVelocity : Vector3D {
+        Vector3D(convertToWorldAcceleration(sensorAccel: acceleration, quaternion: leftRealityKitRotation.quaternion.inverse.simd_quatf))
+    }
     
     var rightRealityKitRotation: Rotation3D {
-        let attitude = self.attitude
-        let cmQuat = attitude.quaternion
-        let deviceQuat = simd_quatd(ix: cmQuat.vector.z,
-                                    iy: -cmQuat.vector.x,
-                                    iz: cmQuat.vector.y,
-                                    r: cmQuat.vector.w).normalized
-        return Rotation3D( deviceQuat).rotated(by: Rotation3D(angle: Angle2D(degrees: -90), axis: RotationAxis3D(x: 0, y: 1, z: 0)))
+        let p = ProjectiveTransform3D(scale: Size3D(vector: [-1,-1,-1]),rotation: Rotation3D(simd_quatd(real: -1, imag: [-1.0,-1.0,1.0]).normalized))
+        return Rotation3D.init(simd_quatd(vector:p.matrix.inverse * attitude.vector))
     }
     
     var leftRealityKitRotation: Rotation3D {
-        let attitude = self.attitude
-        let cmQuat = attitude.quaternion
-        let deviceQuat = simd_quatd(ix: cmQuat.vector.z,
-                                    iy: -cmQuat.vector.x,
-                                    iz: cmQuat.vector.y,
-                                    r: cmQuat.vector.w).normalized
-        return Rotation3D( deviceQuat).rotated(by: Rotation3D(angle: Angle2D(degrees: -180), axis: RotationAxis3D(x: 0, y: 1, z: 0)))
+        let p = ProjectiveTransform3D(scale: Size3D(vector: [-1,-1,-1]),rotation: Rotation3D(simd_quatd(real: 1, imag: [1.0,1.0,-1.0]).normalized))
+        return Rotation3D.init(simd_quatd(vector:p.matrix.inverse * attitude.vector)).rotated(by: Rotation3D(angle: Angle2D(radians: .pi), axis: RotationAxis3D(x: 0, y: 1, z: 0)))
     }
+    
     static private func int16ToFloat(data: Data) -> MotionSensorData {
 
         let intbyte :[Int16] = data.withUnsafeBytes {

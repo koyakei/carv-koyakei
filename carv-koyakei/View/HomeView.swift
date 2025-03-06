@@ -26,6 +26,10 @@ struct HomeView: View {
                 Text(carv2DataPair.right.attitude.quaternion.formatQuaternion)
             }
             HStack{
+                Text(carv2DataPair.left.leftRealityKitAcceleration.description)
+                Text(carv2DataPair.left.leftRealityKitAngularVelocity.description)
+            }
+            HStack{
                 Text(String(format: "%.1f",carv2DataPair.parallelAngleByAttitude))
             }
             HStack{
