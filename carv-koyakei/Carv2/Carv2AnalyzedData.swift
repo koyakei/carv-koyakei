@@ -12,7 +12,7 @@ struct Carv2AnalyzedData {
     var acceleration: SIMD3<Float>
     var angularVelocity : SIMD3<Float>
     let recordetTime: TimeInterval = Date.now.timeIntervalSince1970
-    var rollAngle: Double {attitude.eulerAngles(order: .xyz).angles.x}
+    var rollAngle: Double {attitude.eulerAngles(order: .xyz).angles.z}
     var yawAngle: Double {attitude.eulerAngles(order: .xyz).angles.y}
     var pitchAngle: Double {attitude.eulerAngles(order: .xyz).angles.z}
 }
@@ -33,8 +33,11 @@ struct Carv2AnalyzedDataPair :Identifiable{
             }
         }
     }
-    var outsideSki: Carv2AnalyzedData {
-        if yawingSide == .LeftYawing {
+    var outsideSkiRollAngle: Double {
+        return left.rollAngle + Angle2D(degrees: 90).radians
+    }
+    
+    var outsideSki: Carv2AnalyzedData {        if yawingSide == .LeftYawing {
             return left
         } else {
             return right
@@ -50,10 +53,11 @@ struct Carv2AnalyzedDataPair :Identifiable{
     }
     
     var isTurnSwitching: Bool
-    var unitedAttitude: simd_quatf {
-        (left.attitude.quaternion + right.attitude.quaternion).normalized.simd_quatf
+    var unitedAttitude : Rotation3D {
+        Rotation3D.slerp(from: left.attitude, to: right.attitude, t: 0.5)
     }
-    var percentageOfTurns: Float
+    var percentageOfTurnsByAngle: Float
+    var percentageOfTurnsByTime: Double
     var unitedYawingAngle : Float {
         left.angularVelocity.y + right.angularVelocity.y
     }

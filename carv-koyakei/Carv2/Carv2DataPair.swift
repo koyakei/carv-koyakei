@@ -26,6 +26,7 @@ class Carv2DataPair : ObservableObject{
     public static let shared: Carv2DataPair = .init()
     @Published var currentTurn: [Carv2AnalyzedDataPair] = []
     @Published var beforeTurn: [Carv2AnalyzedDataPair] = []
+    
     func receive(data: Carv2AnalyzedDataPair){
         currentTurn.append(data)
         if currentTurn.count > 200 { // 20fps * 3 が最大だろう　２００は楽勝
@@ -53,13 +54,14 @@ class Carv2DataPair : ObservableObject{
     
     var leftSingleTurnSequence: [Carv2AnalyzedData] = []
     var rightSingleTurnSequence: [Carv2AnalyzedData] = []
-    var analyzedDataPair : Carv2AnalyzedDataPair = .init(left: .init(attitude: .identity, acceleration: .one, angularVelocity: .one), right: .init(attitude: .identity, acceleration: .one, angularVelocity: .one), isTurnSwitching: false,percentageOfTurns: .zero, numberOfTurns: .zero, recordetTime: Date.now.timeIntervalSince1970)
+    var analyzedDataPair : Carv2AnalyzedDataPair = .init(left: .init(attitude: .identity, acceleration: .one, angularVelocity: .one), right: .init(attitude: .identity, acceleration: .one, angularVelocity: .one), isTurnSwitching: false,percentageOfTurnsByAngle: .zero, percentageOfTurnsByTime: Date.now.timeIntervalSince1970, numberOfTurns: .zero, recordetTime: Date.now.timeIntervalSince1970)
     var turnSideChangingPeriodFinder: TurnSideChangingPeriodFinder =
             TurnSideChangingPeriodFinder.init()
     var turnSwitchingDirectionFinder: TurnSwitchingDirectionFinder = TurnSwitchingDirectionFinder.init()
     var turnSwitchingTimingFinder: TurnSwitchingTimingFinder = TurnSwitchingTimingFinder.init()
-    var lastTurnSwitchingUnitedAttitude: simd_quatf = simd_quatf.init()
+    var lastTurnSwitchingUnitedAttitude: Rotation3D = .identity
     var oneTurnDiffreentialFinder: OneTurnDiffrentialFinder = OneTurnDiffrentialFinder.init()
+    var turnPhaseByTime:TurnPhaseByTime = TurnPhaseByTime.init()
     var unitedAttitude:Rotation3D {
         Rotation3D.slerp(from: left.leftRealityKitRotation, to: right.rightRealityKitRotation, t: 0.5)
     }
@@ -82,24 +84,26 @@ class Carv2DataPair : ObservableObject{
         isRecordingCSV = false
         numberOfTurn = 0
     }
-    
+    var currentTurnPhaseByTime: Double = 0
 //     同じやつをここに移植
     lazy var  parallelAngleByAttitude = Double(
                     left.leftRealityKitRotation.quaternion.simd_quatf.getSignedAngleBetweenQuaternions2(q2: right.rightRealityKitRotation.quaternion.simd_quatf))
     func receive(left data: Carv2Data)  -> Carv2AnalyzedDataPair {
         self.left = data
         let isTurnSwitching: Bool = turnSwitchingTimingFinder.handle(zRotationAngle: Double(unitedYawingAngle), timeInterval: data.recordetTime)
-        let oneTurnDiffAngleEuller = oneTurnDiffreentialFinder.handle(isTurnSwitched: isTurnSwitching, currentTurnSwitchAngle: analyzedDataPair.unitedAttitude)
-        let turnPhasePercantageByAngle =  FindTurnPhaseBy100.init().handle(currentRotationEullerAngleFromTurnSwitching: CurrentDiffrentialFinder.init().handle(lastTurnSwitchAngle: lastTurnSwitchingUnitedAttitude, currentQuaternion: analyzedDataPair.unitedAttitude), oneTurnDiffrentialAngle: oneTurnDiffAngleEuller)
+        let oneTurnDiffAngleEuller = oneTurnDiffreentialFinder.handle(isTurnSwitched: isTurnSwitching, currentTurnSwitchAngle: analyzedDataPair.unitedAttitude.quaternion.simd_quatf)
+        let turnPhasePercantageByAngle =  FindTurnPhaseBy100.init().handle(currentRotationEullerAngleFromTurnSwitching: CurrentDiffrentialFinder.init().handle(lastTurnSwitchAngle: lastTurnSwitchingUnitedAttitude.quaternion.simd_quatf, currentQuaternion: analyzedDataPair.unitedAttitude.quaternion.simd_quatf), oneTurnDiffrentialAngle: oneTurnDiffAngleEuller)
         if isTurnSwitching {
             leftSingleTurnSequence.removeAll()
             rightSingleTurnSequence.removeAll()
-            lastTurnSwitchingUnitedAttitude = analyzedDataPair.unitedAttitude
+            lastTurnSwitchingUnitedAttitude = unitedAttitude
             numberOfTurn = numberOfTurn + 1
+            turnPhaseByTime.turnSwitched(currentTime: data.recordetTime)
         }
         analyzedDataPair.left = Carv2AnalyzedData(attitude: data.attitude, acceleration: data.acceleration, angularVelocity: data.angularVelocity)
         analyzedDataPair.numberOfTurns = numberOfTurn
-        analyzedDataPair.percentageOfTurns = Float(turnPhasePercantageByAngle)
+        analyzedDataPair.percentageOfTurnsByAngle = Float(turnPhasePercantageByAngle)
+        analyzedDataPair.percentageOfTurnsByTime = turnPhaseByTime.handle(currentTime: data.recordetTime, currentAttitude: data.leftRealityKitRotation)
         analyzedDataPair.recordetTime = data.recordetTime
         analyzedDataPair.isTurnSwitching = isTurnSwitching
         if isRecordingCSV {
@@ -112,17 +116,19 @@ class Carv2DataPair : ObservableObject{
     func receive(right data: Carv2Data)  -> Carv2AnalyzedDataPair {
         self.right = data
         let isTurnSwitching: Bool = turnSwitchingTimingFinder.handle(zRotationAngle: Double(unitedYawingAngle), timeInterval: data.recordetTime)
-        let oneTurnDiffAngleEuller = oneTurnDiffreentialFinder.handle(isTurnSwitched: isTurnSwitching, currentTurnSwitchAngle: analyzedDataPair.unitedAttitude)
-        let turnPhasePercantageByAngle =  FindTurnPhaseBy100.init().handle(currentRotationEullerAngleFromTurnSwitching: CurrentDiffrentialFinder.init().handle(lastTurnSwitchAngle: lastTurnSwitchingUnitedAttitude, currentQuaternion: analyzedDataPair.unitedAttitude), oneTurnDiffrentialAngle: oneTurnDiffAngleEuller)
+        let oneTurnDiffAngleEuller = oneTurnDiffreentialFinder.handle(isTurnSwitched: isTurnSwitching, currentTurnSwitchAngle: analyzedDataPair.unitedAttitude.quaternion.simd_quatf)
+        let turnPhasePercantageByAngle =  FindTurnPhaseBy100.init().handle(currentRotationEullerAngleFromTurnSwitching: CurrentDiffrentialFinder.init().handle(lastTurnSwitchAngle: lastTurnSwitchingUnitedAttitude.quaternion.simd_quatf, currentQuaternion: analyzedDataPair.unitedAttitude.quaternion.simd_quatf), oneTurnDiffrentialAngle: oneTurnDiffAngleEuller)
         if isTurnSwitching {
             leftSingleTurnSequence.removeAll()
             rightSingleTurnSequence.removeAll()
-            lastTurnSwitchingUnitedAttitude = analyzedDataPair.unitedAttitude
+            lastTurnSwitchingUnitedAttitude = unitedAttitude
             numberOfTurn = numberOfTurn + 1
+            turnPhaseByTime.turnSwitched(currentTime: data.recordetTime)
         }
         analyzedDataPair.right = Carv2AnalyzedData(attitude: data.attitude, acceleration: data.acceleration, angularVelocity: data.angularVelocity)
         analyzedDataPair.numberOfTurns = numberOfTurn
-        analyzedDataPair.percentageOfTurns = Float(turnPhasePercantageByAngle)
+        analyzedDataPair.percentageOfTurnsByAngle = Float(turnPhasePercantageByAngle)
+        analyzedDataPair.percentageOfTurnsByTime = turnPhaseByTime.handle(currentTime: data.recordetTime, currentAttitude: data.rightRealityKitRotation)
         analyzedDataPair.recordetTime = data.recordetTime
         analyzedDataPair.isTurnSwitching = isTurnSwitching
         if isRecordingCSV {

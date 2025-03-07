@@ -161,7 +161,7 @@ class CSVExporter {
         text += "\(motion.unitedAttitude.vector.w),"
         text += "\(motion.unitedYawingAngle),"
         text += "\(motion.yawingSide),"
-        text += "\(motion.percentageOfTurns),"
+        text += "\(motion.percentageOfTurnsByAngle),"
         text += "\(motion.numberOfTurns),"
         text += "\n"
         print(text)
