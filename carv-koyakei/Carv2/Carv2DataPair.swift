@@ -24,6 +24,19 @@ class Carv2DataPair : ObservableObject{
     private let  csvExporter = CSVExporter()
     private var numberOfTurn : Int = 0
     public static let shared: Carv2DataPair = .init()
+    @Published var currentTurn: [Carv2AnalyzedDataPair] = []
+    @Published var beforeTurn: [Carv2AnalyzedDataPair] = []
+    func receive(data: Carv2AnalyzedDataPair){
+        currentTurn.append(data)
+        if currentTurn.count > 200 { // 20fps * 3 が最大だろう　２００は楽勝
+            currentTurn.removeFirst()
+        }
+        
+        if data.isTurnSwitching {
+            self.beforeTurn = self.currentTurn
+            self.currentTurn = []
+        }
+    }
     
     var yawingSide: TurnYawingSide {
         get{
@@ -47,7 +60,9 @@ class Carv2DataPair : ObservableObject{
     var turnSwitchingTimingFinder: TurnSwitchingTimingFinder = TurnSwitchingTimingFinder.init()
     var lastTurnSwitchingUnitedAttitude: simd_quatf = simd_quatf.init()
     var oneTurnDiffreentialFinder: OneTurnDiffrentialFinder = OneTurnDiffrentialFinder.init()
-
+    var unitedAttitude:Rotation3D {
+        Rotation3D.slerp(from: left.leftRealityKitRotation, to: right.rightRealityKitRotation, t: 0.5)
+    }
     var yawingAngulerRateDiffrential: Float { Float(right.angularVelocity.y - left.angularVelocity.y)}
     // ローリングの方向を　realitykit 用の変換コードを一つの行列変換で表現したやつを掛けて揃えなきゃいけないんだけど、やってない。
     // ここでサボると加速度の変換がおかしなことになる。
@@ -90,6 +105,7 @@ class Carv2DataPair : ObservableObject{
         if isRecordingCSV {
             csvExporter.write(analyzedDataPair)
         }
+        receive(data: analyzedDataPair)
         return analyzedDataPair
     }
     
@@ -112,6 +128,7 @@ class Carv2DataPair : ObservableObject{
         if isRecordingCSV {
             csvExporter.write(analyzedDataPair)
         }
+        receive(data: analyzedDataPair)
         return analyzedDataPair
     }
 }

@@ -6,15 +6,16 @@
 //
 import Foundation
 import Spatial
-struct TurnSwitchingTimingFinder{
-    var lastTurnSiwtchedTimeInterval = Date.now.timeIntervalSince1970
-    let minimumTurnPeriod : TimeInterval = 0.7
-    let rotationNoizeRange: Range<Double> = (Measurement(value: -10
+import SwiftUI
+class TurnSwitchingTimingFinder:ObservableObject{
+    @Published var lastTurnSiwtchedTimeInterval = Date.now.timeIntervalSince1970
+    let minimumTurnPeriod : TimeInterval = 0.4
+    let rotationNoizeRange: Range<Double> = (Measurement(value: -15
                                             , unit: UnitAngle.degrees)
-                                    .converted(to: .radians).value)..<Measurement(value: 10
+                                    .converted(to: .radians).value)..<Measurement(value: 15
                                                                                   , unit: UnitAngle.degrees)
                                                                           .converted(to: .radians).value
-    mutating func handle(zRotationAngle: Double, timeInterval : TimeInterval)-> Bool{
+    func handle(zRotationAngle: Double, timeInterval : TimeInterval)-> Bool{
         if rotationNoizeRange ~= zRotationAngle
             && (Date.now.timeIntervalSince1970 - lastTurnSiwtchedTimeInterval) > minimumTurnPeriod {
             lastTurnSiwtchedTimeInterval = timeInterval

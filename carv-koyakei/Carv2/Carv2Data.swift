@@ -48,9 +48,9 @@ class Carv2Data {
         return SIMD3<Float>(-worldAccel.x, -worldAccel.y, -worldAccel.z)
     }
     
-    var attitude: Rotation3D
-    var acceleration: SIMD3<Float>
-    var angularVelocity : SIMD3<Float>
+    let attitude: Rotation3D
+    let acceleration: SIMD3<Float>
+    let angularVelocity : SIMD3<Float>
     let recordetTime: TimeInterval = Date.now.timeIntervalSince1970
     var leftRealityKitAcceleration : Vector3D {
         let v = simd_dot(

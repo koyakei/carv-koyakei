@@ -28,22 +28,24 @@ class CarvDevice: NSObject, ObservableObject, Identifiable, CBPeripheralDelegate
     }
     
     // 特性発見メソッドを実装
-        public func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
-            if let error = error {
-                print("特性発見エラー: \(error.localizedDescription)")
-                return
-            }
-            
-            guard let characteristics = service.characteristics else { return }
-            for characteristic in characteristics {
-                print("発見された特性: \(characteristic.uuid)")
-            }
+    public func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
+        if let error = error {
+            print("特性発見エラー: \(error.localizedDescription)")
+            return
         }
-func updateConnectionState(_ state: CBPeripheralState) {
-    DispatchQueue.main.async {
-        self.connectionState = state
+        
+        guard let characteristics = service.characteristics else { return }
+        for characteristic in characteristics {
+            print("発見された特性: \(characteristic.uuid)")
+        }
     }
-}
+    
+    func updateConnectionState(_ state: CBPeripheralState) {
+        DispatchQueue.main.async {
+            self.connectionState = state
+        }
+    }
+    
     func subscribeAttitude() {
         guard let characteristic = findCharacteristic(periferalName: peripheral.name!) else {
             print("Characteristic not found")
@@ -109,8 +111,6 @@ func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CB
         } else if characteristic.service?.peripheral?.name == Carv2DataPair.periferalName {
             
             if peripheral.identifier == Carv2DataPair.rightCharactaristicUUID{
-                
-                    
                      // この戻り値をCSVに出力したい。どうすればいいのか？
                 carv2AnalyzedDataPairManager.receive(data: self.carv2DataPair.receive(right: Carv2Data(rightData: value)))
                 

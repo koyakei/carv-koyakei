@@ -13,17 +13,25 @@ struct HomeView: View {
     @ObservedObject var ble = BluethoothCentralManager()
     @ObservedObject var carv2DataPair = Carv2DataPair.shared
     @ObservedObject var conductor = DynamicOscillatorConductor()
-    
+    @ObservedObject var carv2AnalyzedDataPairManager = Carv2AnalyzedDataPairManager.shared
     @State var diffYawingTargetAngle: Double = 2.0
     @State var yawingBeep: Bool = false
-    
     @State var rollingBeep: Bool = false
     @State var diffRollingTargetAngle: Double = 2.0
     var body: some View {
         VStack {
+            
             HStack{
                 Text(carv2DataPair.left.attitude.quaternion.formatQuaternion)
                 Text(carv2DataPair.right.attitude.quaternion.formatQuaternion)
+                VStack{
+                    Text(carv2DataPair.unitedYawingAngle.description)
+                    Text(carv2DataPair.analyzedDataPair.numberOfTurns.description)
+                
+                    Text(Date(timeIntervalSince1970:  carv2DataPair.turnSideChangingPeriodFinder.lastSwitchedTurnSideTimeStamp) , format: Date.FormatStyle(date: .omitted, time: .complete))
+                    Text(carv2DataPair.currentTurn.count.description)
+                    Text(carv2AnalyzedDataPairManager.currentTurn.description)
+                }
             }
             HStack{
                 Text(carv2DataPair.left.leftRealityKitAcceleration.description)

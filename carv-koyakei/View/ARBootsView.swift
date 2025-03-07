@@ -17,6 +17,7 @@ struct ARBootsView: View {
     @State private var initialScale: CGFloat = 3.0
     let leftAnchorName = "leftAnchor"
     let rightAnchorName = "rightAnchor"
+    let unifiedAnchorName = "unifiedAnchor"
     private static func createAxisLabel(text: String, color: UIColor) -> ModelEntity {
         let textMesh = MeshResource.generateText(
             text,
@@ -109,6 +110,9 @@ struct ARBootsView: View {
                 arrowEntityleft.name = leftAnchorName
                 arrowEntityleft.position.x = -0.5
                 worldAnchor.addChild(arrowEntityleft)
+                let arrowEntityUnified = createArrowEntity()
+                arrowEntityUnified.name = unifiedAnchorName
+                worldAnchor.addChild(arrowEntityUnified)
                 worldAnchor.position.z = -2
                 worldAnchor.name = "worldAnchor"
                 content.add(worldAnchor)
@@ -121,6 +125,10 @@ struct ARBootsView: View {
                 guard let arrowRight = content.entities.first(where: {$0.name == "worldAnchor"})?.children.first(where: { $0.name == rightAnchorName })else  { return }
                 arrowRight.setOrientation(
                     simd_quatf(Carv2DataPair.shared.right.rightRealityKitRotation
+                              ) , relativeTo: nil)
+                guard let arrowUnified = content.entities.first(where: {$0.name == "worldAnchor"})?.children.first(where: { $0.name == unifiedAnchorName })else  { return }
+                arrowUnified.setOrientation(
+                    simd_quatf(Carv2DataPair.shared.unitedAttitude
                               ) , relativeTo: nil)
             }
             .gesture(magnificationGesture)
@@ -157,7 +165,7 @@ struct ARBootsView: View {
                     
                     Chart {
                         // 前回ターン（青い折れ線）
-                        ForEach(carv2AnalyzedDataPairManager.beforeTurn) { data in
+                        ForEach(carv2DataPair.beforeTurn) { data in
                             PointMark(
                                 x: .value("フェーズ", data.percentageOfTurns),
                                 y: .value("角度", data.outsideSki.rollAngle)
@@ -167,7 +175,7 @@ struct ARBootsView: View {
                         }
                         
                         // 現在ターン（赤いポイント）
-                        ForEach(carv2AnalyzedDataPairManager.currentTurn) { data in
+                        ForEach(carv2DataPair.currentTurn) { data in
                             PointMark(
                                 x: .value("フェーズ", data.percentageOfTurns),
                                 y: .value("角度", data.outsideSki.rollAngle)
