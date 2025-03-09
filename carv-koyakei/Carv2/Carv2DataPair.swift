@@ -11,11 +11,11 @@ import SwiftUICore
 
 class Carv2DataPair : ObservableObject{
     // ipad
-    static let rightCharactaristicUUID = UUID(uuidString: "85A29A4C-09C3-C632-858A-3387339C67CF")
-    static let leftCharactaristicUUID = UUID(uuidString:  "850D8BCF-3B03-1322-F51C-DD38E961FC1A")
+//    static let rightCharactaristicUUID = UUID(uuidString: "85A29A4C-09C3-C632-858A-3387339C67CF")
+//    static let leftCharactaristicUUID = UUID(uuidString:  "850D8BCF-3B03-1322-F51C-DD38E961FC1A")
     // iphone
-//    static let rightCharactaristicUUID = UUID(uuidString: "85E2946B-0D18-FA01-E1C9-0393EDD9013A")
-//    static let leftCharactaristicUUID = UUID(uuidString:  "57089C67-2275-E220-B6D3-B16E2639EFD6")
+    static let rightCharactaristicUUID = UUID(uuidString: "85E2946B-0D18-FA01-E1C9-0393EDD9013A")
+    static let leftCharactaristicUUID = UUID(uuidString:  "57089C67-2275-E220-B6D3-B16E2639EFD6")
     
     static let periferalName = "CARV 2"
     @Published var left:  Carv2Data = Carv2Data.init()
@@ -26,6 +26,15 @@ class Carv2DataPair : ObservableObject{
     public static let shared: Carv2DataPair = .init()
     @Published var currentTurn: [Carv2AnalyzedDataPair] = []
     @Published var beforeTurn: [Carv2AnalyzedDataPair] = []
+    
+    func turnDiffrencial(){
+        beforeLastTurnSwitchingUnitedAttitude.inverse * lastTurnSwitchingUnitedAttitude
+    }
+    //ターン後半30%で内筒しているかどうか
+    func isInclineInEndOfTurn(standardTurn: [any OutsideSkiRollAngle] = []) -> Bool {
+        return self.currentTurn.last?.isTurnSwitching ?? false
+    }
+    
     
     func receive(data: Carv2AnalyzedDataPair){
         currentTurn.append(data)
@@ -60,6 +69,7 @@ class Carv2DataPair : ObservableObject{
     var turnSwitchingDirectionFinder: TurnSwitchingDirectionFinder = TurnSwitchingDirectionFinder.init()
     var turnSwitchingTimingFinder: TurnSwitchingTimingFinder = TurnSwitchingTimingFinder.init()
     var lastTurnSwitchingUnitedAttitude: Rotation3D = .identity
+    var beforeLastTurnSwitchingUnitedAttitude: Rotation3D = .identity
     var oneTurnDiffreentialFinder: OneTurnDiffrentialFinder = OneTurnDiffrentialFinder.init()
     var turnPhaseByTime:TurnPhaseByTime = TurnPhaseByTime.init()
     var unitedAttitude:Rotation3D {
@@ -96,6 +106,7 @@ class Carv2DataPair : ObservableObject{
         if isTurnSwitching {
             leftSingleTurnSequence.removeAll()
             rightSingleTurnSequence.removeAll()
+            beforeLastTurnSwitchingUnitedAttitude = lastTurnSwitchingUnitedAttitude
             lastTurnSwitchingUnitedAttitude = unitedAttitude
             numberOfTurn = numberOfTurn + 1
             turnPhaseByTime.turnSwitched(currentTime: data.recordetTime)
@@ -121,6 +132,7 @@ class Carv2DataPair : ObservableObject{
         if isTurnSwitching {
             leftSingleTurnSequence.removeAll()
             rightSingleTurnSequence.removeAll()
+            beforeLastTurnSwitchingUnitedAttitude = lastTurnSwitchingUnitedAttitude
             lastTurnSwitchingUnitedAttitude = unitedAttitude
             numberOfTurn = numberOfTurn + 1
             turnPhaseByTime.turnSwitched(currentTime: data.recordetTime)

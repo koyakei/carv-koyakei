@@ -17,7 +17,7 @@ struct Carv2AnalyzedData {
     var pitchAngle: Double {attitude.eulerAngles(order: .xyz).angles.z}
 }
 
-struct Carv2AnalyzedDataPair :Identifiable{
+struct Carv2AnalyzedDataPair :Identifiable, OutsideSkiRollAngle{
     let id = UUID()
     var left: Carv2AnalyzedData
     var right: Carv2AnalyzedData
@@ -34,7 +34,7 @@ struct Carv2AnalyzedDataPair :Identifiable{
         }
     }
     var outsideSkiRollAngle: Double {
-        return left.rollAngle + Angle2D(degrees: 90).radians
+        return outsideSki.rollAngle + Angle2D(degrees: 90).radians
     }
     
     var outsideSki: Carv2AnalyzedData {        if yawingSide == .LeftYawing {
