@@ -16,10 +16,11 @@ class Carv2Data {
     let angularVelocity : SIMD3<Float>
     let recordetTime: TimeInterval = Date.now.timeIntervalSince1970
     
-    // x 前上　+ 　後上ー
+    // 右側　x 前上　+ 　後上ー 　左は逆
     // y  上々　＋　下下　ー
-    // z 内上＋　外上ー
-    var rightRealityKitAcceleration : Vector3D {
+    // 右側　z 内上＋　外上ー　多分左は逆
+    //
+    var realityKitAcceleration : Vector3D {
         // Rの筐体上の方向を　Yマイナス１として姿勢を正しく認識　Yが縦だからこれが正しいはず
         //前方向を植えにすると　Z　マイナス１ roll がZなのでこれも正しいはず
         // 外を植えにするとXマイナス１
@@ -27,9 +28,9 @@ class Carv2Data {
         return Vector3D(x: -v.z, y: v.y, z: v.x)
     }
     
-    // without gravity
-    var userAccelerationRight : Vector3D {
-        Vector3D(leftRealityKitAngularVelocity.vector - Vector3D(acceleration).vector)
+    // without gravity 左右共有
+    var userAcceleration : Vector3D {
+        Vector3D(realityKitAcceleration.vector - Vector3D(acceleration).vector)
     }
     
     var leftRealityKitAngularVelocity : Vector3D {
