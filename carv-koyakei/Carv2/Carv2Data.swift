@@ -19,7 +19,7 @@ class Carv2Data {
     // x 前上　+ 　後上ー
     // y  上々　＋　下下　ー
     // z 内上＋　外上ー
-    var leftRealityKitAcceleration : Vector3D {
+    var rightRealityKitAcceleration : Vector3D {
         // Rの筐体上の方向を　Yマイナス１として姿勢を正しく認識　Yが縦だからこれが正しいはず
         //前方向を植えにすると　Z　マイナス１ roll がZなのでこれも正しいはず
         // 外を植えにするとXマイナス１
@@ -28,7 +28,7 @@ class Carv2Data {
     }
     
     // without gravity
-    var userAccelerationLeft : Vector3D {
+    var userAccelerationRight : Vector3D {
         Vector3D(leftRealityKitAngularVelocity.vector - Vector3D(acceleration).vector)
     }
     

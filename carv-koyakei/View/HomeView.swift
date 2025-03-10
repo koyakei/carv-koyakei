@@ -35,10 +35,6 @@ struct HomeView: View {
                 }
             }
             HStack{
-                Text(carv2DataPair.right.leftRealityKitAcceleration.description)
-                
-                Text(carv2DataPair.right.leftRealityKitAngularVelocity.description)
-                Text(carv2DataPair.right.userAccelerationLeft.description)
                 Text(carv2DataPair.right.acceleration.description)
             }
             HStack{
