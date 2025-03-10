@@ -18,6 +18,7 @@ struct HomeView: View {
     @State var yawingBeep: Bool = false
     @State var rollingBeep: Bool = false
     @State var diffRollingTargetAngle: Double = 2.0
+
     var body: some View {
         VStack {
             
@@ -34,8 +35,11 @@ struct HomeView: View {
                 }
             }
             HStack{
-                Text(carv2DataPair.left.leftRealityKitAcceleration.description)
-                Text(carv2DataPair.left.leftRealityKitAngularVelocity.description)
+                Text(carv2DataPair.right.leftRealityKitAcceleration.description)
+                
+                Text(carv2DataPair.right.leftRealityKitAngularVelocity.description)
+                Text(carv2DataPair.right.userAccelerationLeft.description)
+                Text(carv2DataPair.right.acceleration.description)
             }
             HStack{
                 Text(String(format: "%.1f",carv2DataPair.parallelAngleByAttitude))

@@ -4,72 +4,43 @@
 //
 //  Created by keisuke koyanagi on 2025/02/04.
 //
-
 import Foundation
 import Spatial
 import simd
 import SwiftUICore
 import Combine
 
-   
 class Carv2Data {
-    // クォータニオンから回転行列への変換
-    func quaternionToRotationMatrix(_ q: simd_quatf) -> matrix_float3x3 {
-        let norm = simd_normalize(q)
-        let x = norm.vector.x
-        let y = norm.vector.y
-        let z = norm.vector.z
-        let w = norm.vector.w
-        
-        return matrix_float3x3(rows: [
-            simd_float3(
-                1 - 2*y*y - 2*z*z,
-                2*x*y + 2*z*w,
-                2*x*z - 2*y*w
-            ),
-            simd_float3(
-                2*x*y - 2*z*w,
-                1 - 2*x*x - 2*z*z,
-                2*y*z + 2*x*w
-            ),
-            simd_float3(
-                2*x*z + 2*y*w,
-                2*y*z - 2*x*w,
-                1 - 2*x*x - 2*y*y
-            )
-        ])
-    }
-    func convertToWorldAcceleration(sensorAccel: SIMD3<Float>,
-                                   quaternion: simd_quatf) -> SIMD3<Float> {
-        let rotationMatrix = quaternionToRotationMatrix(quaternion)
-        let worldAccel = rotationMatrix * sensorAccel
-        
-        // センサー特性に応じた符号反転（必要に応じて調整）
-        return SIMD3<Float>(-worldAccel.x, -worldAccel.y, -worldAccel.z)
-    }
-    
     let attitude: Rotation3D
     let acceleration: SIMD3<Float>
     let angularVelocity : SIMD3<Float>
     let recordetTime: TimeInterval = Date.now.timeIntervalSince1970
+    
+    // x 前上　+ 　後上ー
+    // y  上々　＋　下下　ー
+    // z 内上＋　外上ー
     var leftRealityKitAcceleration : Vector3D {
-        let v = simd_dot(
-            simd_quatf(from:  (simd_quatd(angle: 0, axis: [0,0,1]) * leftRealityKitRotation.quaternion
-                              ).vector).axis
-            ,
-                simd_float3(acceleration.x, acceleration.y,
-                                 acceleration.z)
-        )
-        return Vector3D(x: v, y: 0, z: 0)
-//        Vector3D(acceleration).applying(AffineTransform3D(rotation: leftRealityKitRotation.inverse))
+        // Rの筐体上の方向を　Yマイナス１として姿勢を正しく認識　Yが縦だからこれが正しいはず
+        //前方向を植えにすると　Z　マイナス１ roll がZなのでこれも正しいはず
+        // 外を植えにするとXマイナス１
+        let v = Vector3D(x: 1, y: 0, z: 0).rotated(by: attitude)
+        return Vector3D(x: -v.z, y: v.y, z: v.x)
     }
+    
+    // without gravity
+    var userAccelerationLeft : Vector3D {
+        Vector3D(leftRealityKitAngularVelocity.vector - Vector3D(acceleration).vector)
+    }
+    
     var leftRealityKitAngularVelocity : Vector3D {
-        Vector3D(convertToWorldAcceleration(sensorAccel: acceleration, quaternion: leftRealityKitRotation.quaternion.inverse.simd_quatf))
+        Vector3D(angularVelocity)
     }
+    
     
     var rightRealityKitRotation: Rotation3D {
         let p = ProjectiveTransform3D(scale: Size3D(vector: [-1,-1,-1]),rotation: Rotation3D(simd_quatd(real: 1, imag: [-1.0,-1.0,1.0]).normalized))
-        return Rotation3D.init(simd_quatd(vector:p.matrix * attitude.vector)).rotated(by: Rotation3D(angle: Angle2D(radians: .pi/2), axis: RotationAxis3D(vector: [0,1,0])))
+        return Rotation3D.init(simd_quatd(vector:p.matrix * attitude.vector))
+//            .rotated(by: Rotation3D(angle: Angle2D(radians: .pi/2), axis: RotationAxis3D(vector: [0,1,0])))
     }
     
     var leftRealityKitRotation: Rotation3D {
@@ -88,9 +59,9 @@ class Carv2Data {
         let quaty = Float(intbyte[i+1])  / 32768.0
         let quatz = Float(intbyte[i+2])  / 32768.0
         let quatw = Float(intbyte[i+3])  / 32768.0
-        let ax = Float(intbyte[i+4])  / 32768.0  * 16 * 9.8
-        let ay = Float(intbyte[i+5])  / 32768.0  * 16 * 9.8
-        let az = Float(intbyte[i+6])  / 32768.0  * 16 * 9.8
+        let ax = Float(intbyte[i+4])  / 32768.0  * 16
+        let ay = Float(intbyte[i+5])  / 32768.0  * 16
+        let az = Float(intbyte[i+6])  / 32768.0  * 16
                 let intbyte3 : [Float] = data.dropFirst(14).withUnsafeBytes { buffer in
                     guard let baseAddress = buffer.baseAddress else { return [] }
                     let count = buffer.count / MemoryLayout<Float32>.stride
