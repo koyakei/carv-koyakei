@@ -9,18 +9,18 @@ import Spatial
 import simd
 import SwiftUICore
 import Combine
-
-class Carv2Data {
+class Carv2Data{
     let attitude: Rotation3D
     let acceleration: SIMD3<Float>
     let angularVelocity : SIMD3<Float>
     let recordetTime: TimeInterval = Date.now.timeIntervalSince1970
     
+
     // 右側　x 前上　+ 　後上ー 　左は逆
     // y  上々　＋　下下　ー
     // 右側　z 内上＋　外上ー　多分左は逆
     //
-    var realityKitAcceleration : Vector3D {
+    var gravityAccel : Vector3D {
         // Rの筐体上の方向を　Yマイナス１として姿勢を正しく認識　Yが縦だからこれが正しいはず
         //前方向を植えにすると　Z　マイナス１ roll がZなのでこれも正しいはず
         // 外を植えにするとXマイナス１
@@ -30,11 +30,21 @@ class Carv2Data {
     
     // without gravity 左右共有
     var userAcceleration : Vector3D {
-        Vector3D(realityKitAcceleration.vector - Vector3D(acceleration).vector)
+        Vector3D(gravityAccel.vector - Vector3D(acceleration).vector)
     }
     
     var leftRealityKitAngularVelocity : Vector3D {
         Vector3D(angularVelocity)
+    }
+    
+    
+    var worldAcceleration0 : Vector3D {
+        let v = Vector3D(acceleration).rotated(by: attitude)
+        return Vector3D(x: -v.z, y: v.y, z: v.x)
+    }
+    // 東西南北を固定したワールド座標系に対する加速度
+    var worldAcceleration : Vector3D {
+        worldAcceleration0.projected(.init(x: 1, y: 1, z: 1).rotated(by: attitude)).rotated(by: attitude)
     }
     
     
