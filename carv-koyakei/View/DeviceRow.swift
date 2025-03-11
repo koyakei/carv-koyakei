@@ -29,12 +29,6 @@ struct DeviceRow: View {
                 }
                 .disabled(device.connectionState == .connected)
                 
-                
-                if let service = device.services.first {
-                    Button(action: { ble.subscribe(servece: service) }) {
-                        Text("Subscribe")
-                    }
-                }
                     
             }
             
