@@ -10,7 +10,7 @@ import RealityKit
 import Charts
 
 struct ARBootsView: View {
-    @ObservedObject var carv2DataPair = Carv2DataPair.shared
+    @EnvironmentObject var carv2DataPair : Carv2DataPair
     @StateObject private var cameraManager = CameraManager()
     var carv2AnalyzedDataPairManager = Carv2AnalyzedDataPairManager.shared
     @State private var currentScale: CGFloat = 3.0
@@ -120,11 +120,11 @@ struct ARBootsView: View {
                 guard let arrowLeft = content.entities.first(where: {$0.name == "worldAnchor"})?.children.first(where: { $0.name == leftAnchorName }) else {
                     return }
                 arrowLeft.setOrientation(
-                    simd_quatf(Carv2DataPair.shared.left.leftRealityKitRotation
+                    simd_quatf(carv2DataPair.left.leftRealityKitRotation
                               ), relativeTo: nil)
                 guard let arrowRight = content.entities.first(where: {$0.name == "worldAnchor"})?.children.first(where: { $0.name == rightAnchorName })else  { return }
                 arrowRight.setOrientation(
-                    simd_quatf(Carv2DataPair.shared.right.rightRealityKitRotation
+                    simd_quatf(carv2DataPair.right.rightRealityKitRotation
                               ) , relativeTo: nil)
             }
             .gesture(magnificationGesture)
@@ -228,5 +228,5 @@ struct VisualEffectBlur: UIViewRepresentable {
 }
 
 #Preview {
-    ARBootsView(carv2DataPair: Carv2DataPair())
+    ARBootsView()
 }

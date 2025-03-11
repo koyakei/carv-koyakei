@@ -1,11 +1,11 @@
 import SwiftUI
 
 struct ContentView: View {
-    
+    @EnvironmentObject var carv2DataPair: Carv2DataPair
     
     var body: some View {
         TabView {
-            HomeView()
+            HomeView(ble: BluethoothCentralManager(carv2DataPair: carv2DataPair))
                 .tabItem {
                     Image(systemName: "house.fill")
                     Text("ホーム")

@@ -10,9 +10,11 @@ import CoreBluetooth
 
 @main
 struct carv_koyakeiApp: App {
+    @StateObject private var carv2DataPair: Carv2DataPair = Carv2DataPair()
+    @StateObject private var carv1DataPair: Carv1DataPair = Carv1DataPair()
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView().environmentObject(carv1DataPair).environmentObject(carv2DataPair) 
         }
     }
     

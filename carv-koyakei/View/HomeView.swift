@@ -10,15 +10,15 @@ import Spatial
 import AudioKit
 
 struct HomeView: View {
-    @ObservedObject var ble = BluethoothCentralManager()
-    @ObservedObject var carv2DataPair = Carv2DataPair.shared
+    @ObservedObject var ble:BluethoothCentralManager
+    @EnvironmentObject var carv2DataPair : Carv2DataPair
     @ObservedObject var conductor = DynamicOscillatorConductor()
     @ObservedObject var carv2AnalyzedDataPairManager = Carv2AnalyzedDataPairManager.shared
     @State var diffYawingTargetAngle: Double = 2.0
     @State var yawingBeep: Bool = false
     @State var rollingBeep: Bool = false
     @State var diffRollingTargetAngle: Double = 2.0
-
+    
     var body: some View {
         VStack {
             
@@ -34,12 +34,16 @@ struct HomeView: View {
                     Text(carv2AnalyzedDataPairManager.currentTurn.description)
                 }
             }
+            
+            HStack{
+                Text(carv2DataPair.right.worldAcceleration.description)
+            }
+            
             HStack{
                 Text(carv2DataPair.right.acceleration.description)
-            }
-            HStack{
                 Text(String(format: "%.1f",carv2DataPair.parallelAngleByAttitude))
             }
+            
             HStack{
                 VStack{
                     

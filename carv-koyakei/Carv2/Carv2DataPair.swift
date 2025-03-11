@@ -23,10 +23,11 @@ class Carv2DataPair : ObservableObject{
     private var isRecordingCSV = false
     private let  csvExporter = CSVExporter()
     private var numberOfTurn : Int = 0
-    public static let shared: Carv2DataPair = .init()
     @Published var currentTurn: [Carv2AnalyzedDataPair] = []
     @Published var beforeTurn: [Carv2AnalyzedDataPair] = []
-    
+    public init (){
+        
+    }
     func turnDiffrencial(){
         beforeLastTurnSwitchingUnitedAttitude.inverse * lastTurnSwitchingUnitedAttitude
     }

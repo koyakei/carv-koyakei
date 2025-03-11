@@ -3,15 +3,15 @@ import Spatial
 import Foundation
 import SwiftUI
  class BluethoothCentralManager: NSObject, ObservableObject, CBCentralManagerDelegate {
-     public static var shared: BluethoothCentralManager = .init()
+     
      @Published var carvDeviceList: [CarvDevice] = []
-     @Published var rotation3D: Rotation3D = .identity
-     @Published var carv2DataPair: Carv2DataPair = Carv2DataPair.shared
+      var carv2DataPair : Carv2DataPair
      
      var centralManager: CBCentralManager!
     static let targetServiceUUID = CBUUID(string: "2DFBFFFF-960D-4909-8D28-F353CB168E8A")
-override init() {
-    super.init()
+     init(carv2DataPair: Carv2DataPair) {
+         self.carv2DataPair = carv2DataPair
+         super.init()
     centralManager = CBCentralManager(delegate: self, queue: nil)
 }
 
@@ -44,7 +44,7 @@ private func addDevice(_ peripheral: CBPeripheral) {
     if !carvDeviceList.contains(where: { $0.id == Carv2DataPair.leftCharactaristicUUID &&
         $0.peripheral.name == Carv2DataPair.periferalName
     }) {
-        let newDevice = CarvDevice(peripheral: peripheral,carv2DataPair: &carv2DataPair)
+        let newDevice = CarvDevice(peripheral: peripheral, carv2DataPair: carv2DataPair)
         DispatchQueue.main.async {
             self.carvDeviceList.append(newDevice)
         }
