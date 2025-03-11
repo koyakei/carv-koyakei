@@ -1,8 +1,7 @@
 import SwiftUI
 
 struct ContentView: View {
-    
-    
+    @EnvironmentObject var carv2DataPair: Carv2DataPair
     var body: some View {
         TabView {
             HomeView()
