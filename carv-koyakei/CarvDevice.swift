@@ -112,11 +112,11 @@ func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CB
             
             if peripheral.identifier == Carv2DataPair.rightCharactaristicUUID{
                      // この戻り値をCSVに出力したい。どうすればいいのか？
-                carv2AnalyzedDataPairManager.receive(data: self.carv2DataPair.receive(right: Carv2Data(rightData: value)))
+                carv2AnalyzedDataPairManager.receive(data: self.carv2DataPair.receive(right: Carv2Data(value)))
                 
             }
             if peripheral.identifier == Carv2DataPair.leftCharactaristicUUID {
-                carv2AnalyzedDataPairManager.receive(data:self.carv2DataPair.receive(left: Carv2Data(leftData: value)) )
+                carv2AnalyzedDataPairManager.receive(data:self.carv2DataPair.receive(left: Carv2Data(value)) )
                 
             }
         }

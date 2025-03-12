@@ -23,7 +23,7 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "ECBAE64C-C782-49D0-B2F8-EC91AEA34515"
+            uuid = "74C62C57-7A05-45C6-BD7D-94BBA20E0F75"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -33,22 +33,6 @@
             startingLineNumber = "106"
             endingLineNumber = "106"
             landmarkName = "receive(left:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "74C62C57-7A05-45C6-BD7D-94BBA20E0F75"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "carv-koyakei/Carv2/Carv2DataPair.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "132"
-            endingLineNumber = "132"
-            landmarkName = "receive(right:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
