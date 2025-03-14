@@ -12,6 +12,14 @@ struct DeviceRow: View {
     
     var body: some View {
         
+        VStack {
+            Picker("オプションを選択", selection: $device.carv2PripheralSide) {
+                            ForEach(Carv2PripheralSide.allCases, id: \.self) { option in
+                                Text(option.rawValue).tag(option)
+                            }
+                        }
+                        .pickerStyle(.menu)
+            }.padding()
         if (device.id == Carv2DataPair.leftCharactaristicUUID || device.id == Carv2DataPair.leftCharactaristicUUID){
             Text("Left")
         }

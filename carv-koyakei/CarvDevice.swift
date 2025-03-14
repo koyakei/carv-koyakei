@@ -17,6 +17,17 @@ class CarvDevice: NSObject, ObservableObject, Identifiable, CBPeripheralDelegate
     @Published var carv2DataPair: Carv2DataPair = Carv2DataPair.shared
     @Published var carv1DataPair: Carv1DataPair = Carv1DataPair.shared
     var carv2AnalyzedDataPairManager = Carv2AnalyzedDataPairManager.init()
+
+    @Published var carv2PripheralSide: Carv2PripheralSide = .right {
+        didSet{
+            switch carv2PripheralSide {
+                case .left:
+                    UserDefaults.standard.set(id.uuidString, forKey: "leftCarv2UUID") // device.carv2PripheralSideを　picker から変更してもここが動かない
+                case .right:
+                    UserDefaults.standard.set(id.uuidString, forKey: "rightCarv2UUID")
+            }
+        }
+    }
     
     init(peripheral: CBPeripheral, carv2DataPair: inout Carv2DataPair) {
         self.id = peripheral.identifier
@@ -25,6 +36,27 @@ class CarvDevice: NSObject, ObservableObject, Identifiable, CBPeripheralDelegate
         self.carv2DataPair = carv2DataPair
         super.init()
         self.peripheral.delegate = self
+        //　UserDefaults.standard.string(forKey: "leftCarv2UUID")　が空だった場合、現在の値を代入
+        
+        if let uuidString = UserDefaults.standard.object(forKey: "leftCarv2UUID"){
+            if let uuid =  UUID(uuidString: uuidString as! String) {
+                if id == uuid {
+                    carv2PripheralSide = .left
+                }
+            } else {
+                UserDefaults.standard.set(id.uuidString, forKey: "leftCarv2UUID")
+            }
+        }
+        
+        if let uuidString = UserDefaults.standard.object(forKey: "rightCarv2UUID"){
+            if let uuid =  UUID(uuidString: uuidString as! String) {
+                if id == uuid {
+                    carv2PripheralSide = .right
+                }
+            } else {
+                UserDefaults.standard.set(id.uuidString, forKey: "rightCarv2UUID")
+            }
+        }
     }
     
     // 特性発見メソッドを実装
