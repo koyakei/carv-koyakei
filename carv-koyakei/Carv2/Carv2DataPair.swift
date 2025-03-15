@@ -99,6 +99,19 @@ class Carv2DataPair : ObservableObject{
     var unifiedDiffrentialAttitudeFromRightToLeft: Rotation3D {
         right.rightRealityKitRotation.inverse * left.leftRealityKitRotation
     }
+    
+    var rightAngularVelocityProjectedToLeft: Vector3D {
+        Vector3D(right.angularVelocity).projected(Vector3D(x: 1, y: 0, z: 0).normalized.rotated(by: unifiedDiffrentialAttitudeFromRightToLeft))
+    }
+    
+    var rightAngularVelocityProjectedToLeft2: Vector3D {
+        Vector3D(right.angularVelocity).projected(Vector3D(x: 0, y: 0, z: 1).normalized.rotated(by: unifiedDiffrentialAttitudeFromRightToLeft))
+    }
+    
+    var rightAngularVelocityProjectedToLeft3: Vector3D {
+        Vector3D(right.angularVelocity).projected(Vector3D(x: 1, y: 1, z: 1).normalized.rotated(by: unifiedDiffrentialAttitudeFromRightToLeft))
+    }
+    
 //     同じやつをここに移植
     lazy var  parallelAngleByAttitude = Double(
                     left.leftRealityKitRotation.quaternion.simd_quatf.getSignedAngleBetweenQuaternions2(q2: right.rightRealityKitRotation.quaternion.simd_quatf))

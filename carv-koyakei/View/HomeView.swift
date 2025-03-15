@@ -9,6 +9,11 @@ import SwiftUI
 import Spatial
 import AudioKit
 
+extension Vector3D {
+    var description: String {
+        "(\(String(format: "%.1f",x)), \(String(format: "%.1f",y)), \(String(format: "%.1f",z)))"
+    }
+}
 struct HomeView: View {
     @ObservedObject var ble = BluethoothCentralManager()
     @ObservedObject var carv2DataPair = Carv2DataPair.shared
@@ -21,10 +26,15 @@ struct HomeView: View {
 
     var body: some View {
         VStack {
-            
+            HStack{
+                Text(carv2DataPair.rightAngularVelocityProjectedToLeft.description)
+                Text(carv2DataPair.rightAngularVelocityProjectedToLeft2.description)
+            }
+            Text(carv2DataPair.rightAngularVelocityProjectedToLeft3.description)
             HStack{
                 Text(carv2DataPair.left.attitude.quaternion.formatQuaternion)
                 Text(carv2DataPair.right.attitude.quaternion.formatQuaternion)
+                
                 VStack{
                     Text(carv2DataPair.unitedYawingAngle.description)
                     Text(carv2DataPair.analyzedDataPair.numberOfTurns.description)
@@ -35,7 +45,7 @@ struct HomeView: View {
                 }
             }
             HStack{
-                Text(carv2DataPair.right.acceleration.description)
+                Text(Vector3D(carv2DataPair.right.angularVelocity).description)
             }
             HStack{
                 Text(String(format: "%.1f",carv2DataPair.parallelAngleByAttitude))
