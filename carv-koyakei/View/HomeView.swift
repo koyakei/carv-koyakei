@@ -28,12 +28,10 @@ struct HomeView: View {
         VStack {
             HStack{
                 Text(carv2DataPair.rightAngularVelocityProjectedToLeft.description)
-                Text(carv2DataPair.rightAngularVelocityProjectedToLeft2.description)
             }
-            Text(carv2DataPair.rightAngularVelocityProjectedToLeft3.description)
             HStack{
-                Text(carv2DataPair.left.attitude.quaternion.formatQuaternion)
-                Text(carv2DataPair.right.attitude.quaternion.formatQuaternion)
+                Text(carv2DataPair.left.leftRealityKitRotation.quaternion.formatQuaternion)
+                Text(carv2DataPair.right.rightRealityKitRotation.quaternion.formatQuaternion)
                 
                 VStack{
                     Text(carv2DataPair.unitedYawingAngle.description)
