@@ -127,10 +127,10 @@ struct ARBootsView: View {
                     simd_quatf(Carv2DataPair.shared.right.rightRealityKitRotation
                               ) , relativeTo: nil)
                 
-//                guard let arrowUnified = content.entities.first(where: {$0.name == "worldAnchor"})?.children.first(where: { $0.name == unifiedAnchorName })else  { return }
-//                arrowUnified.setOrientation(
-//                    simd_quatf(Carv2DataPair.shared.unifiedDiffrentialAttitudeFromRight
-//                              ) , relativeTo: nil)
+                guard let arrowUnified = content.entities.first(where: {$0.name == "worldAnchor"})?.children.first(where: { $0.name == unifiedAnchorName })else  { return }
+                arrowUnified.setOrientation(
+                    simd_quatf(Carv2DataPair.shared.unifiedDiffrentialAttitudeFromRightToLeft
+                              ) , relativeTo: nil)
                 
             }
             .gesture(magnificationGesture)

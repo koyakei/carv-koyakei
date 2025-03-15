@@ -27,7 +27,7 @@ class Carv2DataPair : ObservableObject{
     @Published var currentTurn: [Carv2AnalyzedDataPair] = []
     @Published var beforeTurn: [Carv2AnalyzedDataPair] = []
     
-    func turnDiffrencial(){
+    var turnDiffrencial: Rotation3D{
         beforeLastTurnSwitchingUnitedAttitude.inverse * lastTurnSwitchingUnitedAttitude
     }
     //ターン後半30%で内筒しているかどうか
@@ -95,6 +95,10 @@ class Carv2DataPair : ObservableObject{
         numberOfTurn = 0
     }
     var currentTurnPhaseByTime: Double = 0
+    
+    var unifiedDiffrentialAttitudeFromRightToLeft: Rotation3D {
+        right.rightRealityKitRotation.inverse * left.leftRealityKitRotation
+    }
 //     同じやつをここに移植
     lazy var  parallelAngleByAttitude = Double(
                     left.leftRealityKitRotation.quaternion.simd_quatf.getSignedAngleBetweenQuaternions2(q2: right.rightRealityKitRotation.quaternion.simd_quatf))
