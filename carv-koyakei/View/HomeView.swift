@@ -77,7 +77,7 @@ struct HomeView: View {
                 }
             }
             //            Text("paralell rotation angle \(carv2DataPair.yawingAngulerRateDiffrential * 10)")
-            //            Text("parallel angle2 \(ceil(parallelAngle2))")
+           
             HStack{
                 Button(action: {
                     yawingBeep.toggle()}){
