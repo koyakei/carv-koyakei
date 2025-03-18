@@ -9,18 +9,13 @@ import SwiftUI
 import Spatial
 import AudioKit
 
-extension Vector3D {
-    var description: String {
-        "(\(String(format: "%.1f",x)), \(String(format: "%.1f",y)), \(String(format: "%.1f",z)))"
-    }
-}
+
 struct HomeView: View {
-    @ObservedObject var ble = BluethoothCentralManager()
+    @EnvironmentObject var ble : BluethoothCentralManager
     @ObservedObject var carv2DataPair = Carv2DataPair.shared
-    @ObservedObject var conductor = DynamicOscillatorConductor()
+    @EnvironmentObject var yawingBeep: YawingBeep
     @ObservedObject var carv2AnalyzedDataPairManager = Carv2AnalyzedDataPairManager.shared
-    @State var diffYawingTargetAngle: Double = 2.0
-    @State var yawingBeep: Bool = false
+   
     @State var rollingBeep: Bool = false
     @State var diffRollingTargetAngle: Double = 2.0
 
@@ -32,11 +27,9 @@ struct HomeView: View {
             HStack{
                 Text(carv2DataPair.left.leftRealityKitRotation.quaternion.formatQuaternion)
                 Text(carv2DataPair.right.rightRealityKitRotation.quaternion.formatQuaternion)
-                
                 VStack{
                     Text(carv2DataPair.unitedYawingAngle.description)
                     Text(carv2DataPair.analyzedDataPair.numberOfTurns.description)
-                
                     Text(Date(timeIntervalSince1970:  carv2DataPair.turnSideChangingPeriodFinder.lastSwitchedTurnSideTimeStamp) , format: Date.FormatStyle(date: .omitted, time: .complete))
                     Text(carv2DataPair.currentTurn.count.description)
                     Text(carv2AnalyzedDataPairManager.currentTurn.description)
@@ -88,15 +81,20 @@ struct HomeView: View {
            
             HStack{
                 Button(action: {
-                    yawingBeep.toggle()}){
-                        Text("yawing beep \(yawingBeep ? "on" : "off")")
+                    yawingBeep.isBeeping.toggle()}){
+                        Text("yawing beep \(yawingBeep.isBeeping ? "on" : "off")")
                     }
-                Text("Current value: \(diffYawingTargetAngle, specifier: "%.2f")")
+                Text("Current value: \(yawingBeep.diffYawingTargetAngle, specifier: "%.2f")")
                     .padding()
+                Button(action: {
+                    yawingBeep.startBeep()
+                }){
+                    Text("on")
+                }
             }
-            if yawingBeep {
+            if yawingBeep.isBeeping {
                     Slider(
-                        value: $diffYawingTargetAngle,
+                        value: $yawingBeep.diffYawingTargetAngle,
                         in: 0.0...4.0,
                         step: 0.2
                     ) {
@@ -106,7 +104,7 @@ struct HomeView: View {
             HStack{
                 Button(action: {
                     rollingBeep.toggle()}){
-                        Text("rolling beep \(yawingBeep ? "on" : "off")")
+                        Text("rolling beep \(yawingBeep.isBeeping ? "on" : "off")")
                     }
                 Text("Current value: \(diffRollingTargetAngle, specifier: "%.2f")")
                     .padding()
@@ -134,44 +132,7 @@ struct HomeView: View {
                 DeviceRow(device: device, ble: ble)
             }
         }.onAppear {
-            conductor.start()
-        }
-        .onDisappear {
-            conductor.stop()
-        }.onChange(of: carv2DataPair.yawingAngulerRateDiffrential) {
-            if yawingBeep {
-                if (-diffYawingTargetAngle...diffYawingTargetAngle).contains(Double(carv2DataPair.yawingAngulerRateDiffrential) ) {
-                    conductor.data.isPlaying = false
-                } else {
-                    conductor.data.isPlaying = true
-                }
-                if carv2DataPair.yawingAngulerRateDiffrential > 0 {
-                    conductor.panner.pan = 1.0
-                    conductor.data.frequency = AUValue(ToneStep.lowToHigh(ceil(carv2DataPair.yawingAngulerRateDiffrential * 10)))
-                    conductor.changeWaveFormToSin()
-                } else {
-                    conductor.panner.pan = -1.0
-                    conductor.changeWaveFormToTriangle()
-                    conductor.data.frequency = AUValue(ToneStep.hight(ceil(carv2DataPair.yawingAngulerRateDiffrential * 10)))
-                }
-            }
-        }.onChange(of: carv2DataPair.rollingAngulerRateDiffrential) {
-            if rollingBeep {
-                if (-diffRollingTargetAngle...diffRollingTargetAngle).contains(Double(carv2DataPair.rollingAngulerRateDiffrential) ) {
-                    conductor.data.isPlaying = false
-                } else {
-                    conductor.data.isPlaying = true
-                }
-                if carv2DataPair.rollingAngulerRateDiffrential > 0 {
-                    conductor.panner.pan = 1.0
-                    conductor.data.frequency = AUValue(ToneStep.lowToHigh(ceil(carv2DataPair.rollingAngulerRateDiffrential * 10)))
-                    conductor.changeWaveFormToSin()
-                } else {
-                    conductor.panner.pan = -1.0
-                    conductor.changeWaveFormToTriangle()
-                    conductor.data.frequency = AUValue(ToneStep.hight(ceil(carv2DataPair.rollingAngulerRateDiffrential * 10)))
-                }
-            }
+//            conductor.start()
         }
     }
 }

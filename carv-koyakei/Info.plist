@@ -14,6 +14,7 @@
 		<string>bluetooth-peripheral</string>
 		<string>audio</string>
 		<string>processing</string>
+		<string>push-to-talk</string>
 	</array>
 	<key>UIFileSharingEnabled</key>
 	<true/>
