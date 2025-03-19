@@ -113,3 +113,10 @@ extension simd_quatf{
         )
     }
 }
+
+import Spatial
+extension Vector3D {
+    var description: String {
+        "(\(String(format: "%.1f",x)), \(String(format: "%.1f",y)), \(String(format: "%.1f",z)))"
+    }
+}

@@ -14,7 +14,11 @@ class Carv2Data{
     let acceleration: SIMD3<Float>
     let angularVelocity : SIMD3<Float>
     let recordetTime: TimeInterval = Date.now.timeIntervalSince1970
-    
+    init(){
+        attitude = .identity
+        acceleration = .zero
+        angularVelocity = .zero
+    }
 
     // 右側　x 前上　+ 　後上ー 　左は逆
     // y  上々　＋　下下　ー
@@ -49,30 +53,35 @@ class Carv2Data{
     
     
     var rightRealityKitRotation: Rotation3D {
-        let p = ProjectiveTransform3D(scale: Size3D(vector: [-1,-1,-1]),rotation: Rotation3D(simd_quatd(real: 1, imag: [-1.0,-1.0,1.0]).normalized))
+        let p = ProjectiveTransform3D(scale: Size3D(vector: [-1,-1,-1]),rotation: Rotation3D(simd_quatd(real: 1, imag: [1.0,1.0,1.0]).normalized))
         return Rotation3D.init(simd_quatd(vector:p.matrix * attitude.vector))
-//            .rotated(by: Rotation3D(angle: Angle2D(radians: .pi/2), axis: RotationAxis3D(vector: [0,1,0])))
+            .rotated(by: Rotation3D(angle: Angle2D(radians: -.pi), axis: RotationAxis3D(vector: [0,1,0])))
     }
     
+    
+    
     var leftRealityKitRotation: Rotation3D {
-        let p = ProjectiveTransform3D(scale: Size3D(vector: [-1,-1,-1]),rotation: Rotation3D(simd_quatd(real: 1, imag: [-1.0,1.0,-1.0]).normalized))
-        return Rotation3D.init(simd_quatd(vector:p.matrix * attitude.vector)).rotated(by: Rotation3D(angle: Angle2D(radians: .pi), axis: RotationAxis3D(vector: [1,0,0])))
+        let p = ProjectiveTransform3D(scale: Size3D(vector: [-1,-1,-1]),rotation: Rotation3D(simd_quatd(real: 1, imag: [-1.0,1.0,1.0]).normalized))
+        return Rotation3D.init(simd_quatd(vector: attitude.vector * p.matrix ))
+            .rotated(by: Rotation3D(angle: Angle2D(radians: .pi), axis: RotationAxis3D(vector: [1,0,0]))).rotated(by: Rotation3D(angle: Angle2D(radians: -.pi/2), axis: RotationAxis3D(vector: [0,1,0])))
+    }
+    var rightRealityKitRotation2: Rotation3D {
+        return attitude.rotated(by: Rotation3D(eulerAngles: EulerAngles(x: Angle2D(radians: .pi / 2), y: Angle2D(radians: .pi / 2), z: Angle2D(radians: .pi / 2), order: .xyz)))
+    }
+    var leftRealityKitRotation2: Rotation3D {
+        return attitude.rotated(by: Rotation3D(eulerAngles: EulerAngles(x: Angle2D(radians: 0), y: Angle2D(radians: 0), z: Angle2D(radians: .pi), order: .xyz)))
+    }
+    var leftRealityKitRotation3: Rotation3D {
+        
+        return attitude.rotated(by: Rotation3D(eulerAngles: EulerAngles(x: Angle2D(radians: .pi), y: Angle2D(radians: 0), z: Angle2D(radians: .pi), order: .xyz)))
     }
   
     
     static private func int16ToFloat(data: Data) -> MotionSensorData {
 
-        let intbyte :[Int16] = data.withUnsafeBytes {
+        let intbyte :[Float] = data.withUnsafeBytes {
             Array(UnsafeBufferPointer<Int16>(start: $0.baseAddress?.assumingMemoryBound(to: Int16.self), count: data.count / MemoryLayout<Int16>.stride))
-        }
-        let i = 0
-        let quatx = Float(intbyte[i]) / 32768.0
-        let quaty = Float(intbyte[i+1])  / 32768.0
-        let quatz = Float(intbyte[i+2])  / 32768.0
-        let quatw = Float(intbyte[i+3])  / 32768.0
-        let ax = Float(intbyte[i+4])  / 32768.0  * 16
-        let ay = Float(intbyte[i+5])  / 32768.0  * 16
-        let az = Float(intbyte[i+6])  / 32768.0  * 16
+        }.map { Float($0)/32768.0 }
                 let intbyte3 : [Float] = data.dropFirst(14).withUnsafeBytes { buffer in
                     guard let baseAddress = buffer.baseAddress else { return [] }
                     let count = buffer.count / MemoryLayout<Float32>.stride
@@ -81,27 +90,14 @@ class Carv2Data{
                         count: count
                     )).map { Float32($0) }
                 }
-        
-        return MotionSensorData(attitude: Rotation3D.init(simd_quatf(vector: simd_float4(quatx, quaty, quatz, quatw))), acceleration:  SIMD3<Float>(x: ax, y: ay, z: az),angularVelocity: SIMD3<Float>(x: intbyte3[safe:0, default: 0], y: intbyte3[safe: 1, default: 0] , z: intbyte3[safe: 2,default: 0 ]))
+        return MotionSensorData(attitude: Rotation3D.init(simd_quatf(vector: simd_float4(intbyte[0], intbyte[1], intbyte[2], intbyte[3]))), acceleration:  SIMD3<Float>(x: intbyte[4] * 16, y: intbyte[5]  * 16, z: intbyte[6] * 16),angularVelocity: SIMD3<Float>(x: intbyte3[safe:0, default: 0], y: intbyte3[safe: 1, default: 0] , z: intbyte3[safe: 2,default: 0 ]))
     }
     
-    public init(rightData data: Data) {
+    public init(_ data: Data) {
         let motionSensorData = Carv2Data.int16ToFloat(data: data.dropFirst(1))
         attitude = motionSensorData.attitude
         acceleration = motionSensorData.acceleration
         angularVelocity = motionSensorData.angularVelocity
-    }
-    
-    public init(leftData data: Data){
-        let motionSensorData = Carv2Data.int16ToFloat(data: data.dropFirst(1))
-        attitude = motionSensorData.attitude
-        acceleration = motionSensorData.acceleration
-        angularVelocity = motionSensorData.angularVelocity
-    }
-    public init () {
-        attitude = .identity
-        acceleration = .zero
-        angularVelocity = .zero
     }
 }
 

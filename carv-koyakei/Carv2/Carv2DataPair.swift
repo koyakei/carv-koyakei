@@ -8,27 +8,63 @@ import Foundation
 import Spatial
 import simd
 import SwiftUICore
+import Combine
+import AudioKit
+
+extension Array where Element == Carv2AnalyzedDataPair {
+    var fallLineAttitude: Rotation3D {
+        Rotation3D(self.map { $0.unitedAttitude.quaternion}.reduce(simd_quatf(), +).normalized)
+    }
+}
 
 class Carv2DataPair : ObservableObject{
+    @ObservedObject var conductor = DynamicOscillatorConductor()
     // ipad
     static let rightCharactaristicUUID = UUID(uuidString: "85A29A4C-09C3-C632-858A-3387339C67CF")
     static let leftCharactaristicUUID = UUID(uuidString:  "850D8BCF-3B03-1322-F51C-DD38E961FC1A")
     // iphone
 //    static let rightCharactaristicUUID = UUID(uuidString: "85E2946B-0D18-FA01-E1C9-0393EDD9013A")
 //    static let leftCharactaristicUUID = UUID(uuidString:  "57089C67-2275-E220-B6D3-B16E2639EFD6")
-    
+    @State var diffYawingTargetAngle: Double = 1.0
     static let periferalName = "CARV 2"
     @Published var left:  Carv2Data = Carv2Data.init()
     @Published var right: Carv2Data = Carv2Data.init()
+    private var cancellables = Set<AnyCancellable>()
     private var isRecordingCSV = false
     private let  csvExporter = CSVExporter()
     private var numberOfTurn : Int = 0
+    public static let shared: Carv2DataPair = .init()
+    
+    init(){
+        conductor.start()
+        $right
+                   .sink { [weak self] newValue in
+                       self?.handleRightChange(newValue)
+                   }
+                   .store(in: &cancellables)
+    }
+    
+    private func handleRightChange(_ newValue: Carv2Data) {
+        if (-diffYawingTargetAngle...diffYawingTargetAngle).contains(Double(yawingAngulerRateDiffrential) ) {
+            conductor.data.isPlaying = false
+        } else {
+            conductor.data.isPlaying = true
+        }
+        if yawingAngulerRateDiffrential > 0 {
+            conductor.panner.pan = 1.0
+            conductor.data.frequency = AUValue(ToneStep.lowToHigh(ceil(yawingAngulerRateDiffrential * 10)))
+            conductor.changeWaveFormToSin()
+        } else {
+            conductor.panner.pan = -1.0
+            conductor.changeWaveFormToTriangle()
+            conductor.data.frequency = AUValue(ToneStep.hight(ceil(yawingAngulerRateDiffrential * 10)))
+        }
+        }
+    
     @Published var currentTurn: [Carv2AnalyzedDataPair] = []
     @Published var beforeTurn: [Carv2AnalyzedDataPair] = []
-    public init (){
-        
-    }
-    func turnDiffrencial(){
+    
+    var turnDiffrencial: Rotation3D{
         beforeLastTurnSwitchingUnitedAttitude.inverse * lastTurnSwitchingUnitedAttitude
     }
     //ターン後半30%で内筒しているかどうか
@@ -76,7 +112,7 @@ class Carv2DataPair : ObservableObject{
     var unitedAttitude:Rotation3D {
         Rotation3D.slerp(from: left.leftRealityKitRotation, to: right.rightRealityKitRotation, t: 0.5)
     }
-    var yawingAngulerRateDiffrential: Float { Float(right.angularVelocity.y - left.angularVelocity.y)}
+    var yawingAngulerRateDiffrential: Float { Float(right.angularVelocity.y - left.angularVelocity.y)} 
     // ローリングの方向を　realitykit 用の変換コードを一つの行列変換で表現したやつを掛けて揃えなきゃいけないんだけど、やってない。
     // ここでサボると加速度の変換がおかしなことになる。
     var rollingAngulerRateDiffrential: Float { Float(right.angularVelocity.x + left.angularVelocity.x)}
@@ -96,6 +132,15 @@ class Carv2DataPair : ObservableObject{
         numberOfTurn = 0
     }
     var currentTurnPhaseByTime: Double = 0
+    
+    var unifiedDiffrentialAttitudeFromRightToLeft: Rotation3D {
+        right.rightRealityKitRotation.inverse * left.leftRealityKitRotation
+    }
+    
+    var rightAngularVelocityProjectedToLeft: Vector3D {
+        Vector3D(right.angularVelocity).rotated(by: unifiedDiffrentialAttitudeFromRightToLeft)
+    }
+    
 //     同じやつをここに移植
     lazy var  parallelAngleByAttitude = Double(
                     left.leftRealityKitRotation.quaternion.simd_quatf.getSignedAngleBetweenQuaternions2(q2: right.rightRealityKitRotation.quaternion.simd_quatf))
@@ -112,7 +157,7 @@ class Carv2DataPair : ObservableObject{
             numberOfTurn = numberOfTurn + 1
             turnPhaseByTime.turnSwitched(currentTime: data.recordetTime)
         }
-        analyzedDataPair.left = Carv2AnalyzedData(attitude: data.attitude, acceleration: data.acceleration, angularVelocity: data.angularVelocity)
+        analyzedDataPair.left = Carv2AnalyzedData(attitude: data.leftRealityKitRotation, acceleration: data.acceleration, angularVelocity: data.angularVelocity)
         analyzedDataPair.numberOfTurns = numberOfTurn
         analyzedDataPair.percentageOfTurnsByAngle = Float(turnPhasePercantageByAngle)
         analyzedDataPair.percentageOfTurnsByTime = turnPhaseByTime.handle(currentTime: data.recordetTime, currentAttitude: data.leftRealityKitRotation)
@@ -138,7 +183,7 @@ class Carv2DataPair : ObservableObject{
             numberOfTurn = numberOfTurn + 1
             turnPhaseByTime.turnSwitched(currentTime: data.recordetTime)
         }
-        analyzedDataPair.right = Carv2AnalyzedData(attitude: data.attitude, acceleration: data.acceleration, angularVelocity: data.angularVelocity)
+        analyzedDataPair.right = Carv2AnalyzedData(attitude: data.rightRealityKitRotation, acceleration: data.acceleration, angularVelocity: data.angularVelocity)
         analyzedDataPair.numberOfTurns = numberOfTurn
         analyzedDataPair.percentageOfTurnsByAngle = Float(turnPhasePercantageByAngle)
         analyzedDataPair.percentageOfTurnsByTime = turnPhaseByTime.handle(currentTime: data.recordetTime, currentAttitude: data.rightRealityKitRotation)

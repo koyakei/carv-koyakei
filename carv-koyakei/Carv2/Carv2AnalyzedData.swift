@@ -37,7 +37,8 @@ struct Carv2AnalyzedDataPair :Identifiable, OutsideSkiRollAngle{
         return outsideSki.rollAngle + Angle2D(degrees: 90).radians
     }
     
-    var outsideSki: Carv2AnalyzedData {        if yawingSide == .LeftYawing {
+    var outsideSki: Carv2AnalyzedData {
+        if yawingSide == .LeftYawing {
             return left
         } else {
             return right

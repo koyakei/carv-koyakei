@@ -85,7 +85,7 @@ class DynamicOscillatorConductor: ObservableObject {
     }
 
     func start() {
-            osc.amplitude = 0.2
+            osc.amplitude = 0.5
             do {
                 try AVAudioSession.sharedInstance().setCategory(
                     .playAndRecord,

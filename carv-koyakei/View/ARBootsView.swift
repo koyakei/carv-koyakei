@@ -8,6 +8,7 @@
 import SwiftUI
 import RealityKit
 import Charts
+import Spatial
 
 struct ARBootsView: View {
     @EnvironmentObject var carv2DataPair : Carv2DataPair
@@ -126,6 +127,12 @@ struct ARBootsView: View {
                 arrowRight.setOrientation(
                     simd_quatf(carv2DataPair.right.rightRealityKitRotation
                               ) , relativeTo: nil)
+                
+                guard let arrowUnified = content.entities.first(where: {$0.name == "worldAnchor"})?.children.first(where: { $0.name == unifiedAnchorName })else  { return }
+                arrowUnified.setOrientation(
+                    simd_quatf(Carv2DataPair.shared.beforeTurn.fallLineAttitude
+                              ) , relativeTo: nil)
+                
             }
             .gesture(magnificationGesture)
             .overlay(alignment: .bottom){
