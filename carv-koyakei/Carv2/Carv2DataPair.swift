@@ -11,6 +11,12 @@ import SwiftUICore
 import Combine
 import AudioKit
 
+extension Array where Element == Carv2AnalyzedDataPair {
+    var fallLineAttitude: Rotation3D {
+        Rotation3D(self.map { $0.unitedAttitude.quaternion}.reduce(simd_quatf(), +).normalized)
+    }
+}
+
 class Carv2DataPair : ObservableObject{
     @ObservedObject var conductor = DynamicOscillatorConductor()
     // ipad
@@ -151,7 +157,7 @@ class Carv2DataPair : ObservableObject{
             numberOfTurn = numberOfTurn + 1
             turnPhaseByTime.turnSwitched(currentTime: data.recordetTime)
         }
-        analyzedDataPair.left = Carv2AnalyzedData(attitude: data.attitude, acceleration: data.acceleration, angularVelocity: data.angularVelocity)
+        analyzedDataPair.left = Carv2AnalyzedData(attitude: data.leftRealityKitRotation, acceleration: data.acceleration, angularVelocity: data.angularVelocity)
         analyzedDataPair.numberOfTurns = numberOfTurn
         analyzedDataPair.percentageOfTurnsByAngle = Float(turnPhasePercantageByAngle)
         analyzedDataPair.percentageOfTurnsByTime = turnPhaseByTime.handle(currentTime: data.recordetTime, currentAttitude: data.leftRealityKitRotation)
@@ -177,7 +183,7 @@ class Carv2DataPair : ObservableObject{
             numberOfTurn = numberOfTurn + 1
             turnPhaseByTime.turnSwitched(currentTime: data.recordetTime)
         }
-        analyzedDataPair.right = Carv2AnalyzedData(attitude: data.attitude, acceleration: data.acceleration, angularVelocity: data.angularVelocity)
+        analyzedDataPair.right = Carv2AnalyzedData(attitude: data.rightRealityKitRotation, acceleration: data.acceleration, angularVelocity: data.angularVelocity)
         analyzedDataPair.numberOfTurns = numberOfTurn
         analyzedDataPair.percentageOfTurnsByAngle = Float(turnPhasePercantageByAngle)
         analyzedDataPair.percentageOfTurnsByTime = turnPhaseByTime.handle(currentTime: data.recordetTime, currentAttitude: data.rightRealityKitRotation)

@@ -11,7 +11,6 @@ struct DeviceRow: View {
     let ble: BluethoothCentralManager
     
     var body: some View {
-        
         VStack {
             Picker("オプションを選択", selection: $device.carv2PripheralSide) {
                             ForEach(Carv2PripheralSide.allCases, id: \.self) { option in
