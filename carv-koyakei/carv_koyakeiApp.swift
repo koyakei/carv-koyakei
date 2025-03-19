@@ -12,16 +12,15 @@ import AVFAudio
 @main
 struct carv_koyakeiApp: App {
     @StateObject private var conductor = DynamicOscillatorConductor()
-    @StateObject private var carv2DataPair: Carv2DataPair = Carv2DataPair()
     @StateObject private var carv1DataPair: Carv1DataPair = Carv1DataPair()
     @Environment(\.scenePhase) var scenePhase
-
+    
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environmentObject(carv1DataPair)
-                .environmentObject(carv2DataPair)
-                .environmentObject(YawingBeep(carv2DataPair: carv2DataPair, conductor: conductor))
+                .environmentObject(YawingBeep())
                 .environmentObject(BluethoothCentralManager())
                 .environmentObject(conductor)
                 .onAppear {

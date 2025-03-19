@@ -5,12 +5,11 @@ import SwiftUI
  class BluethoothCentralManager: NSObject, ObservableObject, CBCentralManagerDelegate {
      
      @Published var carvDeviceList: [CarvDevice] = []
-      var carv2DataPair : Carv2DataPair
+     var carv2DataPair : Carv2DataPair = Carv2DataPair.shared
      
      var centralManager: CBCentralManager!
     static let targetServiceUUID = CBUUID(string: "2DFBFFFF-960D-4909-8D28-F353CB168E8A")
-     init(carv2DataPair: Carv2DataPair) {
-         self.carv2DataPair = carv2DataPair
+     override init() {
          super.init()
     centralManager = CBCentralManager(delegate: self, queue: nil)
 }

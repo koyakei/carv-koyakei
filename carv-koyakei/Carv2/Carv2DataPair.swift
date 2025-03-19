@@ -37,29 +37,8 @@ class Carv2DataPair : ObservableObject{
     
     init(){
         conductor.start()
-        $right
-                   .sink { [weak self] newValue in
-                       self?.handleRightChange(newValue)
-                   }
-                   .store(in: &cancellables)
     }
-    
-    private func handleRightChange(_ newValue: Carv2Data) {
-        if (-diffYawingTargetAngle...diffYawingTargetAngle).contains(Double(yawingAngulerRateDiffrential) ) {
-            conductor.data.isPlaying = false
-        } else {
-            conductor.data.isPlaying = true
-        }
-        if yawingAngulerRateDiffrential > 0 {
-            conductor.panner.pan = 1.0
-            conductor.data.frequency = AUValue(ToneStep.lowToHigh(ceil(yawingAngulerRateDiffrential * 10)))
-            conductor.changeWaveFormToSin()
-        } else {
-            conductor.panner.pan = -1.0
-            conductor.changeWaveFormToTriangle()
-            conductor.data.frequency = AUValue(ToneStep.hight(ceil(yawingAngulerRateDiffrential * 10)))
-        }
-        }
+   
     
     @Published var currentTurn: [Carv2AnalyzedDataPair] = []
     @Published var beforeTurn: [Carv2AnalyzedDataPair] = []

@@ -13,7 +13,7 @@ import AudioKit
 struct HomeView: View {
     @EnvironmentObject var ble : BluethoothCentralManager
     @ObservedObject var carv2DataPair = Carv2DataPair.shared
-    @EnvironmentObject var yawingBeep: YawingBeep
+    @ObservedObject var yawingBeep: YawingBeep = .shared
     @ObservedObject var carv2AnalyzedDataPairManager = Carv2AnalyzedDataPairManager.shared
    
     @State var rollingBeep: Bool = false
@@ -104,7 +104,6 @@ struct HomeView: View {
                     Text("stop csv")
                 }
             }
-            //            Text("paralell rotation angle \(carv2DataPair.yawingAngulerRateDiffrential * 10)")
            
             HStack{
                 Button(action: {
@@ -113,11 +112,6 @@ struct HomeView: View {
                     }
                 Text("Current value: \(yawingBeep.diffYawingTargetAngle, specifier: "%.2f")")
                     .padding()
-                Button(action: {
-                    yawingBeep.startBeep()
-                }){
-                    Text("on")
-                }
             }
             if yawingBeep.isBeeping {
                     Slider(

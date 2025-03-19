@@ -16,7 +16,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "148"
             endingLineNumber = "148"
-            landmarkName = "magnificationGesture"
+            landmarkName = "body"
             landmarkType = "24">
          </BreakpointContent>
       </BreakpointProxy>
@@ -30,10 +30,10 @@
             filePath = "carv-koyakei/Carv2/Carv2DataPair.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "108"
-            endingLineNumber = "108"
-            landmarkName = "receive(left:)"
-            landmarkType = "7">
+            startingLineNumber = "87"
+            endingLineNumber = "87"
+            landmarkName = "Carv2DataPair"
+            landmarkType = "3">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -46,10 +46,10 @@
             filePath = "carv-koyakei/Carv2/Carv2DataPair.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "134"
-            endingLineNumber = "134"
-            landmarkName = "receive(right:)"
-            landmarkType = "7">
+            startingLineNumber = "113"
+            endingLineNumber = "113"
+            landmarkName = "Carv2DataPair"
+            landmarkType = "3">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -62,9 +62,9 @@
             filePath = "carv-koyakei/CarvDevice.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "115"
-            endingLineNumber = "115"
-            landmarkName = "peripheral(_:didUpdateValueFor:error:)"
+            startingLineNumber = "114"
+            endingLineNumber = "114"
+            landmarkName = "peripheral(_:didDiscoverServices:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

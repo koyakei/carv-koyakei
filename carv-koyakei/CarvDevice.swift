@@ -14,7 +14,7 @@ class CarvDevice: NSObject, ObservableObject, Identifiable, CBPeripheralDelegate
     let peripheral: CBPeripheral
     @Published var connectionState: CBPeripheralState
     @Published var services: [CBService] = []
-    @Published var carv2DataPair: Carv2DataPair
+    @Published var carv2DataPair: Carv2DataPair = Carv2DataPair.shared
     @Published var carv1DataPair: Carv1DataPair = Carv1DataPair.shared
     var carv2AnalyzedDataPairManager = Carv2AnalyzedDataPairManager.init()
 
@@ -33,7 +33,6 @@ class CarvDevice: NSObject, ObservableObject, Identifiable, CBPeripheralDelegate
         self.id = peripheral.identifier
         self.peripheral = peripheral
         self.connectionState = peripheral.state
-        self.carv2DataPair = carv2DataPair
         super.init()
         self.peripheral.delegate = self
         //　UserDefaults.standard.string(forKey: "leftCarv2UUID")　が空だった場合、現在の値を代入
