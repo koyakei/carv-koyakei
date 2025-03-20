@@ -18,7 +18,6 @@ extension Array where Element == Carv2AnalyzedDataPair {
 }
 
 class Carv2DataPair : ObservableObject{
-    @ObservedObject var conductor = DynamicOscillatorConductor()
     // ipad
     static let rightCharactaristicUUID = UUID(uuidString: "85A29A4C-09C3-C632-858A-3387339C67CF")
     static let leftCharactaristicUUID = UUID(uuidString:  "850D8BCF-3B03-1322-F51C-DD38E961FC1A")
@@ -34,11 +33,6 @@ class Carv2DataPair : ObservableObject{
     private let  csvExporter = CSVExporter()
     private var numberOfTurn : Int = 0
     public static let shared: Carv2DataPair = .init()
-    
-    init(){
-        conductor.start()
-    }
-   
     
     @Published var currentTurn: [Carv2AnalyzedDataPair] = []
     @Published var beforeTurn: [Carv2AnalyzedDataPair] = []
