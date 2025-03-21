@@ -21,35 +21,81 @@ struct HomeView: View {
 
     var body: some View {
         VStack {
+//            HStack{
+//                Text(Angle2D(radians: carv2DataPair.beforeTurn.fallLineAttitude.eulerAngles(order: .xyz).angles.x).degrees.description)
+//                Text(Angle2D(radians: carv2DataPair.beforeTurn.fallLineAttitude.eulerAngles(order: .xyz).angles.y).degrees.description)
+//                Text(Angle2D(radians: carv2DataPair.beforeTurn.fallLineAttitude.eulerAngles(order: .xyz).angles.z).degrees.description)
+//            }
+//            HStack{
+//                Text(Angle2D(radians: carv2DataPair.left.leftRealityKitRotation.eulerAngles(order: .xyz).angles.x).degrees.description)
+//                Text(Angle2D(radians: carv2DataPair.left.leftRealityKitRotation.eulerAngles(order: .xyz).angles.y).degrees.description)
+//                Text(Angle2D(radians: carv2DataPair.left.leftRealityKitRotation.eulerAngles(order: .xyz).angles.z).degrees.description)
+//            }
+//            HStack{
+//                Text(Angle2D(radians: carv2DataPair.right.rightRealityKitRotation.eulerAngles(order: .xyz).angles.x).degrees.description)
+//                Text(Angle2D(radians: carv2DataPair.right.rightRealityKitRotation.eulerAngles(order: .xyz).angles.y).degrees.description)
+//                Text(Angle2D(radians: carv2DataPair.right.rightRealityKitRotation.eulerAngles(order: .xyz).angles.z).degrees.description)
+//            }
+//            HStack{
+//                Text(Angle2D(radians: carv2DataPair.right.leftRealityKitRotation3.eulerAngles(order: .xyz).angles.x).degrees.description)
+//                Text(Angle2D(radians: carv2DataPair.right.leftRealityKitRotation3.eulerAngles(order: .xyz).angles.y).degrees.description)
+//                Text(Angle2D(radians: carv2DataPair.right.leftRealityKitRotation3.eulerAngles(order: .xyz).angles.z).degrees.description)
+//            }
+//            HStack{
+//                Text(Angle2D(radians: carv2DataPair.right.attitude.eulerAngles(order: .xyz).angles.x).degrees.description)
+//                Text(Angle2D(radians: carv2DataPair.right.attitude.eulerAngles(order: .xyz).angles.y).degrees.description)
+//                Text(Angle2D(radians: carv2DataPair.right.attitude.eulerAngles(order: .xyz).angles.z).degrees.description)
+//            }
+//            HStack{
+//                Text(Angle2D(radians: carv2DataPair.left.attitude.eulerAngles(order: .xyz).angles.x).degrees.description)
+//                Text(Angle2D(radians: carv2DataPair.left.attitude.eulerAngles(order: .xyz).angles.y).degrees.description)
+//                Text(Angle2D(radians: carv2DataPair.left.attitude.eulerAngles(order: .xyz).angles.z).degrees.description)
+//            }
             HStack{
-                Text(Angle2D(radians: carv2DataPair.beforeTurn.fallLineAttitude.eulerAngles(order: .xyz).angles.x).degrees.description)
-                Text(Angle2D(radians: carv2DataPair.beforeTurn.fallLineAttitude.eulerAngles(order: .xyz).angles.y).degrees.description)
-                Text(Angle2D(radians: carv2DataPair.beforeTurn.fallLineAttitude.eulerAngles(order: .xyz).angles.z).degrees.description)
-            }
-            HStack{
-                Text(Angle2D(radians: carv2DataPair.left.leftRealityKitRotation.eulerAngles(order: .xyz).angles.x).degrees.description)
-                Text(Angle2D(radians: carv2DataPair.left.leftRealityKitRotation.eulerAngles(order: .xyz).angles.y).degrees.description)
-                Text(Angle2D(radians: carv2DataPair.left.leftRealityKitRotation.eulerAngles(order: .xyz).angles.z).degrees.description)
-            }
-            HStack{
-                Text(Angle2D(radians: carv2DataPair.right.rightRealityKitRotation.eulerAngles(order: .xyz).angles.x).degrees.description)
-                Text(Angle2D(radians: carv2DataPair.right.rightRealityKitRotation.eulerAngles(order: .xyz).angles.y).degrees.description)
-                Text(Angle2D(radians: carv2DataPair.right.rightRealityKitRotation.eulerAngles(order: .xyz).angles.z).degrees.description)
-            }
-            HStack{
-                Text(Angle2D(radians: carv2DataPair.right.leftRealityKitRotation3.eulerAngles(order: .xyz).angles.x).degrees.description)
-                Text(Angle2D(radians: carv2DataPair.right.leftRealityKitRotation3.eulerAngles(order: .xyz).angles.y).degrees.description)
-                Text(Angle2D(radians: carv2DataPair.right.leftRealityKitRotation3.eulerAngles(order: .xyz).angles.z).degrees.description)
-            }
-            HStack{
-                Text(Angle2D(radians: carv2DataPair.right.attitude.eulerAngles(order: .xyz).angles.x).degrees.description)
-                Text(Angle2D(radians: carv2DataPair.right.attitude.eulerAngles(order: .xyz).angles.y).degrees.description)
-                Text(Angle2D(radians: carv2DataPair.right.attitude.eulerAngles(order: .xyz).angles.z).degrees.description)
-            }
-            HStack{
-                Text(Angle2D(radians: carv2DataPair.left.attitude.eulerAngles(order: .xyz).angles.x).degrees.description)
-                Text(Angle2D(radians: carv2DataPair.left.attitude.eulerAngles(order: .xyz).angles.y).degrees.description)
-                Text(Angle2D(radians: carv2DataPair.left.attitude.eulerAngles(order: .xyz).angles.z).degrees.description)
+                VStack{
+                    Text( carv2DataPair.right.angularVelocity.x.formatted(.number.precision(.fractionLength(1))))
+                    Text( carv2DataPair.right.angularVelocity.y.formatted(.number.precision(.fractionLength(1))))
+                    Text( carv2DataPair.right.angularVelocity.z.formatted(.number.precision(.fractionLength(1))))
+                }
+                VStack{
+                    Text( carv2DataPair.right.初期姿勢に対しての角速度Right.x.formatted(.number.precision(.fractionLength(1))))
+                    Text( carv2DataPair.right.初期姿勢に対しての角速度Right.y.formatted(.number.precision(.fractionLength(1))))
+                    Text( carv2DataPair.right.初期姿勢に対しての角速度Right.z.formatted(.number.precision(.fractionLength(1))))
+                }
+                VStack{
+                    Text( carv2DataPair.right.初期姿勢に対しての角速度2.x.formatted(.number.precision(.fractionLength(1))))
+                    Text( carv2DataPair.right.初期姿勢に対しての角速度2.y.formatted(.number.precision(.fractionLength(1))))
+                    Text( carv2DataPair.right.初期姿勢に対しての角速度2.z.formatted(.number.precision(.fractionLength(1))))
+                }
+                
+                VStack{
+                    Text( carv2DataPair.right.初期姿勢に対しての角速度3.x.formatted(.number.precision(.fractionLength(1))))
+                    Text( carv2DataPair.right.初期姿勢に対しての角速度3.y.formatted(.number.precision(.fractionLength(1))))
+                    Text( carv2DataPair.right.初期姿勢に対しての角速度3.z.formatted(.number.precision(.fractionLength(1))))
+                }
+                
+                VStack{
+                    Text( carv2DataPair.right.初期姿勢に対しての角速度4.x.formatted(.number.precision(.fractionLength(1))))
+                    Text( carv2DataPair.right.初期姿勢に対しての角速度4.y.formatted(.number.precision(.fractionLength(1))))
+                    Text( carv2DataPair.right.初期姿勢に対しての角速度4.z.formatted(.number.precision(.fractionLength(1))))
+                }
+                VStack{
+                    Text( carv2DataPair.right.初期姿勢に対しての角速度5.x.formatted(.number.precision(.fractionLength(1))))
+                    Text( carv2DataPair.right.初期姿勢に対しての角速度5.y.formatted(.number.precision(.fractionLength(1))))
+                    Text( carv2DataPair.right.初期姿勢に対しての角速度5.z.formatted(.number.precision(.fractionLength(1))))
+                }
+                VStack{
+                    Text( carv2DataPair.right.初期姿勢に対しての角速度6.x.formatted(.number.precision(.fractionLength(1))))
+                    Text( carv2DataPair.right.初期姿勢に対しての角速度6.y.formatted(.number.precision(.fractionLength(1))))
+                    Text( carv2DataPair.right.初期姿勢に対しての角速度6.z.formatted(.number.precision(.fractionLength(1))))
+                }
+                
+                VStack{
+                    Text( carv2DataPair.right.初期姿勢に対しての角速度7.x.formatted(.number.precision(.fractionLength(1))))
+                    Text( carv2DataPair.right.初期姿勢に対しての角速度7.y.formatted(.number.precision(.fractionLength(1))))
+                    Text( carv2DataPair.right.初期姿勢に対しての角速度7.z.formatted(.number.precision(.fractionLength(1))))
+                }
+                
             }
             HStack{
                 Text(carv2DataPair.left.leftRealityKitRotation.quaternion.formatQuaternion)

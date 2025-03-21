@@ -24,9 +24,8 @@ class Carv2DataPair : ObservableObject{
     // iphone
 //    static let rightCharactaristicUUID = UUID(uuidString: "85E2946B-0D18-FA01-E1C9-0393EDD9013A")
 //    static let leftCharactaristicUUID = UUID(uuidString:  "57089C67-2275-E220-B6D3-B16E2639EFD6")
-    @State var diffYawingTargetAngle: Double = 1.0
     static let periferalName = "CARV 2"
-    @Published var left:  Carv2Data = Carv2Data.init()
+    @Published var left: Carv2Data = Carv2Data.init()
     @Published var right: Carv2Data = Carv2Data.init()
     private var cancellables = Set<AnyCancellable>()
     private var isRecordingCSV = false
@@ -45,6 +44,39 @@ class Carv2DataPair : ObservableObject{
         return self.currentTurn.last?.isTurnSwitching ?? false
     }
     
+    
+    
+   
+    // z がヨーイング角速度の同調　左足前テレマークでの　parallel ski
+    var angulerVelocityDiffrencialForTelemarkLeftSideFont: Vector3D {
+        return 左側基準の右足の角速度 - Vector3D.init(x: left.angularVelocity.x, y: left.angularVelocity.z, z: -left.angularVelocity.y)
+    }
+    
+    var 左側基準の右足の角速度 : Vector3D {
+        return Vector3D.init(x: right.angularVelocity.x, y: -right.angularVelocity.z, z: -right.angularVelocity.y).rotated(by: unifiedDiffrentialAttitudeFromLeftToRight)
+    }
+    
+    // z yaw x roll y pitch
+    var angulerVelocityDiffrencialForTelemarkRightSideFont: Vector3D {
+        return 右側基準の左足の角速度 - Vector3D.init(x: right.angularVelocity.x, y: right.angularVelocity.z, z: right.angularVelocity.y)
+    }
+    
+    var 右側基準の左足の角速度 : Vector3D {
+        return Vector3D.init(x: -left.angularVelocity.x, y: -left.angularVelocity.z, z: left.angularVelocity.y).rotated(by: unifiedDiffrentialAttitudeFromRightToLeft)
+    }
+    var 初期姿勢に対しての角速度8 : Vector3D {
+        return Vector3D.init(x: -right.angularVelocity.x, y: -right.angularVelocity.z, z: right.angularVelocity.y).rotated(by: unifiedDiffrentialAttitudeFromLeftToRight.inverse)
+    }
+    
+    var 初期姿勢に対しての角速度9 : Vector3D {
+        return Vector3D.init(x: 0, y: 1, z: 0).rotated(by: unifiedDiffrentialAttitudeFromRightToLeft)
+    }
+    
+    var 初期姿勢に対しての角速度1 : Vector3D {
+        return Vector3D.init(x: 0, y: 0, z: 1).rotated(by: unifiedDiffrentialAttitudeFromRightToLeft)
+    }
+    
+   
     
     func receive(data: Carv2AnalyzedDataPair){
         currentTurn.append(data)
@@ -108,6 +140,10 @@ class Carv2DataPair : ObservableObject{
     
     var unifiedDiffrentialAttitudeFromRightToLeft: Rotation3D {
         right.rightRealityKitRotation.inverse * left.leftRealityKitRotation
+    }
+    
+    var unifiedDiffrentialAttitudeFromLeftToRight: Rotation3D {
+        left.leftRealityKitRotation.inverse * right.rightRealityKitRotation
     }
     
     var rightAngularVelocityProjectedToLeft: Vector3D {

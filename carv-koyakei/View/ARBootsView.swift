@@ -130,20 +130,59 @@ struct ARBootsView: View {
                 
                 guard let arrowUnified = content.entities.first(where: {$0.name == "worldAnchor"})?.children.first(where: { $0.name == unifiedAnchorName })else  { return }
                 arrowUnified.setOrientation(
-                    simd_quatf(Carv2DataPair.shared.beforeTurn.fallLineAttitude
+                    simd_quatf(Carv2DataPair.shared.unifiedDiffrentialAttitudeFromRightToLeft
                               ) , relativeTo: nil)
                 
             }
             .gesture(magnificationGesture)
             .overlay(alignment: .bottom){
-                chartOverlay
-                                .background(
-                                    VisualEffectBlur(blurStyle: .systemUltraThinMaterial)
-                                        .opacity(0.9)
-                                        .cornerRadius(12)
-                                )
-                                .padding(.horizontal, 20)
-                                .padding(.bottom, 10)
+//                chartOverlay
+//                                .background(
+//                                    VisualEffectBlur(blurStyle: .systemUltraThinMaterial)
+//                                        .opacity(0.9)
+//                                        .cornerRadius(12)
+//                                )
+//                                .padding(.horizontal, 20)
+//                                .padding(.bottom, 10)
+                HStack{
+                    VStack{
+                        Text( carv2DataPair.angulerVelocityDiffrencialForTelemarkLeftSideFont.x.formatted(.number.precision(.fractionLength(1))))
+                        Text( carv2DataPair.angulerVelocityDiffrencialForTelemarkLeftSideFont.y.formatted(.number.precision(.fractionLength(1))))
+                        Text( carv2DataPair.angulerVelocityDiffrencialForTelemarkLeftSideFont.z.formatted(.number.precision(.fractionLength(1))))
+                    }
+                    VStack{
+                        Text( carv2DataPair.左側基準の右足の角速度.x.formatted(.number.precision(.fractionLength(1))))
+                        Text( carv2DataPair.左側基準の右足の角速度.y.formatted(.number.precision(.fractionLength(1))))
+                        Text( carv2DataPair.左側基準の右足の角速度.z.formatted(.number.precision(.fractionLength(1))))
+                    }
+                    
+                    VStack{
+                        Text( carv2DataPair.angulerVelocityDiffrencialForTelemarkRightSideFont.x.formatted(.number.precision(.fractionLength(1))))
+                        Text( carv2DataPair.angulerVelocityDiffrencialForTelemarkRightSideFont.y.formatted(.number.precision(.fractionLength(1))))
+                        Text( carv2DataPair.angulerVelocityDiffrencialForTelemarkRightSideFont.z.formatted(.number.precision(.fractionLength(1))))
+                    }
+                    VStack{
+                        Text( carv2DataPair.右側基準の左足の角速度.x.formatted(.number.precision(.fractionLength(1))))
+                        Text( carv2DataPair.右側基準の左足の角速度.y.formatted(.number.precision(.fractionLength(1))))
+                        Text( carv2DataPair.右側基準の左足の角速度.z.formatted(.number.precision(.fractionLength(1))))
+                    }
+                    VStack{
+                        Text( carv2DataPair.初期姿勢に対しての角速度8.x.formatted(.number.precision(.fractionLength(1))))
+                        Text( carv2DataPair.初期姿勢に対しての角速度8.y.formatted(.number.precision(.fractionLength(1))))
+                        Text( carv2DataPair.初期姿勢に対しての角速度8.z.formatted(.number.precision(.fractionLength(1))))
+                    }
+                    
+                    VStack{
+                        Text( carv2DataPair.left.angularVelocity.x.formatted(.number.precision(.fractionLength(1))))
+                        Text( carv2DataPair.left.angularVelocity.y.formatted(.number.precision(.fractionLength(1))))
+                        Text( carv2DataPair.left.angularVelocity.z.formatted(.number.precision(.fractionLength(1))))
+                    }
+                    VStack{
+                        Text( carv2DataPair.right.angularVelocity.x.formatted(.number.precision(.fractionLength(1))))
+                        Text( carv2DataPair.right.angularVelocity.y.formatted(.number.precision(.fractionLength(1))))
+                        Text( carv2DataPair.right.angularVelocity.z.formatted(.number.precision(.fractionLength(1))))
+                    }
+                }
             }
             
                             

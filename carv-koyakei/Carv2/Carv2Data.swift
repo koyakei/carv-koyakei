@@ -41,6 +41,40 @@ class Carv2Data{
         Vector3D(angularVelocity)
     }
     
+    var 初期姿勢に対しての角速度Right : Vector3D {
+        let p = ProjectiveTransform3D(scale: Size3D(vector: [-1,-1,-1]),rotation: Rotation3D(simd_quatd(real: 1, imag: [1.0,1.0,1.0]).normalized))
+        return Vector3D.init(x: angularVelocity.x, y: angularVelocity.z, z: -angularVelocity.y).rotated(by: Rotation3D.init(simd_quatd(vector:p.matrix * attitude.vector)).rotated(by: Rotation3D(angle: Angle2D(radians: -.pi), axis: RotationAxis3D(vector: [0,1,0]))))
+       
+    }
+    
+    var 初期姿勢に対しての角速度2 : Vector3D {
+        let p = ProjectiveTransform3D(scale: Size3D(vector: [-1,-1,-1]),rotation: Rotation3D(simd_quatd(real: 1, imag: [1.0,1.0,1.0]).normalized))
+        return Vector3D.init(x: 0, y: 1, z: 0).rotated(by: Rotation3D.init(simd_quatd(vector:p.matrix * attitude.vector)).rotated(by: Rotation3D(angle: Angle2D(radians: -.pi), axis: RotationAxis3D(vector: [0,1,0]))))
+    }
+    
+    var 初期姿勢に対しての角速度3 : Vector3D {
+        let p = ProjectiveTransform3D(scale: Size3D(vector: [-1,-1,-1]),rotation: Rotation3D(simd_quatd(real: 1, imag: [1.0,1.0,1.0]).normalized))
+        return Vector3D.init(x: 0, y: 0, z: 1).rotated(by: Rotation3D.init(simd_quatd(vector:p.matrix * attitude.vector)).rotated(by: Rotation3D(angle: Angle2D(radians: -.pi), axis: RotationAxis3D(vector: [0,1,0]))))
+    }
+    
+    var 初期姿勢に対しての角速度4 : Vector3D {
+        let p = ProjectiveTransform3D(scale: Size3D(vector: [-1,-1,-1]),rotation: Rotation3D(simd_quatd(real: 1, imag: [1.0,1.0,1.0]).normalized))
+        return Vector3D.init(x: 1, y: 0, z: 0).rotated(by: Rotation3D.init(simd_quatd(vector:p.matrix * attitude.vector)).rotated(by: Rotation3D(angle: Angle2D(radians: -.pi), axis: RotationAxis3D(vector: [0,1,0]))))
+    }
+    
+    var 初期姿勢に対しての角速度5 : Vector3D {
+        return Vector3D.init(x: 1, y: 0, z: 0).rotated(by: attitude.inverse)
+    }
+    
+    var 初期姿勢に対しての角速度6 : Vector3D {
+        return Vector3D.init(x: 0, y: 1, z: 0).rotated(by: attitude.inverse)
+    }
+    
+    var 初期姿勢に対しての角速度7 : Vector3D {
+        return Vector3D.init(x: 0, y: 0, z: 1).rotated(by: attitude.inverse)
+    }
+    
+    
     
     var worldAcceleration0 : Vector3D {
         let v = Vector3D(acceleration).rotated(by: attitude)
@@ -63,7 +97,8 @@ class Carv2Data{
     var leftRealityKitRotation: Rotation3D {
         let p = ProjectiveTransform3D(scale: Size3D(vector: [-1,-1,-1]),rotation: Rotation3D(simd_quatd(real: 1, imag: [-1.0,1.0,1.0]).normalized))
         return Rotation3D.init(simd_quatd(vector: attitude.vector * p.matrix ))
-            .rotated(by: Rotation3D(angle: Angle2D(radians: .pi), axis: RotationAxis3D(vector: [1,0,0]))).rotated(by: Rotation3D(angle: Angle2D(radians: -.pi/2), axis: RotationAxis3D(vector: [0,1,0])))
+            .rotated(by: Rotation3D(angle: Angle2D(radians: .pi), axis: RotationAxis3D(vector: [1,0,0])))
+            .rotated(by: Rotation3D(angle: Angle2D(radians: .pi/2), axis: RotationAxis3D(vector: [0,1,0])))
     }
     var rightRealityKitRotation2: Rotation3D {
         return attitude.rotated(by: Rotation3D(eulerAngles: EulerAngles(x: Angle2D(radians: .pi / 2), y: Angle2D(radians: .pi / 2), z: Angle2D(radians: .pi / 2), order: .xyz)))
