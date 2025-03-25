@@ -37,15 +37,23 @@ class YawingBeep: ObservableObject{
             conductor.data.isPlaying = true
         }
         if carv2DataPair.yawingAngulerRateDiffrential > 0 {
-            conductor.panner.pan = 1.0
-            conductor.data.frequency = AUValue(ToneStep.lowToHigh(ceil(carv2DataPair.yawingAngulerRateDiffrential * 10)))
+            conductor.data.frequency = AUValue(hight(ceil(carv2DataPair.yawingAngulerRateDiffrential * 10)))
             conductor.changeWaveFormToSin()
         } else {
-            conductor.panner.pan = -1.0
             conductor.changeWaveFormToTriangle()
-            conductor.data.frequency = AUValue(ToneStep.hight(ceil(carv2DataPair.yawingAngulerRateDiffrential * 10)))
+            conductor.data.frequency = AUValue(lowToHigh(-ceil(carv2DataPair.yawingAngulerRateDiffrential * 10)))
         }
     }
     
+    func lowToHigh(_ num : Float) -> Float {
+            let base : Float = 440.0
+            let max: Float = -48
+            return base * pow(pow(2, max - num), 1/12)
+        }
     
+    func hight(_ num : Float) -> Float {
+            let base : Float = 440.0
+            let min: Float = 0
+            return base * pow(pow(2, num + min), 1/12)
+        }
 }

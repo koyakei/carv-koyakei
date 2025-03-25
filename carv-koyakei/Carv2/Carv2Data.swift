@@ -85,23 +85,20 @@ class Carv2Data{
         worldAcceleration0.projected(.init(x: 1, y: 1, z: 1).rotated(by: attitude)).rotated(by: attitude)
     }
     
-    
     var rightRealityKitRotation: Rotation3D {
         let p = ProjectiveTransform3D(scale: Size3D(vector: [-1,-1,-1]),rotation: Rotation3D(simd_quatd(real: 1, imag: [1.0,1.0,1.0]).normalized))
         return Rotation3D.init(simd_quatd(vector:p.matrix * attitude.vector))
-            .rotated(by: Rotation3D(angle: Angle2D(radians: -.pi), axis: RotationAxis3D(vector: [0,1,0])))
+//            .rotated(by: Rotation3D(angle: Angle2D(radians: .pi), axis: RotationAxis3D(vector: [0,1,0])))
     }
-    
-    
     
     var leftRealityKitRotation: Rotation3D {
         let p = ProjectiveTransform3D(scale: Size3D(vector: [-1,-1,-1]),rotation: Rotation3D(simd_quatd(real: 1, imag: [-1.0,1.0,1.0]).normalized))
         return Rotation3D.init(simd_quatd(vector: attitude.vector * p.matrix ))
             .rotated(by: Rotation3D(angle: Angle2D(radians: .pi), axis: RotationAxis3D(vector: [1,0,0])))
-            .rotated(by: Rotation3D(angle: Angle2D(radians: .pi/2), axis: RotationAxis3D(vector: [0,1,0])))
+            .rotated(by: Rotation3D(angle: Angle2D(radians: -.pi), axis: RotationAxis3D(vector: [0,1,0])))
     }
     var rightRealityKitRotation2: Rotation3D {
-        return attitude.rotated(by: Rotation3D(eulerAngles: EulerAngles(x: Angle2D(radians: .pi / 2), y: Angle2D(radians: .pi / 2), z: Angle2D(radians: .pi / 2), order: .xyz)))
+        return attitude.rotated(by: Rotation3D(eulerAngles: EulerAngles(x: Angle2D(radians: .pi / 2), y: Angle2D(radians: .pi / 2), z: Angle2D(radians: .pi), order: .xyz)))
     }
     var leftRealityKitRotation2: Rotation3D {
         return attitude.rotated(by: Rotation3D(eulerAngles: EulerAngles(x: Angle2D(radians: 0), y: Angle2D(radians: 0), z: Angle2D(radians: .pi), order: .xyz)))

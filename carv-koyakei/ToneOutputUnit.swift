@@ -13,23 +13,12 @@ import AudioToolbox
 import SoundpipeAudioKit
 import Combine
 
-struct ToneStep{
-    static func hight(_ num : Float) -> Float {
-        let base : Float = 440.0
-        let min: Float = -24
-        return base * pow(pow(2, num + min), 1/12)
-    }
-    static func lowToHigh(_ num : Float) -> Float {
-        let base : Float = 440.0
-        let max: Float = 22
-        return base * pow(pow(2, max - num), 1/12)
-    }
-}
+
 
 struct DynamicOscillatorData {
     var isPlaying: Bool = false
     var frequency: AUValue = 440
-    var amplitude: AUValue = 0.1
+    var amplitude: AUValue = 1.0
     var rampDuration: AUValue = 0
     var detuningOffset: AUValue = 440
     var balance: AUValue = 1.0
@@ -90,9 +79,8 @@ class DynamicOscillatorConductor: ObservableObject {
                 try AVAudioSession.sharedInstance().setCategory(
                     .playAndRecord,
                     mode: .default,
-                    options: [  .allowBluetoothA2DP ]
+                    options: [  .allowBluetoothA2DP  ]
                         )
-                try AVAudioSession.sharedInstance().overrideOutputAudioPort(.speaker)
                         try AVAudioSession.sharedInstance().setActive(true)
                         try engine.start()
             } catch let err {

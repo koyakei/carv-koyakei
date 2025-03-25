@@ -4,6 +4,8 @@ struct ContentView: View {
     @EnvironmentObject var carv2DataPair: Carv2DataPair
     @EnvironmentObject var ble :BluethoothCentralManager
     @EnvironmentObject var yawingBeep: YawingBeep
+    @StateObject var cameraViewModel = CameraViewModel()
+    
     var body: some View {
         TabView {
             HomeView()
@@ -21,6 +23,18 @@ struct ContentView: View {
                     Image(systemName: "person.fill")
                     Text("pressure")
                 }
+            switch cameraViewModel.status {
+                    case .configured:
+                        YawingAnglerVelocityChartOverlay(cameraViewModel: cameraViewModel).tabItem {
+                            Image(systemName: "person.fill")
+                            Text("anguler")
+                        }
+                    case .unauthorized:
+                        Text("カメラへのアクセスが許可されていません")
+                    case .unconfigured:
+                        ProgressView()
+                    }
+            
         }
     }
 }

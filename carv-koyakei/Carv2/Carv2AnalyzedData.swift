@@ -62,6 +62,10 @@ struct Carv2AnalyzedDataPair :Identifiable, OutsideSkiRollAngle{
     var unitedYawingAngle : Float {
         left.angularVelocity.y + right.angularVelocity.y
     }
+    var yawingAngulerRateDiffrential: Float { Float(right.angularVelocity.y - left.angularVelocity.y)}
     var numberOfTurns: Int
     var recordetTime: TimeInterval
+    var unifiedDiffrentialAttitudeFromLeftToRight: Rotation3D {
+        left.attitude.inverse * right.attitude
+    }
 }

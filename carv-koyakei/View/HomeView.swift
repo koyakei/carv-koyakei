@@ -99,7 +99,10 @@ struct HomeView: View {
             }
             HStack{
                 Text(carv2DataPair.left.leftRealityKitRotation.quaternion.formatQuaternion)
-                Text(carv2DataPair.right.rightRealityKitRotation.quaternion.formatQuaternion)
+                Text(carv2DataPair.yawingAngulerRateDiffrential.debugDescription)
+                Text(Angle2D(radians: carv2DataPair.unifiedDiffrentialAttitudeFromLeftToRight.eulerAngles(order: .xyz).angles.x).degrees.description)
+                Text(Angle2D(radians: carv2DataPair.unifiedDiffrentialAttitudeFromLeftToRight.eulerAngles(order: .xyz).angles.y).degrees.description)
+                Text(Angle2D(radians: carv2DataPair.unifiedDiffrentialAttitudeFromLeftToRight.eulerAngles(order: .xyz).angles.z).degrees.description)
                 VStack{
                     Text(carv2DataPair.unitedYawingAngle.description)
                     Text(carv2DataPair.analyzedDataPair.numberOfTurns.description)
