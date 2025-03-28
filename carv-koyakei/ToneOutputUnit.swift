@@ -82,6 +82,7 @@ class DynamicOscillatorConductor: ObservableObject {
                     options: [  .allowBluetoothA2DP  ]
                         )
                         try AVAudioSession.sharedInstance().setActive(true)
+                try AVAudioSession.sharedInstance().overrideOutputAudioPort(.speaker)
                         try engine.start()
             } catch let err {
                 Log(err)

@@ -13,6 +13,7 @@ import AVFAudio
 struct carv_koyakeiApp: App {
     @StateObject private var conductor = DynamicOscillatorConductor()
     @StateObject private var carv1DataPair: Carv1DataPair = Carv1DataPair()
+    private var locationManager = LocationManager()
     @Environment(\.scenePhase) var scenePhase
     
     

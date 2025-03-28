@@ -445,7 +445,10 @@
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "つかう";
 				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "ｐつかう";
 				INFOPLIST_KEY_NSCameraUsageDescription = AR;
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = carv;
+				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = da;
 				INFOPLIST_KEY_NSLocationUsageDescription = location;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = da;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -493,7 +496,10 @@
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "つかう";
 				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "ｐつかう";
 				INFOPLIST_KEY_NSCameraUsageDescription = AR;
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = carv;
+				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = da;
 				INFOPLIST_KEY_NSLocationUsageDescription = location;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = da;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;

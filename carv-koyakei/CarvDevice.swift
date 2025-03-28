@@ -29,6 +29,16 @@ class CarvDevice: NSObject, ObservableObject, Identifiable, CBPeripheralDelegate
         }
     }
     
+    func setUUID(_ uuid: UUID, _ carv2PripheralSide: Carv2PripheralSide) {
+//        self.carv2PripheralSide = carv2PripheralSide
+        switch carv2PripheralSide {
+            case .left:
+                UserDefaults.standard.set(uuid.uuidString, forKey: "leftCarv2UUID") 
+            case .right:
+                UserDefaults.standard.set(uuid.uuidString, forKey: "rightCarv2UUID")
+        }
+    }
+    
     init(peripheral: CBPeripheral, carv2DataPair: Carv2DataPair) {
         self.id = peripheral.identifier
         self.peripheral = peripheral

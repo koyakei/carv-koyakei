@@ -18,18 +18,21 @@ struct DeviceRow: View {
                             }
                         }
                         .pickerStyle(.menu)
-            }.padding()
-        if (device.id == Carv2DataPair.leftCharactaristicUUID || device.id == Carv2DataPair.leftCharactaristicUUID){
-            Text("Left")
-        }
-        if (device.id == Carv2DataPair.rightCharactaristicUUID || device.id == Carv2DataPair.rightCharactaristicUUID){Text("Right")}
+            Button(action: {
+                device.setUUID(device.id, device.carv2PripheralSide)
+            }){
+                Text("set side")
+            }
+            }
+        
+        Text(device.carv2PripheralSide.rawValue)
+        
         VStack(alignment: .leading) {
             Text(device.id.uuidString)
                 .font(.headline)
             Text("State: \(device.connectionState.rawValue)")
                 .font(.subheadline)
             Text(device.peripheral.name ?? "(unknown)")
-//            Text(device.carv2DataPaird.right.attitude.description)
             HStack {
                 Button(action: { ble.connect(carvDevice: device) }) {
                     Text("Connect")

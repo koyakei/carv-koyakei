@@ -18,6 +18,8 @@ struct HomeView: View {
    
     @State var rollingBeep: Bool = false
     @State var diffRollingTargetAngle: Double = 2.0
+    @State private var savedTime: String = ""
+    @State private var leftid: String = ""
 
     var body: some View {
         VStack {
@@ -53,9 +55,11 @@ struct HomeView: View {
 //            }
             HStack{
                 VStack{
-                    Text( carv2DataPair.right.angularVelocity.x.formatted(.number.precision(.fractionLength(1))))
-                    Text( carv2DataPair.right.angularVelocity.y.formatted(.number.precision(.fractionLength(1))))
-                    Text( carv2DataPair.right.angularVelocity.z.formatted(.number.precision(.fractionLength(1))))
+                    
+                        
+//                    Text( carv2DataPair.right.angularVelocity.x.formatted(.number.precision(.fractionLength(1))))
+//                    Text( carv2DataPair.right.angularVelocity.y.formatted(.number.precision(.fractionLength(1))))
+//                    Text( carv2DataPair.right.angularVelocity.z.formatted(.number.precision(.fractionLength(1))))
                 }
                 VStack{
                     Text( carv2DataPair.right.初期姿勢に対しての角速度Right.x.formatted(.number.precision(.fractionLength(1))))
@@ -152,8 +156,32 @@ struct HomeView: View {
                 }){
                     Text("stop csv")
                 }
+                
             }
-           
+            VStack(spacing: 20) {
+                        // 現在保存されている時刻を表示
+                        Text(savedTime.isEmpty ? "保存された時刻がありません" : "保存された時刻: \(savedTime)")
+                            
+            }.onAppear {
+                        // アプリ起動時に保存されている時刻を取得
+                        if let storedTime = UserDefaults.standard.string(forKey: "rightCarv2UUID") {
+                            savedTime = storedTime
+                        }
+                    }
+                    .padding()
+            
+            VStack(spacing: 20) {
+                        // 現在保存されている時刻を表示
+                Text(leftid.isEmpty ? "no left" : "left: \(leftid)")
+                            
+            }.onAppear {
+                        // アプリ起動時に保存されている時刻を取得
+                        if let leftids = UserDefaults.standard.string(forKey: "leftCarv2UUID") {
+                            leftid = leftids
+                        }
+                    }
+                    .padding()
+            
             HStack{
                 Button(action: {
                     yawingBeep.isBeeping.toggle()}){
