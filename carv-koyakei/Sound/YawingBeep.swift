@@ -19,7 +19,8 @@ class YawingBeep: ObservableObject{
     
     @Published var diffYawingTargetAngle: Double = 2.0
     @ObservedObject var conductor : DynamicOscillatorConductor = DynamicOscillatorConductor()
-    init() {
+    private init() {
+        
         conductor.start()
         carv2DataPair.$right
             .sink { [weak self] newValue in
