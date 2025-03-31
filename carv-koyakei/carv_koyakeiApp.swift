@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import CoreBluetooth
 import AVFAudio
 
 @main
