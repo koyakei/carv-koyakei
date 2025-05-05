@@ -79,7 +79,7 @@ class DynamicOscillatorConductor: ObservableObject {
                 try AVAudioSession.sharedInstance().setCategory(
                     .playAndRecord,
                     mode: .default,
-                    options: [  .allowBluetoothA2DP  ]
+                    options: [  .allowBluetoothA2DP ,.duckOthers ]
                         )
                 try engine.start()
             } catch let err {

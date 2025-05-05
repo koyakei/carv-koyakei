@@ -193,7 +193,7 @@ struct HomeView: View {
             if yawingBeep.isBeeping {
                     Slider(
                         value: $yawingBeep.diffYawingTargetAngle,
-                        in: 0.0...4.0,
+                        in: 0.8...4.8,
                         step: 0.2
                     ) {
                     Text("Yaw Adjustment")
