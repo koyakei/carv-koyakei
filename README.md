@@ -1,3 +1,13 @@
+This is CARV digital ski coach third party monitor mode app.
+https://getcarv.com/
+
+# feature 
+get raw data
+view 3d realitime view
+original monitor mode ( roll and yaw rotation rate)
+
+# how to install
+
 boot carv
 start Recording
 
