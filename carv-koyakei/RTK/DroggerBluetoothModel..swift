@@ -22,6 +22,8 @@ let droggerSerialDataCharactaristic = CBUUID(string: "0baba002-0000-1000-8000-00
 let droggerSerialWriteCharactaristic = CBUUID(string: "0baba003-0000-1000-8000-00805f9b34fb")
 
 class DroggerBluetoothModel: NSObject, ObservableObject {
+    
+    var rtkDevice: RTKDevise = .shared
     private var centralManager: CBCentralManager!
     private var peripheral: CBPeripheral?
     private var outputs: [String] = []
@@ -95,6 +97,8 @@ extension DroggerBluetoothModel: CBCentralManagerDelegate {
 }
 
 extension DroggerBluetoothModel: CBPeripheralDelegate {
+    
+    
     func peripheral(_ p: CBPeripheral, didDiscoverServices error: (any Error)?) {
         for service in p.services ?? [] {
             if service.uuid == droggerService {
@@ -116,7 +120,9 @@ extension DroggerBluetoothModel: CBPeripheralDelegate {
                 print("No data received for SerialData");
                 return
             }
+            
             let str = String(decoding: data, as: UTF8.self)
+            rtkDevice.update( str)
             //print("Data: \(str)")
             addOutput(string: str)
             return
