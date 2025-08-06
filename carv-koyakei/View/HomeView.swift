@@ -12,6 +12,8 @@ import AudioKit
 
 struct HomeView: View {
     @EnvironmentObject var ble : BluethoothCentralManager
+    @StateObject var droggerBluetoothModel = DroggerBluetoothModel()
+    @State private var enableToUpdateOutputText = true
     @ObservedObject var carv2DataPair = Carv2DataPair.shared
     @ObservedObject var yawingBeep: YawingBeep = .shared
     @ObservedObject var carv2AnalyzedDataPairManager = Carv2AnalyzedDataPairManager.shared
@@ -23,6 +25,40 @@ struct HomeView: View {
 
     var body: some View {
         VStack {
+            Text("RWS iOS Sample App")
+                            .font(.largeTitle)
+                            .padding(.bottom, 12)
+                        HStack () {
+                            Label("Device", systemImage: "info.circle")
+                                .labelStyle(.automatic)
+                                .padding(.bottom, 12)
+                            Spacer()
+                            Text(droggerBluetoothModel.peripheralStatus.rawValue)
+                        }
+                        Text(droggerBluetoothModel.deviceDetail)
+                            .font(.system(size: 10, design: .monospaced))
+                            .textSelection(.enabled)
+                        Divider()
+                            .padding(.top, 12)
+                            .padding(.bottom, 12)
+                        HStack () {
+                            Label("Output", systemImage: "scroll")
+                                .labelStyle(.automatic)
+                                .padding(.bottom, 12)
+                            Spacer()
+                            Toggle("Update", isOn: $enableToUpdateOutputText)
+                                .frame(width: 120)
+                                .onChange(of: enableToUpdateOutputText) {
+                                    droggerBluetoothModel.enableToUpdateOutputText = enableToUpdateOutputText
+                                }
+                        }
+                        Text(droggerBluetoothModel.output)
+                            .font(.system(size: 10, design: .monospaced))
+                            .textSelection(.enabled)
+                        Spacer()
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+                    .padding(12)
 //            HStack{
 //                Text(Angle2D(radians: carv2DataPair.beforeTurn.fallLineAttitude.eulerAngles(order: .xyz).angles.x).degrees.description)
 //                Text(Angle2D(radians: carv2DataPair.beforeTurn.fallLineAttitude.eulerAngles(order: .xyz).angles.y).degrees.description)
