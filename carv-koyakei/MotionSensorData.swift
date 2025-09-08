@@ -8,7 +8,7 @@
 import Foundation
 import Spatial
 import simd
-import SwiftUICore
+import SwiftUI
 
 struct MotionSensorData{
     public let attitude: Rotation3D

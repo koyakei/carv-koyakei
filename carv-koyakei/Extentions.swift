@@ -47,7 +47,7 @@ extension simd_quatd {
     }
 }
 
-import SwiftUICore
+import SwiftUI
 extension simd_quatf {
     init(from double4: SIMD4<Double>) {
         self.init(

@@ -7,7 +7,7 @@
 import Foundation
 import Spatial
 import simd
-import SwiftUICore
+import SwiftUI
 import Combine
 import AudioKit
 

@@ -14,7 +14,7 @@
 import Foundation
 import Spatial
 import simd
-import SwiftUICore
+import SwiftUI
 
 public class Carv1DataPair :ObservableObject{
     @Published var left: Carv1Data = Carv1Data.init()

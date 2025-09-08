@@ -7,7 +7,7 @@
 import Foundation
 import Spatial
 import simd
-import SwiftUICore
+import SwiftUI
 import Combine
 class Carv2Data{
     let attitude: Rotation3D

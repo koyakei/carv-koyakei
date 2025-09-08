@@ -15,7 +15,7 @@
 import Foundation
 import Spatial
 import simd
-import SwiftUICore
+import SwiftUI
 
 public class Carv1Data :ObservableObject{
   

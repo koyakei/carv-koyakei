@@ -9,7 +9,7 @@
 import AudioKit
 import Foundation
 import Combine
-import SwiftUICore
+import SwiftUI
 
 class YawingBeep: ObservableObject{
     
