@@ -14,12 +14,10 @@ class Carv2Data{
     let acceleration: SIMD3<Float>
     let angularVelocity : SIMD3<Float>
     let recordetTime: TimeInterval = Date.now.timeIntervalSince1970
-    let doubleArray: [Float]
     init(){
         attitude = .identity
         acceleration = .zero
         angularVelocity = .zero
-        doubleArray = []
     }
 
     // 右側　x 前上　+ 　後上ー 　左は逆
@@ -126,13 +124,11 @@ class Carv2Data{
 
         let intbyte3 : [Float] = floatArray(from: data.dropFirst(16))
         
-        
         return MotionSensorData(attitude: Rotation3D.init(simd_quatf(vector: simd_float4(intbyte[safe:1,default: 0], intbyte[safe:2,default: 0], intbyte[safe:3,default: 0], intbyte[safe:4,default: 0]))), acceleration:  SIMD3<Float>(x: intbyte[safe:7,default: 0] * 16, y: intbyte[safe:5,default: 0]  * 16, z: intbyte[safe:6,default: 0] * 16),angularVelocity: SIMD3<Float>(x: intbyte3[safe:0,default: 0], y: intbyte3[safe:1,default: 0] , z: intbyte3[safe:2,default: 0]))
     }
     
     public init(_ data: Data) {
         let motionSensorData = Carv2Data.int16ToFloat(data: data.dropFirst(1))
-        doubleArray = Carv2Data.floatArray(from: data.dropFirst(17))
         attitude = motionSensorData.attitude
         acceleration = motionSensorData.acceleration
         angularVelocity = motionSensorData.angularVelocity
