@@ -123,7 +123,7 @@ class Carv2Data{
         }.map { Float($0)/32768.0 }
 
         let intbyte3 : [Float] = floatArray(from: data.dropFirst(16))
-        
+//        intbyte[safe:５,default: 0] これがTimeinterval ぽいぞ　なんとか
         return MotionSensorData(attitude: Rotation3D.init(simd_quatf(vector: simd_float4(intbyte[safe:1,default: 0], intbyte[safe:2,default: 0], intbyte[safe:3,default: 0], intbyte[safe:4,default: 0]))), acceleration:  SIMD3<Float>(x: intbyte[safe:7,default: 0] * 16, y: intbyte[safe:5,default: 0]  * 16, z: intbyte[safe:6,default: 0] * 16),angularVelocity: SIMD3<Float>(x: intbyte3[safe:0,default: 0], y: intbyte3[safe:1,default: 0] , z: intbyte3[safe:2,default: 0]))
     }
     
