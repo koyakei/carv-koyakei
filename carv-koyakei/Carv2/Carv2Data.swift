@@ -14,10 +14,12 @@ class Carv2Data{
     let acceleration: SIMD3<Float>
     let angularVelocity : SIMD3<Float>
     let recordetTime: TimeInterval = Date.now.timeIntervalSince1970
+    let doubleArray: [Float]
     init(){
         attitude = .identity
         acceleration = .zero
         angularVelocity = .zero
+        doubleArray = []
     }
 
     // 右側　x 前上　+ 　後上ー 　左は逆
@@ -107,26 +109,30 @@ class Carv2Data{
         
         return attitude.rotated(by: Rotation3D(eulerAngles: EulerAngles(x: Angle2D(radians: .pi), y: Angle2D(radians: 0), z: Angle2D(radians: .pi), order: .xyz)))
     }
-  
+    
+    static func floatArray(from data: Data) -> [Float] {
+        let count = data.count / MemoryLayout<Float>.size
+        return data.withUnsafeBytes {
+            let buffer = $0.bindMemory(to: Float.self)
+            return Array(buffer.prefix(count))
+        }.map { $0 }
+    }
     
     static private func int16ToFloat(data: Data) -> MotionSensorData {
 
         let intbyte :[Float] = data.withUnsafeBytes {
             Array(UnsafeBufferPointer<Int16>(start: $0.baseAddress?.assumingMemoryBound(to: Int16.self), count: data.count / MemoryLayout<Int16>.stride))
         }.map { Float($0)/32768.0 }
-        let intbyte3 : [Float] = data.dropFirst(14).withUnsafeBytes { buffer in
-            guard let baseAddress = buffer.baseAddress else { return [] }
-            let count = buffer.count / MemoryLayout<Float32>.stride
-            return [Float32](UnsafeBufferPointer(
-                start: baseAddress.bindMemory(to: Float32.self, capacity: count),
-                count: count
-            )).map { Float32($0) }
-        }
-        return MotionSensorData(attitude: Rotation3D.init(simd_quatf(vector: simd_float4(intbyte[0], intbyte[1], intbyte[2], intbyte[3]))), acceleration:  SIMD3<Float>(x: intbyte[4] * 16, y: intbyte[5]  * 16, z: intbyte[6] * 16),angularVelocity: SIMD3<Float>(x: intbyte3[safe:0, default: 0], y: intbyte3[safe: 1, default: 0] , z: intbyte3[safe: 2,default: 0 ]))
+
+        let intbyte3 : [Float] = floatArray(from: data.dropFirst(16))
+        
+        
+        return MotionSensorData(attitude: Rotation3D.init(simd_quatf(vector: simd_float4(intbyte[safe:1,default: 0], intbyte[safe:2,default: 0], intbyte[safe:3,default: 0], intbyte[safe:4,default: 0]))), acceleration:  SIMD3<Float>(x: intbyte[safe:7,default: 0] * 16, y: intbyte[safe:5,default: 0]  * 16, z: intbyte[safe:6,default: 0] * 16),angularVelocity: SIMD3<Float>(x: intbyte3[safe:0,default: 0], y: intbyte3[safe:1,default: 0] , z: intbyte3[safe:2,default: 0]))
     }
     
     public init(_ data: Data) {
         let motionSensorData = Carv2Data.int16ToFloat(data: data.dropFirst(1))
+        doubleArray = Carv2Data.floatArray(from: data.dropFirst(17))
         attitude = motionSensorData.attitude
         acceleration = motionSensorData.acceleration
         angularVelocity = motionSensorData.angularVelocity
