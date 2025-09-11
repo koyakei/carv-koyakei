@@ -24,6 +24,6 @@ class LocationManager :NSObject{
 
 extension LocationManager: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        YawingBeep.shared
+        
     }
 }

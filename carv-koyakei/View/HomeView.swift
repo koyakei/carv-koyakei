@@ -5,6 +5,9 @@
 //  Created by keisuke koyanagi on 2025/02/26.
 //
 
+
+
+
 import SwiftUI
 import Spatial
 import AudioKit
@@ -12,15 +15,14 @@ import AudioKit
 
 struct HomeView: View {
     @EnvironmentObject var ble : BluethoothCentralManager
-    @ObservedObject var carv2DataPair = Carv2DataPair.shared
-    @ObservedObject var yawingBeep: YawingBeep = .shared
+    @ObservedObject var carv2DataPair: Carv2DataPair
+    @ObservedObject var yawingBeep: YawingBeep
     @ObservedObject var carv2AnalyzedDataPairManager = Carv2AnalyzedDataPairManager.shared
     
     @State var rollingBeep: Bool = false
     @State var diffRollingTargetAngle: Double = 2.0
     @State private var savedTime: String = ""
     @State private var leftid: String = ""
-    
     var body: some View {
         VStack {
 //                        HStack{
@@ -43,11 +45,11 @@ struct HomeView: View {
 //                            Text(Angle2D(radians: carv2DataPair.right.leftRealityKitRotation3.eulerAngles(order: .xyz).angles.y).degrees.description)
 //                            Text(Angle2D(radians: carv2DataPair.right.leftRealityKitRotation3.eulerAngles(order: .xyz).angles.z).degrees.description)
 //                        }
-//                        HStack{
-//                            Text(Angle2D(radians: carv2DataPair.right.attitude.eulerAngles(order: .xyz).angles.x).degrees.description)
-//                            Text(Angle2D(radians: carv2DataPair.right.attitude.eulerAngles(order: .xyz).angles.y).degrees.description)
-//                            Text(Angle2D(radians: carv2DataPair.right.attitude.eulerAngles(order: .xyz).angles.z).degrees.description)
-//                        }
+                        HStack{
+                            Text(Angle2D(radians: carv2DataPair.right.attitude.eulerAngles(order: .xyz).angles.x).degrees.description)
+                            Text(Angle2D(radians: carv2DataPair.right.attitude.eulerAngles(order: .xyz).angles.y).degrees.description)
+                            Text(Angle2D(radians: carv2DataPair.right.attitude.eulerAngles(order: .xyz).angles.z).degrees.description)
+                        }
                         HStack{
                             Text(Angle2D(radians: carv2DataPair.left.attitude.eulerAngles(order: .xyz).angles.x).degrees.description)
                             Text(Angle2D(radians: carv2DataPair.left.attitude.eulerAngles(order: .xyz).angles.y).degrees.description)
@@ -63,6 +65,16 @@ struct HomeView: View {
                                         Text( carv2DataPair.left.acceleration.x.formatted(.number.precision(.fractionLength(1))))
                                         Text( carv2DataPair.left.acceleration.y.formatted(.number.precision(.fractionLength(1))))
                                         Text( carv2DataPair.left.acceleration.z.formatted(.number.precision(.fractionLength(1))))
+                }
+                VStack{
+                                        Text( carv2DataPair.right.angularVelocity.x.formatted(.number.precision(.fractionLength(1))))
+                                        Text( carv2DataPair.right.angularVelocity.y.formatted(.number.precision(.fractionLength(1))))
+                                        Text( carv2DataPair.right.angularVelocity.z.formatted(.number.precision(.fractionLength(1))))
+                }
+                VStack{
+                                        Text( carv2DataPair.right.acceleration.x.formatted(.number.precision(.fractionLength(1))))
+                                        Text( carv2DataPair.right.acceleration.y.formatted(.number.precision(.fractionLength(1))))
+                                        Text( carv2DataPair.right.acceleration.z.formatted(.number.precision(.fractionLength(1))))
                 }
 //                VStack{
 //                    Text( carv2DataPair.right.初期姿勢に対しての角速度Right.x.formatted(.number.precision(.fractionLength(1))))
@@ -189,24 +201,25 @@ struct HomeView: View {
 //                }
 //            }
 //            .padding()
-//            
-//            HStack{
-//                Button(action: {
-//                    yawingBeep.isBeeping.toggle()}){
-//                        Text("yawing beep \(yawingBeep.isBeeping ? "on" : "off")")
-//                    }
-//                Text("Current value: \(yawingBeep.diffYawingTargetAngle, specifier: "%.2f")")
-//                    .padding()
-//            }
-//            if yawingBeep.isBeeping {
-//                Slider(
-//                    value: $yawingBeep.diffYawingTargetAngle,
-//                    in: 0.8...4.8,
-//                    step: 0.2
-//                ) {
-//                    Text("Yaw Adjustment")
-//                }
-//            }
+//
+            HStack{
+                Text(yawingBeep.conductor.data.isPlaying.description)
+                Button(action: {
+                    yawingBeep.isBeeping.toggle()}){
+                        Text("yawing beep \(yawingBeep.isBeeping ? "on" : "off")")
+                    }
+                Text("Current value: \(yawingBeep.diffYawingTargetAngle, specifier: "%.2f")")
+                    .padding()
+            }
+            if yawingBeep.isBeeping {
+                Slider(
+                    value: $yawingBeep.diffYawingTargetAngle,
+                    in: 0.8...4.8,
+                    step: 0.2
+                ) {
+                    Text("Yaw Adjustment")
+                }
+            }
 //            HStack{
 //                Button(action: {
 //                    rollingBeep.toggle()}){
@@ -242,3 +255,4 @@ struct HomeView: View {
         }
     }
 }
+

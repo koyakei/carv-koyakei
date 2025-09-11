@@ -14,12 +14,11 @@ import SwiftUI
 class YawingBeep: ObservableObject{
     
     var isBeeping: Bool = false
-    public static var shared: YawingBeep = .init()
     private var cancellables = Set<AnyCancellable>()
     
     @Published var diffYawingTargetAngle: Double = 2.0
     @ObservedObject var conductor : DynamicOscillatorConductor = DynamicOscillatorConductor()
-    private init() {
+    init() {
         
         conductor.start()
         carv2DataPair.$right

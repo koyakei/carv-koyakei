@@ -205,9 +205,3 @@ class Carv2DataPair : ObservableObject{
         return analyzedDataPair
     }
 }
-
-
-
-
-    
-

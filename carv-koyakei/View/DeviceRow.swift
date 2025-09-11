@@ -13,20 +13,17 @@ struct DeviceRow: View {
     var body: some View {
         VStack {
             Picker("オプションを選択", selection: $device.carv2PripheralSide) {
-                            ForEach(Carv2PripheralSide.allCases, id: \.self) { option in
-                                Text(option.rawValue).tag(option)
-                            }
-                        }
-                        .pickerStyle(.menu)
+                ForEach(Carv2PripheralSide.allCases, id: \.self) { option in
+                    Text(option.rawValue).tag(option)
+                }
+            }
+            .pickerStyle(.menu)
             Button(action: {
                 device.setUUID(device.id, device.carv2PripheralSide)
             }){
                 Text("set side")
             }
-            }
-        
-        Text(device.carv2PripheralSide.rawValue)
-        
+        }
         VStack(alignment: .leading) {
             Text(device.id.uuidString)
                 .font(.headline)
@@ -39,31 +36,30 @@ struct DeviceRow: View {
                 }
                 .disabled(device.connectionState == .connected)
                 
-                    
-            }
-            
-            if !device.services.isEmpty {
-                            Text("Services:")
-                                .font(.headline)
                 
-                            ForEach(device.services, id: \.uuid) { service in
-                                Text(service.uuid.uuidString)
-                                    .font(.caption)
-                                Button(action: {
-                                    device.subscribeAttitude()
-                                }) {
-                                    Text("Subscribe")
-                                }
-//                                .disabled(
-//                                    device.connectionState != .connected
-//                                )
-                                
-//                                Button(action: { device.unsubscribeAttitude() }) {
-//                                    Text("Unsubscribe")
-//                                }
-//                                .disabled(device.connectionState == .connected)
-                            }
-                        }
+            }
+            if !device.services.isEmpty {
+                Text("Services:")
+                    .font(.headline)
+                
+                ForEach(device.services, id: \.uuid) { service in
+                    Text(service.uuid.uuidString)
+                        .font(.caption)
+                    Button(action: {
+                        device.subscribeAttitude()
+                    }) {
+                        Text("Subscribe")
+                    }
+                    //                                .disabled(
+                    //                                    device.connectionState != .connected
+                    //                                )
+                    
+                    //                                Button(action: { device.unsubscribeAttitude() }) {
+                    //                                    Text("Unsubscribe")
+                    //                                }
+                    //                                .disabled(device.connectionState == .connected)
+                }
+            }
         }
     }
 }
