@@ -8,10 +8,11 @@ class BluethoothCentralManager: NSObject, ObservableObject, CBCentralManagerDele
     @Published var carv2DeviceRight: CarvDevicePeripheral? = nil
     
     var carv2DataPair : Carv2DataPair = Carv2DataPair.shared
-    
+    @Published var carv2AnalyzedDataPairManager: Carv2AnalyzedDataPairManager
     var centralManager: CBCentralManager!
     static let targetServiceUUID = CBUUID(string: "2DFBFFFF-960D-4909-8D28-F353CB168E8A")
-    override init() {
+    init(carv2AnalyzedDataPairManager: Carv2AnalyzedDataPairManager) {
+        self.carv2AnalyzedDataPairManager = carv2AnalyzedDataPairManager
         super.init()
         centralManager = CBCentralManager(delegate: self, queue: nil)
     }
@@ -43,10 +44,10 @@ class BluethoothCentralManager: NSObject, ObservableObject, CBCentralManagerDele
     
     private func addDevice(_ peripheral: CBPeripheral) {
         if peripheral.identifier == Carv2DataPair.leftCharactaristicUUID{
-            self.carv2DeviceLeft = CarvDevicePeripheral(peripheral: peripheral, carv2DataPair: carv2DataPair)
+            self.carv2DeviceLeft = CarvDevicePeripheral(peripheral: peripheral, carv2DataPair: carv2DataPair, carv2AnalyzedDataPairManager: carv2AnalyzedDataPairManager)
         }
         if peripheral.identifier == Carv2DataPair.rightCharactaristicUUID{
-            self.carv2DeviceRight = CarvDevicePeripheral(peripheral: peripheral, carv2DataPair: carv2DataPair)
+            self.carv2DeviceRight = CarvDevicePeripheral(peripheral: peripheral, carv2DataPair: carv2DataPair, carv2AnalyzedDataPairManager: carv2AnalyzedDataPairManager)
         }
     }
     
@@ -89,7 +90,4 @@ class BluethoothCentralManager: NSObject, ObservableObject, CBCentralManagerDele
         }
     }
 }
-
-
-
 

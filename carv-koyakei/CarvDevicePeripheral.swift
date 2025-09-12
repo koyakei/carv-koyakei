@@ -15,8 +15,7 @@ class CarvDevicePeripheral: NSObject, ObservableObject, Identifiable, CBPeripher
     @Published var connectionState: CBPeripheralState
     @Published var services: [CBService] = []
     @Published var carv2DataPair: Carv2DataPair
-    @Published var carv1DataPair: Carv1DataPair = Carv1DataPair.shared
-    var carv2AnalyzedDataPairManager = Carv2AnalyzedDataPairManager.init()
+    var carv2AnalyzedDataPairManager :Carv2AnalyzedDataPairManager
     @Published var carv2PripheralSide: Carv2PripheralSide = .right {
         didSet{
             switch carv2PripheralSide {
@@ -38,11 +37,12 @@ class CarvDevicePeripheral: NSObject, ObservableObject, Identifiable, CBPeripher
         }
     }
     
-    init(peripheral: CBPeripheral, carv2DataPair: Carv2DataPair) {
+    init(peripheral: CBPeripheral, carv2DataPair: Carv2DataPair,carv2AnalyzedDataPairManager: Carv2AnalyzedDataPairManager) {
         self.id = peripheral.identifier
         self.peripheral = peripheral
         self.connectionState = peripheral.state
         self.carv2DataPair = carv2DataPair
+        self.carv2AnalyzedDataPairManager = carv2AnalyzedDataPairManager
         super.init()
         self.peripheral.delegate = self
         //　UserDefaults.standard.string(forKey: "leftCarv2UUID")　が空だった場合、現在の値を代入
