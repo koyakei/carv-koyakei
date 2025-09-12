@@ -9,7 +9,9 @@ struct CameraPreview: UIViewRepresentable {
         view.backgroundColor = .black
         view.videoPreviewLayer.session = session
         view.videoPreviewLayer.videoGravity = .resizeAspect
-        view.videoPreviewLayer.connection?.videoOrientation = .portrait
+        if let connection = view.videoPreviewLayer.connection {
+            connection.videoRotationAngle = 0 // .portrait is 0 degrees
+        }
         return view
     }
     
