@@ -9,7 +9,7 @@ import Spatial
 import Foundation
 import SwiftUI
 
-class CarvDevice: NSObject, ObservableObject, Identifiable, CBPeripheralDelegate {
+class CarvDevicePeripheral: NSObject, ObservableObject, Identifiable, CBPeripheralDelegate {
     let id: UUID
     let peripheral: CBPeripheral
     @Published var connectionState: CBPeripheralState
@@ -152,12 +152,12 @@ class CarvDevice: NSObject, ObservableObject, Identifiable, CBPeripheralDelegate
                 
                 if peripheral.identifier == Carv2DataPair.rightCharactaristicUUID{
                     // この戻り値をCSVに出力したい。どうすればいいのか？
-                    carv2AnalyzedDataPairManager.receive(data: self.carv2DataPair.receive(right: Carv2Data(value)))
+                    self.carv2DataPair.receive(right: Carv2Data(value))
                     
                 }
                 if peripheral.identifier == Carv2DataPair.leftCharactaristicUUID {
-                    carv2AnalyzedDataPairManager.receive(data:self.carv2DataPair.receive(left: Carv2Data(value)) )
-                    
+                    self.carv2DataPair.receive(left: Carv2Data(value))
+                
                 }
             }
             

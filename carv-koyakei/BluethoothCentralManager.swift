@@ -4,8 +4,8 @@ import Foundation
 import SwiftUI
 
 class BluethoothCentralManager: NSObject, ObservableObject, CBCentralManagerDelegate {
-    @Published var carv2DeviceLeft: CarvDevice? = nil
-    @Published var carv2DeviceRight: CarvDevice? = nil
+    @Published var carv2DeviceLeft: CarvDevicePeripheral? = nil
+    @Published var carv2DeviceRight: CarvDevicePeripheral? = nil
     
     var carv2DataPair : Carv2DataPair = Carv2DataPair.shared
     
@@ -31,22 +31,22 @@ class BluethoothCentralManager: NSObject, ObservableObject, CBCentralManagerDele
     func subscribe(servece: CBService) {
         
     }
-    func connect(carvDevice: CarvDevice) {
+    func connect(carvDevice: CarvDevicePeripheral) {
         let peripheral = carvDevice.peripheral
         peripheral.delegate = carvDevice // デリゲート再設定
         centralManager.connect(carvDevice.peripheral, options: nil)
     }
     
-    func disconnect(carvDevice: CarvDevice) {
+    func disconnect(carvDevice: CarvDevicePeripheral) {
         centralManager.cancelPeripheralConnection(carvDevice.peripheral)
     }
     
     private func addDevice(_ peripheral: CBPeripheral) {
         if peripheral.identifier == Carv2DataPair.leftCharactaristicUUID{
-            self.carv2DeviceLeft = CarvDevice(peripheral: peripheral, carv2DataPair: carv2DataPair)
+            self.carv2DeviceLeft = CarvDevicePeripheral(peripheral: peripheral, carv2DataPair: carv2DataPair)
         }
         if peripheral.identifier == Carv2DataPair.rightCharactaristicUUID{
-            self.carv2DeviceRight = CarvDevice(peripheral: peripheral, carv2DataPair: carv2DataPair)
+            self.carv2DeviceRight = CarvDevicePeripheral(peripheral: peripheral, carv2DataPair: carv2DataPair)
         }
     }
     

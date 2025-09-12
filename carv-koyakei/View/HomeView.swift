@@ -17,7 +17,6 @@ struct HomeView: View {
     @EnvironmentObject var ble : BluethoothCentralManager
     @ObservedObject var carv2DataPair: Carv2DataPair
     @ObservedObject var yawingBeep: YawingBeep
-    @ObservedObject var carv2AnalyzedDataPairManager = Carv2AnalyzedDataPairManager.shared
     
     @State var rollingBeep: Bool = false
     @State var diffRollingTargetAngle: Double = 2.0

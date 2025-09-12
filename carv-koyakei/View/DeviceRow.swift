@@ -7,7 +7,7 @@
 import SwiftUI
 
 struct DeviceRow: View {
-    @ObservedObject var device: CarvDevice
+    @ObservedObject var device: CarvDevicePeripheral
     let ble: BluethoothCentralManager
     
     var body: some View {
