@@ -4,8 +4,9 @@ import Foundation
 import SwiftUI
 
 class BluethoothCentralManager: NSObject, ObservableObject, CBCentralManagerDelegate {
+    @Published var carv2DeviceLeft: CarvDevice? = nil
+    @Published var carv2DeviceRight: CarvDevice? = nil
     
-    @Published var carvDeviceList: [CarvDevice] = []
     var carv2DataPair : Carv2DataPair = Carv2DataPair.shared
     
     var centralManager: CBCentralManager!
@@ -41,15 +42,12 @@ class BluethoothCentralManager: NSObject, ObservableObject, CBCentralManagerDele
     }
     
     private func addDevice(_ peripheral: CBPeripheral) {
-        if !carvDeviceList.contains(where: { $0.id == Carv2DataPair.leftCharactaristicUUID &&
-            $0.peripheral.name == Carv2DataPair.periferalName
-        }) {
-            let newDevice = CarvDevice(peripheral: peripheral, carv2DataPair: carv2DataPair)
-            DispatchQueue.main.async {
-                self.carvDeviceList.append(newDevice)
-            }
+        if peripheral.identifier == Carv2DataPair.leftCharactaristicUUID{
+            self.carv2DeviceLeft = CarvDevice(peripheral: peripheral, carv2DataPair: carv2DataPair)
         }
-        
+        if peripheral.identifier == Carv2DataPair.rightCharactaristicUUID{
+            self.carv2DeviceRight = CarvDevice(peripheral: peripheral, carv2DataPair: carv2DataPair)
+        }
     }
     
     // MARK: - CBCentralManagerDelegate
@@ -65,20 +63,27 @@ class BluethoothCentralManager: NSObject, ObservableObject, CBCentralManagerDele
     }
     
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
-        if let device = carvDeviceList.first(where: {
-            print (peripheral.name)
-            return $0.peripheral.name == Carv1DataPair.periferalName || $0.peripheral.name == Carv2DataPair.periferalName
-        }) {
-            device.updateConnectionState(.connected)
+        if peripheral.identifier == carv2DeviceLeft?.peripheral.identifier{
+            carv2DeviceLeft?.updateConnectionState(.connected)
             peripheral.discoverServices([BluethoothCentralManager.targetServiceUUID])
-            print(peripheral.name)
+            print("connected")
+        }
+        
+        if peripheral.identifier == carv2DeviceRight?.peripheral.identifier{
+            carv2DeviceLeft?.updateConnectionState(.connected)
+            peripheral.discoverServices([BluethoothCentralManager.targetServiceUUID])
             print("connected")
         }
     }
     
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
-        if let device = carvDeviceList.first(where: { $0.id == peripheral.identifier }) {
-            device.updateConnectionState(.disconnected)
+        if peripheral.identifier == carv2DeviceLeft?.peripheral.identifier{
+            carv2DeviceLeft?.updateConnectionState(.disconnected)
+            print(peripheral.identifier)
+            print("disconnected")
+        }
+        if peripheral.identifier == carv2DeviceRight?.peripheral.identifier{
+            carv2DeviceRight?.updateConnectionState(.disconnected)
             print(peripheral.identifier)
             print("disconnected")
         }

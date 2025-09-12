@@ -246,9 +246,11 @@ struct HomeView: View {
                 }
                 .padding()
             }
-            List(ble.carvDeviceList) { device in
-                
-                DeviceRow(device: device, ble: ble)
+            if let left = ble.carv2DeviceLeft{
+                DeviceRow(device: left, ble: ble)
+            }
+            if let right = ble.carv2DeviceRight{
+                DeviceRow(device: right, ble: ble)
             }
         }.onAppear {
             //            conductor.start()
