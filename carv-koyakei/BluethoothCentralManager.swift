@@ -2,13 +2,12 @@ import CoreBluetooth
 import Spatial
 import Foundation
 import SwiftUI
-
 class BluethoothCentralManager: NSObject, ObservableObject, CBCentralManagerDelegate {
     @Published var carv2DeviceLeft: CarvDevicePeripheral? = nil
     @Published var carv2DeviceRight: CarvDevicePeripheral? = nil
     
     var carv2DataPair : Carv2DataPair = Carv2DataPair.shared
-    @Published var carv2AnalyzedDataPairManager: Carv2AnalyzedDataPairManager
+    var carv2AnalyzedDataPairManager: Carv2AnalyzedDataPairManager
     var centralManager: CBCentralManager!
     static let targetServiceUUID = CBUUID(string: "2DFBFFFF-960D-4909-8D28-F353CB168E8A")
     init(carv2AnalyzedDataPairManager: Carv2AnalyzedDataPairManager) {

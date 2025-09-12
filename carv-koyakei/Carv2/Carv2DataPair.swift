@@ -17,7 +17,8 @@ extension Array where Element == Carv2AnalyzedDataPair {
     }
 }
 
-class Carv2DataPair : ObservableObject{
+@Observable
+class Carv2DataPair {
 //    // ipad
 //    static let rightCharactaristicUUID = UUID(uuidString: "85A29A4C-09C3-C632-858A-3387339C67CF")
 //    static let leftCharactaristicUUID = UUID(uuidString:  "850D8BCF-3B03-1322-F51C-DD38E961FC1A")
@@ -25,16 +26,16 @@ class Carv2DataPair : ObservableObject{
     static let rightCharactaristicUUID = UUID(uuidString: UserDefaults.standard.string(forKey: "rightCarv2UUID") ?? "85E2946B-0D18-FA01-E1C9-0393EDD9013A")//  UUID(uuidString: "85E2946B-0D18-FA01-E1C9-0393EDD9013A")
     static let leftCharactaristicUUID = UUID(uuidString: UserDefaults.standard.string(forKey: "leftCarv2UUID") ?? "57089C67-2275-E220-B6D3-B16E2639EFD6") // UUID(uuidString:  "57089C67-2275-E220-B6D3-B16E2639EFD6")
     static let periferalName = "CARV 2"
-    @Published var left: Carv2Data = Carv2Data.init()
-    @Published var right: Carv2Data = Carv2Data.init()
+    var left: Carv2Data = Carv2Data.init()
+    var right: Carv2Data = Carv2Data.init()
     private var cancellables = Set<AnyCancellable>()
     private var isRecordingCSV = false
     private let  csvExporter = CSVExporter()
     private var numberOfTurn : Int = 0
     public static let shared: Carv2DataPair = .init()
     
-    @Published var currentTurn: [Carv2AnalyzedDataPair] = []
-    @Published var beforeTurn: [Carv2AnalyzedDataPair] = []
+    var currentTurn: [Carv2AnalyzedDataPair] = []
+    var beforeTurn: [Carv2AnalyzedDataPair] = []
     
     var turnDiffrencial: Rotation3D{
         beforeLastTurnSwitchingUnitedAttitude.inverse * lastTurnSwitchingUnitedAttitude
@@ -151,8 +152,9 @@ class Carv2DataPair : ObservableObject{
     }
     
 //     同じやつをここに移植
-    lazy var  parallelAngleByAttitude = Double(
-                    left.leftRealityKitRotation.quaternion.simd_quatf.getSignedAngleBetweenQuaternions2(q2: right.rightRealityKitRotation.quaternion.simd_quatf))
+    var parallelAngleByAttitude: Double {
+        Double(left.leftRealityKitRotation.quaternion.simd_quatf.getSignedAngleBetweenQuaternions2(q2: right.rightRealityKitRotation.quaternion.simd_quatf))
+    }
     func receive(left data: Carv2Data)  -> Carv2AnalyzedDataPair {
         self.left = data
         let isTurnSwitching: Bool = turnSwitchingTimingFinder.handle(zRotationAngle: Double(unitedYawingAngle), timeInterval: data.recordetTime)
@@ -205,3 +207,4 @@ class Carv2DataPair : ObservableObject{
         return analyzedDataPair
     }
 }
+

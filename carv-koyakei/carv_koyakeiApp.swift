@@ -13,8 +13,8 @@ struct carv_koyakeiApp: App {
     @StateObject private var carv1DataPair: Carv1DataPair = Carv1DataPair()
     private var locationManager = LocationManager()
     @Environment(\.scenePhase) var scenePhase
-    @ObservedObject private var yawingBeep: YawingBeep = YawingBeep()
-    @ObservedObject private var carv2AnalyzedDataPairManager: Carv2AnalyzedDataPairManager = Carv2AnalyzedDataPairManager(carv2DataPair: Carv2DataPair.shared)
+    @ObservedObject private var yawingBeep: YawingBeep = YawingBeep(carv2DataPair: Carv2DataPair.shared)
+    @State private var carv2AnalyzedDataPairManager: Carv2AnalyzedDataPairManager = Carv2AnalyzedDataPairManager(carv2DataPair: Carv2DataPair.shared)
     
     var body: some Scene {
         WindowGroup {
@@ -30,6 +30,7 @@ struct carv_koyakeiApp: App {
     
     init(){
         configureAudioSessionForBackground()
+        
     }
 
     private func configureAudioSessionForBackground() {

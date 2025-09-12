@@ -4,7 +4,7 @@ import AVFoundation
 
 struct YawingAnglerVelocityChartOverlay: View {
     @ObservedObject var cameraViewModel: CameraViewModel
-    @ObservedObject var carv2DataPair: Carv2DataPair = Carv2DataPair.shared
+    @State var carv2DataPair: Carv2DataPair = Carv2DataPair.shared
     
     
     var body: some View {

@@ -15,7 +15,7 @@ import AudioKit
 
 struct HomeView: View {
     @EnvironmentObject var ble : BluethoothCentralManager
-    @ObservedObject var carv2DataPair: Carv2DataPair
+    @State var carv2DataPair: Carv2DataPair
     @ObservedObject var yawingBeep: YawingBeep
     
     @State var rollingBeep: Bool = false

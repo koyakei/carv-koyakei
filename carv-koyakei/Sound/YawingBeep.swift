@@ -18,16 +18,11 @@ class YawingBeep: ObservableObject{
     
     @Published var diffYawingTargetAngle: Double = 2.0
     @ObservedObject var conductor : DynamicOscillatorConductor = DynamicOscillatorConductor()
-    init() {
-        
+    init(carv2DataPair :Carv2DataPair) {
+        self.carv2DataPair = carv2DataPair
         conductor.start()
-        carv2DataPair.$right
-            .sink { [weak self] newValue in
-                self?.handleRightChange(newValue)
-            }
-            .store(in: &cancellables)
     }
-    var carv2DataPair :Carv2DataPair = Carv2DataPair.shared
+    var carv2DataPair :Carv2DataPair
         
     private func handleRightChange(_ newValue: Carv2Data) {
         if isBeeping == false { return }
