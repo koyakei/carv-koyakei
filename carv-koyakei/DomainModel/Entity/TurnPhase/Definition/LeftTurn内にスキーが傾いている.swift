@@ -6,7 +6,7 @@ import Foundation
 
 struct LeftTurn内にスキーが傾いている {
     static func handle(absoluteFallLineAttitude: Attitude,
-                       currentMovingPhase: MovingPhaseProtocol)
+                       currentMovingPhase: any MovingPhaseProtocol)
                     -> Bool{
         !RightTurn内にスキーが傾いている.handle(absoluteFallLineAttitude:
                          absoluteFallLineAttitude, currentMovingPhase: currentMovingPhase)

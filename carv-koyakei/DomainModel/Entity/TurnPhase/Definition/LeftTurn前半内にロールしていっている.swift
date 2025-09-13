@@ -6,7 +6,7 @@ import Foundation
 
 struct LeftTurn前半内にロールしていっている {
     static func handle(absoluteFallLineAttitude: Attitude,
-                       currentMovingPhase: MovingPhaseProtocol)
+                       currentMovingPhase: any MovingPhaseProtocol)
                     -> Bool{
         !RightTurn前半スキーが内にロールしていっている.handle(absoluteFallLineAttitude:
                            absoluteFallLineAttitude, currentMovingPhase: currentMovingPhase)

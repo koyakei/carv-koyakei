@@ -78,7 +78,7 @@ class BluethoothCentralManager: NSObject, ObservableObject, @MainActor CBCentral
         }
     }
     
-    func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
+    func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: (any Error)?) {
         if peripheral.identifier == carv2DeviceLeft?.peripheral.identifier{
             carv2DeviceLeft?.updateConnectionState(.disconnected)
             print(peripheral.identifier)

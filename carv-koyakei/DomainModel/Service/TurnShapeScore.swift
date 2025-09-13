@@ -49,7 +49,7 @@ struct YawingShapeScore {
 }
 
 struct TurnScore{
-    let phaseDegreeCollection: [ActualPhaseDegreeProtocol]
+    let phaseDegreeCollection: [any ActualPhaseDegreeProtocol]
     let idealYawingDegreeOfTurn: IdealYawingDegreeOfTurn
     let turnPhaseDegrees : [TurnPhaseDegree]
     func handle() -> Double{

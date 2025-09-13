@@ -70,7 +70,7 @@ class CarvDevicePeripheral: NSObject, ObservableObject, Identifiable,@MainActor 
     }
     
     // 特性発見メソッドを実装
-    public func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
+    public func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: (any Error)?) {
         if let error = error {
             print("特性発見エラー: \(error.localizedDescription)")
             return
@@ -119,7 +119,7 @@ class CarvDevicePeripheral: NSObject, ObservableObject, Identifiable,@MainActor 
     
     // MARK: - CBPeripheralDelegate
     
-    func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
+    func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: (any Error)?) {
         if let error = error {
             print("Error discovering services: \(error.localizedDescription)")
             return
@@ -134,7 +134,7 @@ class CarvDevicePeripheral: NSObject, ObservableObject, Identifiable,@MainActor 
         }
     }
     
-    @MainActor func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
+    @MainActor func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: (any Error)?) {
         if let error = error {
             print("Error updating value: \(error.localizedDescription)")
             return
@@ -157,7 +157,7 @@ class CarvDevicePeripheral: NSObject, ObservableObject, Identifiable,@MainActor 
             
         }
     }
-    public func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
+    public func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: (any Error)?) {
         print("peripheral:didUpdateNotificationStateFor: \(characteristic)")
         if let error = error {
             print("error: \(error)")

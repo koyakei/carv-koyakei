@@ -65,7 +65,7 @@ class Carv2Data{
     }
     
     var leftRealityKitRotation: Rotation3DFloat {
-        let p = ProjectiveTransform3DFloat(scale: Size3DFloat(vector: [-1,-1,-1]),rotation: Rotation3DFloat(simd_quatd(real: 1, imag: [-1.0,1.0,1.0]).normalized))
+        _ = ProjectiveTransform3DFloat(scale: Size3DFloat(vector: [-1,-1,-1]),rotation: Rotation3DFloat(simd_quatd(real: 1, imag: [-1.0,1.0,1.0]).normalized))
         return attitude
             .rotated(by: Rotation3DFloat(angle: Angle2DFloat(radians: .pi), axis: RotationAxis3DFloat(vector: [1,0,0])))
             .rotated(by: Rotation3DFloat(angle: Angle2DFloat(radians: -.pi), axis: RotationAxis3DFloat(vector: [0,1,0])))

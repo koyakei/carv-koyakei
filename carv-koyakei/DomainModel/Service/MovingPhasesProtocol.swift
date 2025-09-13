@@ -13,7 +13,7 @@ protocol MovingPhaseProtocol: RotationRateRecordProtocol, AbsoluteAttitudeProtoc
     var sensorLocation: CMDeviceMotion.SensorLocation{get}
 }
 
-extension Collection where Element == MovingPhaseProtocol {
+extension Collection where Element == any MovingPhaseProtocol {
 
     func recentNSecondsFilter(seconds: Int) -> [Element] {
         self.filter {

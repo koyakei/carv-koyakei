@@ -66,7 +66,7 @@ class BLEPeripheral : NSObject, CBPeripheralManagerDelegate {
         }
     }
 
-    public func peripheralManager(_ peripheral: CBPeripheralManager, didAdd service: CBService, error: Error?){
+    public func peripheralManager(_ peripheral: CBPeripheralManager, didAdd service: CBService, error: (any Error)?){
         if(error != nil){
             print("Add Service error:", error!)
         }else{
@@ -78,7 +78,7 @@ class BLEPeripheral : NSObject, CBPeripheralManagerDelegate {
         }
     }
 
-    public func peripheralManagerDidStartAdvertising(_ peripheral: CBPeripheralManager, error: Error?){
+    public func peripheralManagerDidStartAdvertising(_ peripheral: CBPeripheralManager, error: (any Error)?){
         if(error != nil){
             print("Start Advertising error:", error!)
         }else{
