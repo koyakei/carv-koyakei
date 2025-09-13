@@ -9,7 +9,7 @@
 		<string></string>
 	</array>
 	<key>NSWorldSensingUsageDescription</key>
-	<string></string>
+	<string>位置を知りたい</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>bluetooth-central</string>
