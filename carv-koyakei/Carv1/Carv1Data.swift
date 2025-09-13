@@ -18,7 +18,7 @@ import simd
 import SwiftUI
 import Combine
 
-public class Carv1Data :ObservableObject{
+public class Carv1Data {
     @MainActor var calibrationPressure = [UInt8](repeating: 0, count: 38)
     @Published var attitude: Rotation3D
     @Published var acceleration: SIMD3<Float>
@@ -54,7 +54,7 @@ public class Carv1Data :ObservableObject{
         calibrationPressure = self.pressure
     }
     
-    @MainActor public init(rightData data: Data,) {
+    @MainActor init(_ data: Data,) {
         let motionSensorData = Carv1Data.int16ToFloat(data: data)
         attitude = motionSensorData.attitude
         acceleration = motionSensorData.acceleration
@@ -64,18 +64,6 @@ public class Carv1Data :ObservableObject{
         }
         angularVelocity = motionSensorData.angularVelocity
         print(pressure)
-//        print("yaw: \(Angle2D(radians: attitude.eulerAngles(order: .xyz).angles.x).degrees), pitch: \(Angle2D(radians: attitude.eulerAngles(order: .xyz).angles.y).degrees), roll: \(Angle2D(radians: attitude.eulerAngles(order: .xyz).angles.z).degrees)" )
-    }
-    
-    @MainActor public init(leftData data: Data){
-        let motionSensorData = Carv1Data.int16ToFloat(data: data)
-        attitude = motionSensorData.attitude
-        acceleration = motionSensorData.acceleration
-        pressure = zip(motionSensorData.pressures, calibrationPressure).map { p, cp in
-            let (result, overflow) = cp.subtractingReportingOverflow(p)
-            return overflow ? 0 : result
-        }
-        angularVelocity = motionSensorData.angularVelocity
 //        print("yaw: \(Angle2D(radians: attitude.eulerAngles(order: .xyz).angles.x).degrees), pitch: \(Angle2D(radians: attitude.eulerAngles(order: .xyz).angles.y).degrees), roll: \(Angle2D(radians: attitude.eulerAngles(order: .xyz).angles.z).degrees)" )
     }
     
