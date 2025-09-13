@@ -11,7 +11,7 @@ class TurnPhaseByTime {
     var lastTurnSwitchingTime: TimeInterval = 0.0
     var lastTurnTimeDuration: TimeInterval = 0.0
     
-    func handle(currentTime: TimeInterval,currentAttitude:Rotation3D)-> Double {
+    func handle(currentTime: TimeInterval)-> Double {
         abs((currentTime - lastTurnSwitchingTime) / lastTurnTimeDuration)
     }
     
@@ -24,7 +24,7 @@ class TurnPhaseByTime {
 
 protocol OutsideSkiRollAngle: Identifiable{
     var id : UUID {get}
-    var outsideSkiRollAngle: Double {get}
+    var outsideSkiRollAngle: Float {get}
     var recordetTime: TimeInterval  {get}
 }
 

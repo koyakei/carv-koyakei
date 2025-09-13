@@ -16,6 +16,7 @@ import Foundation
 import Spatial
 import simd
 import SwiftUI
+import Combine
 
 public class Carv1Data :ObservableObject{
     @MainActor var calibrationPressure = [UInt8](repeating: 0, count: 38)

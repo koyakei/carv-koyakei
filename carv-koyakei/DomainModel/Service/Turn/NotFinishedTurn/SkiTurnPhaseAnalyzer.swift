@@ -15,17 +15,3 @@ import Spatial
 
 
 
-extension simd_quatf {
-    public init(_ val: simd_quatd){
-        self.init(ix: Float(val.vector.x), iy: Float(val.vector.y), iz: Float(val.vector.z), r: Float(val.vector.w) )
-    }
-    
-    public static func + (lhs: simd_quatf, rhs: simd_quatd) -> simd_quatf{
-        return simd_quatf( rhs) + lhs
-    }
-    
-    public static func - (lhs: simd_quatf, rhs: simd_quatd) -> simd_quatf{
-        return simd_quatf( rhs) - lhs
-    }
-}
-

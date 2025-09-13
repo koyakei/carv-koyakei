@@ -8,13 +8,13 @@ import Spatial
 import Foundation
 
 struct Carv2AnalyzedData {
-    var attitude: Rotation3D
+    var attitude: Rotation3DFloat
     var acceleration: SIMD3<Float>
     var angularVelocity : SIMD3<Float>
     let recordetTime: TimeInterval = Date.now.timeIntervalSince1970
-    var rollAngle: Double {attitude.eulerAngles(order: .xyz).angles.z}
-    var yawAngle: Double {attitude.eulerAngles(order: .xyz).angles.y}
-    var pitchAngle: Double {attitude.eulerAngles(order: .xyz).angles.z}
+    var rollAngle: Float {attitude.eulerAngles(order: .xyz).angles.z}
+    var yawAngle: Float {attitude.eulerAngles(order: .xyz).angles.y}
+    var pitchAngle: Float {attitude.eulerAngles(order: .xyz).angles.z}
 }
 
 struct Carv2AnalyzedDataPair :Identifiable, OutsideSkiRollAngle{
@@ -33,8 +33,8 @@ struct Carv2AnalyzedDataPair :Identifiable, OutsideSkiRollAngle{
             }
         }
     }
-    var outsideSkiRollAngle: Double {
-        return outsideSki.rollAngle + Angle2D(degrees: 90).radians
+    var outsideSkiRollAngle: Float {
+        return outsideSki.rollAngle + Float(Angle2D(degrees: 90).radians)
     }
     
     var outsideSki: Carv2AnalyzedData {
@@ -54,8 +54,8 @@ struct Carv2AnalyzedDataPair :Identifiable, OutsideSkiRollAngle{
     }
     
     var isTurnSwitching: Bool
-    var unitedAttitude : Rotation3D {
-        Rotation3D.slerp(from: left.attitude, to: right.attitude, t: 0.5)
+    var unitedAttitude : Rotation3DFloat {
+        Rotation3DFloat.slerp(from: left.attitude, to: right.attitude, t: 0.5)
     }
     var percentageOfTurnsByAngle: Float
     var percentageOfTurnsByTime: Double
@@ -65,7 +65,7 @@ struct Carv2AnalyzedDataPair :Identifiable, OutsideSkiRollAngle{
     var yawingAngulerRateDiffrential: Float { Float(right.angularVelocity.y - left.angularVelocity.y)}
     var numberOfTurns: Int
     var recordetTime: TimeInterval
-    var unifiedDiffrentialAttitudeFromLeftToRight: Rotation3D {
+    var unifiedDiffrentialAttitudeFromLeftToRight: Rotation3DFloat {
         left.attitude.inverse * right.attitude
     }
 }

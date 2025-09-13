@@ -7,6 +7,7 @@
 import Foundation
 import Spatial
 import SwiftUI
+import Combine
 class TurnSwitchingTimingFinder:ObservableObject{
     @Published var lastTurnSiwtchedTimeInterval = Date.now.timeIntervalSince1970
     let minimumTurnPeriod : TimeInterval = 0.4

@@ -3,7 +3,7 @@
 //
 
 import Foundation
-
+import CoreMotion
 struct RightTurn前半スキーが内にロールしていっている {
     static func handle(absoluteFallLineAttitude: Attitude,
                 currentMovingPhase: MovingPhaseProtocol)
