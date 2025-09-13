@@ -17,6 +17,7 @@ extension Array where Element == Carv2AnalyzedDataPair {
     }
 }
 
+@MainActor
 class Carv2DataPair : ObservableObject{
 //    // ipad
 //    static let rightCharactaristicUUID = UUID(uuidString: "85A29A4C-09C3-C632-858A-3387339C67CF")
@@ -205,3 +206,4 @@ class Carv2DataPair : ObservableObject{
         return analyzedDataPair
     }
 }
+

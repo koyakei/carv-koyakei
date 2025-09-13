@@ -4,12 +4,13 @@
 ////
 ////  Created by keisuke koyanagi on 2025/02/01.
 ////
-import CoreBluetooth
+@preconcurrency import CoreBluetooth
 import Spatial
 import Foundation
 import SwiftUI
 
-class CarvDevicePeripheral: NSObject, ObservableObject, Identifiable, CBPeripheralDelegate {
+@MainActor
+class CarvDevicePeripheral: NSObject, ObservableObject, Identifiable,@MainActor CBPeripheralDelegate {
     let id: UUID
     let peripheral: CBPeripheral
     @Published var connectionState: CBPeripheralState
@@ -99,10 +100,8 @@ class CarvDevicePeripheral: NSObject, ObservableObject, Identifiable, CBPeripher
             return
         }
         
-        // 非同期処理を追加
-        DispatchQueue.global(qos: .userInitiated).async {
-            self.peripheral.setNotifyValue(true, for: characteristic)
-        }
+        self.peripheral.setNotifyValue(true, for: characteristic)
+        
         print("Subscribe initiated")
     }
     
@@ -135,29 +134,23 @@ class CarvDevicePeripheral: NSObject, ObservableObject, Identifiable, CBPeripher
         }
     }
     
-    func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
+    @MainActor func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
         if let error = error {
             print("Error updating value: \(error.localizedDescription)")
             return
         }
         if let value = characteristic.value {
             if characteristic.service?.peripheral?.name == Carv1DataPair.periferalName{
-                if peripheral.identifier == Carv2DataPair.rightCharactaristicUUID {
-                    Carv1DataPair.shared.right  = Carv1Data(rightData: value)
-                }
-                if peripheral.identifier == Carv2DataPair.leftCharactaristicUUID {
-                    Carv1DataPair.shared.left  = Carv1Data(leftData: value)
-                }
             } else if characteristic.service?.peripheral?.name == Carv2DataPair.periferalName {
                 
                 if peripheral.identifier == Carv2DataPair.rightCharactaristicUUID{
                     // この戻り値をCSVに出力したい。どうすればいいのか？
-                    self.carv2DataPair.receive(right: Carv2Data(value))
+                    let _ = self.carv2DataPair.receive(right: Carv2Data(value))
                     
                 }
                 if peripheral.identifier == Carv2DataPair.leftCharactaristicUUID {
-                    self.carv2DataPair.receive(left: Carv2Data(value))
-                
+                    let _ = self.carv2DataPair.receive(left: Carv2Data(value))
+                    
                 }
             }
             

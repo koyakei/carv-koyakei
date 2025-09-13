@@ -3,7 +3,8 @@ import Spatial
 import Foundation
 import SwiftUI
 
-class BluethoothCentralManager: NSObject, ObservableObject, CBCentralManagerDelegate {
+@MainActor
+class BluethoothCentralManager: NSObject, ObservableObject, @MainActor CBCentralManagerDelegate {
     @Published var carv2DeviceLeft: CarvDevicePeripheral? = nil
     @Published var carv2DeviceRight: CarvDevicePeripheral? = nil
     

@@ -1,6 +1,7 @@
 import Foundation
 import AVFoundation
 
+@MainActor
 class CameraViewModel: NSObject, ObservableObject {
     @Published var session = AVCaptureSession()
     @Published var status: SessionStatus = .unconfigured
@@ -24,7 +25,11 @@ class CameraViewModel: NSObject, ObservableObject {
 
         case .notDetermined:
             AVCaptureDevice.requestAccess(for: .video) { [weak self] granted in
-                if granted { self?.configureSession() }
+                if granted {
+                    Task { @MainActor in
+                        self?.configureSession()
+                    }
+                }
             }
         default:
             status = .unauthorized
@@ -33,9 +38,10 @@ class CameraViewModel: NSObject, ObservableObject {
     
     private func configureSession() {
         sessionQueue.async { // セッション操作を専用キューで実行
-            self.session.beginConfiguration()
-            defer { self.session.commitConfiguration() }
-            
+            Task { @MainActor in
+                self.session.beginConfiguration()
+                do { self.session.commitConfiguration() }
+            }
             do {
                 guard let camera = AVCaptureDevice.default(
                     .builtInWideAngleCamera,
@@ -48,18 +54,19 @@ class CameraViewModel: NSObject, ObservableObject {
                     return
                 }
                 let input = try AVCaptureDeviceInput(device: camera)
-                if self.session.canAddInput(input) {
-                    self.session.addInput(input)
+                Task { @MainActor in
+                    if self.session.canAddInput(input) {
+                        self.session.addInput(input)
+                    }
                 }
-                
                 DispatchQueue.main.async {
                     self.status = .configured
                 }
-                
                 // セッション開始をキュー外で実行
-                self.session.commitConfiguration()
-                self.session.startRunning() // ここで開始
-                
+                Task { @MainActor in
+                    self.session.commitConfiguration()
+                    self.session.startRunning() // ここで開始
+                }
             } catch {
                 print(error.localizedDescription)
                 DispatchQueue.main.async {

@@ -18,7 +18,7 @@ import simd
 import SwiftUI
 
 public class Carv1Data :ObservableObject{
-  
+    @MainActor var calibrationPressure = [UInt8](repeating: 0, count: 38)
     @Published var attitude: Rotation3D
     @Published var acceleration: SIMD3<Float>
     @Published var pressure: [UInt8] = [UInt8](repeating: 0xff, count: 38)
@@ -49,17 +49,16 @@ public class Carv1Data :ObservableObject{
         return Carv1MotionSensorData(attitude: Rotation3D.init(eulerAngles: EulerAngles(x: Angle2D(radians: quatx), y: Angle2D(radians: quaty), z: Angle2D(radians: quatz), order: .xyz)), acceleration:  SIMD3<Float>(x: ax, y: ay, z: az), angularVelocity: SIMD3(x: wx, y: wy, z: wz), pressures: pressures)
     }
     
-    func calibrateForce(){
-        Carv1DataPair.leftCalibrationPressure = self.pressure
-        Carv1DataPair.rightCalibrationPressure = self.pressure
+    @MainActor func calibrateForce(){
+        calibrationPressure = self.pressure
     }
     
-    public init(rightData data: Data) {
+    @MainActor public init(rightData data: Data,) {
         let motionSensorData = Carv1Data.int16ToFloat(data: data)
         attitude = motionSensorData.attitude
         acceleration = motionSensorData.acceleration
         rawPressure = motionSensorData.pressures
-        pressure = zip(motionSensorData.pressures, Carv1DataPair.rightCalibrationPressure).map { p, cp in
+        pressure = zip(motionSensorData.pressures, calibrationPressure).map { p, cp in
             p - cp
         }
         angularVelocity = motionSensorData.angularVelocity
@@ -67,11 +66,11 @@ public class Carv1Data :ObservableObject{
 //        print("yaw: \(Angle2D(radians: attitude.eulerAngles(order: .xyz).angles.x).degrees), pitch: \(Angle2D(radians: attitude.eulerAngles(order: .xyz).angles.y).degrees), roll: \(Angle2D(radians: attitude.eulerAngles(order: .xyz).angles.z).degrees)" )
     }
     
-    public init(leftData data: Data){
+    @MainActor public init(leftData data: Data){
         let motionSensorData = Carv1Data.int16ToFloat(data: data)
         attitude = motionSensorData.attitude
         acceleration = motionSensorData.acceleration
-        pressure = zip(motionSensorData.pressures, Carv1DataPair.leftCalibrationPressure).map { p, cp in
+        pressure = zip(motionSensorData.pressures, calibrationPressure).map { p, cp in
             let (result, overflow) = cp.subtractingReportingOverflow(p)
             return overflow ? 0 : result
         }
@@ -84,5 +83,4 @@ public class Carv1Data :ObservableObject{
         acceleration = .zero
     }
 }
-
 

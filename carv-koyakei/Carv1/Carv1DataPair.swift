@@ -16,6 +16,7 @@ import Spatial
 import simd
 import SwiftUI
 
+@MainActor
 public class Carv1DataPair :ObservableObject{
     @Published var left: Carv1Data = Carv1Data.init()
     @Published var right: Carv1Data = Carv1Data.init()
@@ -28,11 +29,9 @@ public class Carv1DataPair :ObservableObject{
 //    // iphone
 //    static let rightCharactaristicUUID = UUID(uuidString: "85E2946B-0D18-FA01-E1C9-0393EDD9013A")
 //    static let leftCharactaristicUUID = UUID(uuidString:  "57089C67-2275-E220-B6D3-B16E2639EFD6")
-    static var leftCalibrationPressure = [UInt8](repeating: 0, count: 38)
-    static var rightCalibrationPressure = [UInt8](repeating: 0, count: 38)
-    func calibrateForce () {
-        Carv1DataPair.leftCalibrationPressure = left.rawPressure
-        Carv1DataPair.rightCalibrationPressure = right.rawPressure
+    @MainActor func calibrateForce () {
+        left.calibrationPressure = left.rawPressure
+        right.calibrationPressure = right.rawPressure
     }
     
     func angleBetweenUpVectors(q1: simd_quatd, q2: simd_quatd) -> Double {
@@ -52,3 +51,4 @@ public class Carv1DataPair :ObservableObject{
     
     
 }
+
