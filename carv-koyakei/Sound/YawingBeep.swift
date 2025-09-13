@@ -10,7 +10,7 @@ import AudioKit
 import Foundation
 import Combine
 import SwiftUI
-
+@MainActor
 class YawingBeep: ObservableObject{
     
     var isBeeping: Bool = false
