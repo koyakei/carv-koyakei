@@ -16,10 +16,14 @@ extension Array where Element == Carv2AnalyzedDataPair {
         Rotation3DFloat(self.map { $0.unitedAttitude.quaternion}.reduce(simd_quatf(), +).normalized)
     }
 }
+protocol Carv2DataPairDelegate: AnyObject {
+    func carv2DataPair(_ dataPair: Carv2DataPair, didUpdateLeft leftData: Carv2Data)
+}
 
 @MainActor
 @Observable
 class Carv2DataPair {
+    weak var delegate: (any Carv2DataPairDelegate)?
 //    // ipad
 //    static let rightCharactaristicUUID = UUID(uuidString: "85A29A4C-09C3-C632-858A-3387339C67CF")
 //    static let leftCharactaristicUUID = UUID(uuidString:  "850D8BCF-3B03-1322-F51C-DD38E961FC1A")
@@ -30,8 +34,10 @@ class Carv2DataPair {
     var left: Carv2Data {
         didSet { notifyUpdates() }
     }
-    var right: Carv2Data {
-        didSet { notifyUpdates() }
+    var right: Carv2Data{
+        didSet {
+            delegate?.carv2DataPair(self, didUpdateLeft: left)
+        }
     }
     
     private init(){

@@ -10,7 +10,7 @@ import Foundation
 import Combine
 import SwiftUI
 @MainActor
-class YawingBeep: ObservableObject{
+class YawingBeep: ObservableObject, Carv2DataPairDelegate{
     
     var isBeeping: Bool = false
     private var cancellables = Set<AnyCancellable>()
@@ -20,13 +20,19 @@ class YawingBeep: ObservableObject{
     init() {
         
         conductor.start()
-        Task { [weak self] in
-            for await newValue in self?.carv2DataPair.updates ?? AsyncStream { _ in } {
-                await self?.handleRightChange(newValue.right)
-            }
-        }
+//        Task { [weak self] in
+//            for await newValue in self?.carv2DataPair.updates ?? AsyncStream { _ in } {
+//                await self?.handleRightChange(newValue.right)
+//            }
+//        }
     }
     var carv2DataPair :Carv2DataPair = Carv2DataPair.shared
+    func carv2DataPair(_ dataPair: Carv2DataPair, didUpdateLeft leftData: Carv2Data) {
+            print("left データが更新されました: \(leftData)")
+            handleRightChange(leftData)
+        }
+
+    
         
     private func handleRightChange(_ newValue: Carv2Data) {
         if isBeeping == false { return }

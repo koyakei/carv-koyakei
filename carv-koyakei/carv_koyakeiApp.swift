@@ -27,6 +27,7 @@ struct carv_koyakeiApp: App {
     
     init(){
         configureAudioSessionForBackground()
+        Carv2DataPair.shared.delegate = yawingBeep
     }
 
     private func configureAudioSessionForBackground() {
