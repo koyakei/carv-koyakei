@@ -38,7 +38,6 @@ class CameraViewModel: NSObject {
     
     private func configureSession() {
         sessionQueue.async {
-            // Perform session setup off the main actor
             do {
                 guard let camera = AVCaptureDevice.default(
                     .builtInWideAngleCamera,
@@ -51,16 +50,13 @@ class CameraViewModel: NSObject {
                     return
                 }
                 let input = try AVCaptureDeviceInput(device: camera)
-                
-                self.session.beginConfiguration()
-                if self.session.canAddInput(input) {
-                    self.session.addInput(input)
-                }
-                self.session.commitConfiguration()
-                
-                self.session.startRunning()
-                
                 Task { @MainActor in
+                    self.session.beginConfiguration()
+                    if self.session.canAddInput(input) {
+                        self.session.addInput(input)
+                    }
+                    self.session.commitConfiguration()
+                    self.session.startRunning()
                     self.status = .configured
                 }
             } catch {

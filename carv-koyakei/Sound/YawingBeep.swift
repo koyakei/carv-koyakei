@@ -5,7 +5,6 @@
 //  Created by keisuke koyanagi on 2025/03/17.
 //
 
-
 import AudioKit
 import Foundation
 import Combine
@@ -21,11 +20,11 @@ class YawingBeep: ObservableObject{
     init() {
         
         conductor.start()
-        carv2DataPair.$right
-            .sink { [weak self] newValue in
-                self?.handleRightChange(newValue)
+        Task { [weak self] in
+            for await newValue in self?.carv2DataPair.updates ?? AsyncStream { _ in } {
+                await self?.handleRightChange(newValue.right)
             }
-            .store(in: &cancellables)
+        }
     }
     var carv2DataPair :Carv2DataPair = Carv2DataPair.shared
         
@@ -57,3 +56,4 @@ class YawingBeep: ObservableObject{
             return base * pow(pow(2, num + min), 1/12)
         }
 }
+

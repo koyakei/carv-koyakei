@@ -5,7 +5,7 @@ import Spatial
 
 struct YawingAnglerVelocityChartOverlay: View {
     var cameraViewModel: CameraViewModel
-    @ObservedObject var carv2DataPair: Carv2DataPair = Carv2DataPair.shared
+    var carv2DataPair: Carv2DataPair = Carv2DataPair.shared
     
     
     var body: some View {
