@@ -10,7 +10,7 @@ import AVFAudio
 
 @main
 struct carv_koyakeiApp: App {
-    @StateObject private var carv1DataPair: Carv1DataPair = Carv1DataPair()
+    private var carv1DataPair: Carv1DataPair = Carv1DataPair()
     private var locationManager = LocationManager()
     @Environment(\.scenePhase) var scenePhase
     @ObservedObject private var yawingBeep: YawingBeep = YawingBeep()
@@ -18,9 +18,7 @@ struct carv_koyakeiApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView(ble: BluethoothCentralManager(carv2AnalyzedDataPairManager:carv2AnalyzedDataPairManager))
-                .environmentObject(carv1DataPair)
-                .environmentObject(yawingBeep)
+            ContentView(ble: BluethoothCentralManager(carv2AnalyzedDataPairManager:carv2AnalyzedDataPairManager), yawingBeep: yawingBeep)
 //                .onChange(of: scenePhase) { oldPhase, newPhase in
 //                    handleScenePhaseChange(newPhase)
 //                }

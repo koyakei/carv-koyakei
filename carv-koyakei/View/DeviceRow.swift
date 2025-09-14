@@ -5,19 +5,19 @@
 //  Created by keisuke koyanagi on 2025/02/12.
 //
 import SwiftUI
+import CoreBluetooth
 
 struct DeviceRow: View {
-    @ObservedObject var device: CarvDevicePeripheral
+    var device: CarvDevicePeripheral
     let ble: BluethoothCentralManager
     
     var body: some View {
         VStack {
-            Picker("オプションを選択", selection: $device.carv2PripheralSide) {
+            Picker("オプションを選択", selection: .constant(device.carv2PripheralSide)) {
                 ForEach(Carv2PripheralSide.allCases, id: \.self) { option in
                     Text(option.rawValue).tag(option)
                 }
             }
-            .pickerStyle(.menu)
             Button(action: {
                 device.setUUID(device.id, device.carv2PripheralSide)
             }){

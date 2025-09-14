@@ -10,14 +10,15 @@ import Foundation
 import SwiftUI
 
 @MainActor
-class CarvDevicePeripheral: NSObject, ObservableObject, Identifiable,@MainActor CBPeripheralDelegate {
+@Observable
+class CarvDevicePeripheral: NSObject, Identifiable,@MainActor CBPeripheralDelegate {
     let id: UUID
     let peripheral: CBPeripheral
-    @Published var connectionState: CBPeripheralState
-    @Published var services: [CBService] = []
-    @Published var carv2DataPair: Carv2DataPair
+    var connectionState: CBPeripheralState
+    var services: [CBService] = []
+    var carv2DataPair: Carv2DataPair
     var carv2AnalyzedDataPairManager :Carv2AnalyzedDataPairManager
-    @Published var carv2PripheralSide: Carv2PripheralSide = .right {
+    var carv2PripheralSide: Carv2PripheralSide = .right {
         didSet{
             switch carv2PripheralSide {
             case .left:

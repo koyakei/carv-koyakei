@@ -12,14 +12,16 @@
 //  Created by keisuke koyanagi on 2025/02/06.
 //
 import Foundation
+import Observation
 import Spatial
 import simd
 import SwiftUI
 
 @MainActor
-public class Carv1DataPair :ObservableObject{
-    @Published var left: Carv1Data = Carv1Data.init()
-    @Published var right: Carv1Data = Carv1Data.init()
+@Observable
+class Carv1DataPair {
+    var left: Carv1Data = Carv1Data.init()
+    var right: Carv1Data = Carv1Data.init()
     var yawingSide: YawingSide = .straight
     static let periferalName = "⛷CARV"
     public static let shared: Carv1DataPair = .init()

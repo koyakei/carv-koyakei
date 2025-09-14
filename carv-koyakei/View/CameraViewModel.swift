@@ -2,9 +2,9 @@ import Foundation
 import AVFoundation
 
 @MainActor
-class CameraViewModel: NSObject, ObservableObject {
-    @Published var session = AVCaptureSession()
-    @Published var status: SessionStatus = .unconfigured
+class CameraViewModel: NSObject {
+    var session = AVCaptureSession()
+    var status: SessionStatus = .unconfigured
     private let sessionQueue = DispatchQueue(label: "camera.session.queue")
     
     enum SessionStatus {
@@ -15,19 +15,19 @@ class CameraViewModel: NSObject, ObservableObject {
     
     override init() {
         super.init()
-        checkPermissions()    }
+        checkPermissions()
+    }
     
     private func checkPermissions() {
         switch AVCaptureDevice.authorizationStatus(for: .video) {
         case .authorized:
-            
             configureSession()
-
+            
         case .notDetermined:
-            AVCaptureDevice.requestAccess(for: .video) { [weak self] granted in
+            AVCaptureDevice.requestAccess(for: .video) { granted in
                 if granted {
                     Task { @MainActor in
-                        self?.configureSession()
+                        self.configureSession()
                     }
                 }
             }
@@ -37,41 +37,37 @@ class CameraViewModel: NSObject, ObservableObject {
     }
     
     private func configureSession() {
-        sessionQueue.async { // セッション操作を専用キューで実行
-            Task { @MainActor in
-                self.session.beginConfiguration()
-                do { self.session.commitConfiguration() }
-            }
+        sessionQueue.async {
+            // Perform session setup off the main actor
             do {
                 guard let camera = AVCaptureDevice.default(
                     .builtInWideAngleCamera,
                     for: .video,
                     position: .back
                 ) else {
-                    DispatchQueue.main.async {
+                    Task { @MainActor in
                         self.status = .unauthorized
                     }
                     return
                 }
                 let input = try AVCaptureDeviceInput(device: camera)
-                Task { @MainActor in
-                    if self.session.canAddInput(input) {
-                        self.session.addInput(input)
-                    }
+                
+                self.session.beginConfiguration()
+                if self.session.canAddInput(input) {
+                    self.session.addInput(input)
                 }
-                DispatchQueue.main.async {
+                self.session.commitConfiguration()
+                
+                self.session.startRunning()
+                
+                Task { @MainActor in
                     self.status = .configured
                 }
-                // セッション開始をキュー外で実行
-                Task { @MainActor in
-                    self.session.commitConfiguration()
-                    self.session.startRunning() // ここで開始
-                }
             } catch {
-                print(error.localizedDescription)
-                DispatchQueue.main.async {
+                Task { @MainActor in
                     self.status = .unauthorized
                 }
+                print(error.localizedDescription)
             }
         }
     }

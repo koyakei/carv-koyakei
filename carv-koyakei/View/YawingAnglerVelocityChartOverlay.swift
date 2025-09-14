@@ -1,9 +1,10 @@
 import SwiftUI
 import Charts
 import AVFoundation
+import Spatial
 
 struct YawingAnglerVelocityChartOverlay: View {
-    @ObservedObject var cameraViewModel: CameraViewModel
+    var cameraViewModel: CameraViewModel
     @ObservedObject var carv2DataPair: Carv2DataPair = Carv2DataPair.shared
     
     

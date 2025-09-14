@@ -6,8 +6,9 @@
 //
 
 import SwiftUI
+import AudioKit
 struct FootPressureView: View {
-    @ObservedObject var carv1DataPair = Carv1DataPair.shared
+    var carv1DataPair = Carv1DataPair.shared
     let points: [(x: CGFloat, y: CGFloat)] = [
         (0.4, 0.1),(0.5, 0.1),
         (0.35, 0.15),(0.5, 0.15),(0.6, 0.15),

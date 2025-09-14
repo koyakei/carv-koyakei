@@ -3,8 +3,8 @@ import SwiftUI
 struct ContentView: View {
     @StateObject var carv2DataPair: Carv2DataPair = Carv2DataPair.shared
     var ble :BluethoothCentralManager
-    @EnvironmentObject var yawingBeep: YawingBeep
-    @StateObject var cameraViewModel = CameraViewModel()
+    var yawingBeep: YawingBeep
+    var cameraViewModel = CameraViewModel()
     
     var body: some View {
         TabView {
