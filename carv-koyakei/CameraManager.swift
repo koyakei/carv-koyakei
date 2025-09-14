@@ -7,7 +7,8 @@
 import SwiftUI
 import AVFoundation
 
-class CameraManager: NSObject, ObservableObject {
+@Observable
+class CameraManager{
     let session = AVCaptureSession()
     private var device: AVCaptureDevice!
     private var initialZoomFactor: CGFloat = 1.0
@@ -17,8 +18,7 @@ class CameraManager: NSObject, ObservableObject {
     var minZoom: CGFloat { device?.minAvailableVideoZoomFactor ?? 0.5 }
     var maxZoom: CGFloat { device?.maxAvailableVideoZoomFactor ?? 3.0 }
     
-    override init() {
-        super.init()
+    init() {
         configureCamera()
     }
     

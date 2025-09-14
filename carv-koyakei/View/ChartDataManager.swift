@@ -1,10 +1,11 @@
 import SwiftUI
 
-class Carv2AnalyzedDataPairManager :ObservableObject{
-    @Published var currentTurn: [Carv2AnalyzedDataPair] = []
-    @Published var beforeTurn: [Carv2AnalyzedDataPair] = []
+@Observable
+class Carv2AnalyzedDataPairManager {
+    var currentTurn: [Carv2AnalyzedDataPair] = []
+    var beforeTurn: [Carv2AnalyzedDataPair] = []
     
-    @Published var carv2DataPair: Carv2DataPair
+    var carv2DataPair: Carv2DataPair
     init( carv2DataPair: Carv2DataPair) {
         self.carv2DataPair = carv2DataPair
     }

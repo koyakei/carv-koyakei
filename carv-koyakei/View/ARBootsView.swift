@@ -12,7 +12,7 @@ import Spatial
 
 struct ARBootsView: View {
     @ObservedObject var carv2DataPair : Carv2DataPair = Carv2DataPair.shared
-    @StateObject private var cameraManager = CameraManager()
+    @Bindable var cameraManager = CameraManager()
     var carv2AnalyzedDataPairManager = Carv2AnalyzedDataPairManager.init(carv2DataPair: Carv2DataPair.shared)
     @State private var currentScale: CGFloat = 3.0
     @State private var initialScale: CGFloat = 3.0

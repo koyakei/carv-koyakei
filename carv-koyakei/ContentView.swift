@@ -2,17 +2,17 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject var carv2DataPair: Carv2DataPair = Carv2DataPair.shared
-    @EnvironmentObject var ble :BluethoothCentralManager
+    var ble :BluethoothCentralManager
     @EnvironmentObject var yawingBeep: YawingBeep
     @StateObject var cameraViewModel = CameraViewModel()
     
     var body: some View {
         TabView {
-            HomeView(carv2DataPair: carv2DataPair, yawingBeep: yawingBeep)
+            HomeView(ble: ble, carv2DataPair: carv2DataPair, yawingBeep: yawingBeep)
                 .tabItem {
                     Image(systemName: "house.fill")
                     Text("ホーム")
-                }.environmentObject(ble).environmentObject(yawingBeep)
+                }.environmentObject(yawingBeep)
 //            ARBootsView()
 //                .tabItem {
 //                    Image(systemName: "person.fill")
