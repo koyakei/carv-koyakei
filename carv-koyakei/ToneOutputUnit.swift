@@ -14,7 +14,7 @@ import SoundpipeAudioKit
 import Combine
 
 
-class DynamicOscillatorConductor: ObservableObject {
+class DynamicOscillatorConductor {
     let engine = AudioEngine()
     var osc = DynamicOscillator()
     var panner : Panner
@@ -23,18 +23,15 @@ class DynamicOscillatorConductor: ObservableObject {
         data.isPlaying = true
         data.frequency = note.midiNoteToFrequency()
     }
-
+    
     func noteOff(note: MIDINoteNumber) {
         data.isPlaying = false
     }
-
-    @Published var data = DynamicOscillatorData() {
+    
+    var data = DynamicOscillatorData() {
         didSet {
             if data.isPlaying {
-                osc.start()
-                osc.$frequency.ramp(to: data.frequency, duration: data.rampDuration)
-                osc.$amplitude.ramp(to: data.amplitude, duration: data.rampDuration)
-                osc.$detuningOffset.ramp(to: data.detuningOffset, duration: data.rampDuration)
+                osc.amplitude = 1.0
             } else {
                 osc.amplitude = 0.0
             }
@@ -52,26 +49,27 @@ class DynamicOscillatorConductor: ObservableObject {
     func changeWaveFormToSquare(){
         osc.setWaveform(Table(.sawtooth))
     }
-
     
-
     init() {
         let mixer = Mixer(osc)
         mixer.volume = 1.0
         panner = Panner(mixer)
         engine.output = panner
     }
-
+    
     func start() {
-            osc.amplitude = 1
-            do {
-               
-                try engine.start()
-            } catch let err {
-                Log(err)
-            }
+        osc.amplitude = 1
+        do {
+            try engine.start()
+            osc.start()
+            osc.$frequency.ramp(to: data.frequency, duration: data.rampDuration)
+            osc.$amplitude.ramp(to: data.amplitude, duration: data.rampDuration)
+            osc.$detuningOffset.ramp(to: data.detuningOffset, duration: data.rampDuration)
+        } catch let err {
+            Log(err)
         }
-
+    }
+    
     func stop() {
         data.isPlaying = false
         osc.stop()

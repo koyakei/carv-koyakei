@@ -16,7 +16,7 @@ class YawingBeep: ObservableObject, Carv2DataPairDelegate{
     private var cancellables = Set<AnyCancellable>()
     
     @Published var diffYawingTargetAngle: Double = 2.0
-    @ObservedObject var conductor : DynamicOscillatorConductor = DynamicOscillatorConductor()
+    var conductor : DynamicOscillatorConductor = DynamicOscillatorConductor()
     init() {
         
         conductor.start()
