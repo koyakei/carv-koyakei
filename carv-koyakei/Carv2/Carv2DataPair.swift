@@ -17,7 +17,7 @@ extension Array where Element == Carv2AnalyzedDataPair {
     }
 }
 protocol Carv2DataPairDelegate: AnyObject {
-    func carv2DataPair(_ dataPair: Carv2DataPair, didUpdateLeft leftData: Carv2Data)
+    func carv2DataPairUpdate(_ dataPair: Carv2DataPair, didUpdateLeft leftData: Carv2Data)
 }
 
 @MainActor
@@ -36,7 +36,7 @@ class Carv2DataPair {
     }
     var right: Carv2Data{
         didSet {
-            delegate?.carv2DataPair(self, didUpdateLeft: left)
+            delegate?.carv2DataPairUpdate(self, didUpdateLeft: left)
         }
     }
     

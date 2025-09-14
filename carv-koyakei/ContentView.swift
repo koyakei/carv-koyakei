@@ -12,7 +12,7 @@ struct ContentView: View {
                 .tabItem {
                     Image(systemName: "house.fill")
                     Text("ホーム")
-                }.environmentObject(yawingBeep)
+                }
 //            ARBootsView()
 //                .tabItem {
 //                    Image(systemName: "person.fill")
