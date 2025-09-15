@@ -8,16 +8,30 @@
 import Spatial
 import Foundation
 import SwiftUI
+import Combine
 
 @MainActor
 @Observable
-class CarvDevicePeripheral: NSObject, Identifiable,@MainActor CBPeripheralDelegate {
+final class CarvDevicePeripheral: NSObject, Identifiable,@MainActor CBPeripheralDelegate {
+    
+    var latestDataFrame: Data?
+    let characteristicUpdatePublisher = PassthroughSubject<Data, Never>()
+    
+    @MainActor func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: (any Error)?) {
+        if let error = error {
+            print("Error updating value: \(error.localizedDescription)")
+            return
+        }
+        if let value = characteristic.value {
+            self.characteristicUpdatePublisher.send(value)
+        }
+    }
+    
+    
     let id: UUID
     let peripheral: CBPeripheral
     var connectionState: CBPeripheralState
     var services: [CBService] = []
-    var carv2DataPair: Carv2DataPair
-    var carv2AnalyzedDataPairManager :Carv2AnalyzedDataPairManager
     var carv2PripheralSide: Carv2PripheralSide = .right {
         didSet{
             switch carv2PripheralSide {
@@ -39,12 +53,10 @@ class CarvDevicePeripheral: NSObject, Identifiable,@MainActor CBPeripheralDelega
         }
     }
     
-    init(peripheral: CBPeripheral, carv2DataPair: Carv2DataPair,carv2AnalyzedDataPairManager: Carv2AnalyzedDataPairManager) {
+    init(peripheral: CBPeripheral) {
         self.id = peripheral.identifier
         self.peripheral = peripheral
         self.connectionState = peripheral.state
-        self.carv2DataPair = carv2DataPair
-        self.carv2AnalyzedDataPairManager = carv2AnalyzedDataPairManager
         super.init()
         self.peripheral.delegate = self
         //　UserDefaults.standard.string(forKey: "leftCarv2UUID")　が空だった場合、現在の値を代入
@@ -134,30 +146,7 @@ class CarvDevicePeripheral: NSObject, Identifiable,@MainActor CBPeripheralDelega
             peripheral.discoverCharacteristics(nil, for: service)
         }
     }
-    
-    @MainActor func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: (any Error)?) {
-        if let error = error {
-            print("Error updating value: \(error.localizedDescription)")
-            return
-        }
-        if let value = characteristic.value {
-            if characteristic.service?.peripheral?.name == Carv1DataPair.periferalName{
-            } else if characteristic.service?.peripheral?.name == Carv2DataPair.periferalName {
-                
-                if peripheral.identifier == Carv2DataPair.rightCharactaristicUUID{
-                    // この戻り値をCSVに出力したい。どうすればいいのか？
-                    let _ = self.carv2DataPair.receive(right: Carv2Data(value))
-                    
-                }
-                if peripheral.identifier == Carv2DataPair.leftCharactaristicUUID {
-                    let _ = self.carv2DataPair.receive(left: Carv2Data(value))
-                    
-                }
-            }
-            
-            
-        }
-    }
+
     public func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: (any Error)?) {
         print("peripheral:didUpdateNotificationStateFor: \(characteristic)")
         if let error = error {

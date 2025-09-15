@@ -15,7 +15,8 @@ import AudioKit
 
 struct HomeView: View {
     var ble : BluethoothCentralManager
-    var carv2DataPair: Carv2DataPair
+    var dataStore: Carv2DataPairStore
+    
     @State var yawingBeep: YawingBeep
     
     @State var rollingBeep: Bool = false
@@ -45,35 +46,35 @@ struct HomeView: View {
 //                            Text(Angle2D(radians: carv2DataPair.right.leftRealityKitRotation3.eulerAngles(order: .xyz).angles.z).degrees.description)
 //                        }
                         HStack{
-                            Text(Angle2D(radians: carv2DataPair.right.attitude.eulerAngles(order: .xyz).angles.x).degrees.description)
-                            Text(Angle2D(radians: carv2DataPair.right.attitude.eulerAngles(order: .xyz).angles.y).degrees.description)
-                            Text(Angle2D(radians: carv2DataPair.right.attitude.eulerAngles(order: .xyz).angles.z).degrees.description)
+                            Text(Angle2D(radians: dataStore.carv2DataPair.right.attitude.eulerAngles(order: .xyz).angles.x).degrees.description)
+                            Text(Angle2D(radians: dataStore.carv2DataPair.right.attitude.eulerAngles(order: .xyz).angles.y).degrees.description)
+                            Text(Angle2D(radians: dataStore.carv2DataPair.right.attitude.eulerAngles(order: .xyz).angles.z).degrees.description)
                         }
-                        HStack{
-                            Text(Angle2D(radians: ble.carv2AnalyzedDataPairManager.carv2DataPair.left.attitude.eulerAngles(order: .xyz).angles.x).degrees.description)
-                            Text(Angle2D(radians: carv2DataPair.left.attitude.eulerAngles(order: .xyz).angles.y).degrees.description)
-                            Text(Angle2D(radians: carv2DataPair.left.attitude.eulerAngles(order: .xyz).angles.z).degrees.description)
-                        }
+//                        HStack{
+//                            Text(Angle2D(radians: carv2DataPair.left.attitude.eulerAngles(order: .xyz).angles.x).degrees.description)
+//                            Text(Angle2D(radians: carv2DataPair.left.attitude.eulerAngles(order: .xyz).angles.y).degrees.description)
+//                            Text(Angle2D(radians: carv2DataPair.left.attitude.eulerAngles(order: .xyz).angles.z).degrees.description)
+//                        }
             HStack{
                 VStack{
-                                        Text( carv2DataPair.left.angularVelocity.x.formatted(.number.precision(.fractionLength(1))))
-                                        Text( carv2DataPair.left.angularVelocity.y.formatted(.number.precision(.fractionLength(1))))
-                                        Text( carv2DataPair.left.angularVelocity.z.formatted(.number.precision(.fractionLength(1))))
+//                                        Text( carv2DataPair.left.angularVelocity.x.formatted(.number.precision(.fractionLength(1))))
+//                                        Text( carv2DataPair.left.angularVelocity.y.formatted(.number.precision(.fractionLength(1))))
+//                                        Text( carv2DataPair.left.angularVelocity.z.formatted(.number.precision(.fractionLength(1))))
                 }
                 VStack{
-                                        Text( carv2DataPair.left.acceleration.x.formatted(.number.precision(.fractionLength(1))))
-                                        Text( carv2DataPair.left.acceleration.y.formatted(.number.precision(.fractionLength(1))))
-                                        Text( carv2DataPair.left.acceleration.z.formatted(.number.precision(.fractionLength(1))))
+//                                        Text( carv2DataPair.left.acceleration.x.formatted(.number.precision(.fractionLength(1))))
+//                                        Text( carv2DataPair.left.acceleration.y.formatted(.number.precision(.fractionLength(1))))
+//                                        Text( carv2DataPair.left.acceleration.z.formatted(.number.precision(.fractionLength(1))))
                 }
                 VStack{
-                                        Text( carv2DataPair.right.angularVelocity.x.formatted(.number.precision(.fractionLength(1))))
-                                        Text( carv2DataPair.right.angularVelocity.y.formatted(.number.precision(.fractionLength(1))))
-                                        Text( carv2DataPair.right.angularVelocity.z.formatted(.number.precision(.fractionLength(1))))
+//                                        Text( carv2DataPair.right.angularVelocity.x.formatted(.number.precision(.fractionLength(1))))
+//                                        Text( carv2DataPair.right.angularVelocity.y.formatted(.number.precision(.fractionLength(1))))
+//                                        Text( carv2DataPair.right.angularVelocity.z.formatted(.number.precision(.fractionLength(1))))
                 }
                 VStack{
-                                        Text( carv2DataPair.right.acceleration.x.formatted(.number.precision(.fractionLength(1))))
-                                        Text( carv2DataPair.right.acceleration.y.formatted(.number.precision(.fractionLength(1))))
-                                        Text( carv2DataPair.right.acceleration.z.formatted(.number.precision(.fractionLength(1))))
+//                                        Text( carv2DataPair.right.acceleration.x.formatted(.number.precision(.fractionLength(1))))
+//                                        Text( carv2DataPair.right.acceleration.y.formatted(.number.precision(.fractionLength(1))))
+//                                        Text( carv2DataPair.right.acceleration.z.formatted(.number.precision(.fractionLength(1))))
                 }
 //                VStack{
 //                    Text( carv2DataPair.right.初期姿勢に対しての角速度Right.x.formatted(.number.precision(.fractionLength(1))))
@@ -203,6 +204,7 @@ struct HomeView: View {
 //
             HStack{
                 Text(yawingBeep.conductor.data.isPlaying.description)
+                Text(yawingBeep.yawingAngulerRateDiffrential.description)
                 Button(action: {
                     yawingBeep.isBeeping.toggle()}){
                         Text("yawing beep \(yawingBeep.isBeeping ? "on" : "off")")

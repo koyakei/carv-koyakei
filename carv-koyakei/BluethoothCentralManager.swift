@@ -1,22 +1,30 @@
 import CoreBluetooth
+import Combine
 import Spatial
 import Foundation
 import SwiftUI
 
-@Observable
+
 @MainActor
-class BluethoothCentralManager: NSObject, @MainActor CBCentralManagerDelegate {
+@Observable
+final class BluethoothCentralManager: NSObject,CBCentralManagerDelegate {
     var carv2DeviceLeft: CarvDevicePeripheral? = nil
     var carv2DeviceRight: CarvDevicePeripheral? = nil
+    private var cancellables = Set<AnyCancellable>()
     
-    var carv2DataPair : Carv2DataPair = Carv2DataPair.shared
-    var carv2AnalyzedDataPairManager: Carv2AnalyzedDataPairManager
     var centralManager: CBCentralManager!
     static let targetServiceUUID = CBUUID(string: "2DFBFFFF-960D-4909-8D28-F353CB168E8A")
-    init(carv2AnalyzedDataPairManager: Carv2AnalyzedDataPairManager) {
-        self.carv2AnalyzedDataPairManager = carv2AnalyzedDataPairManager
+    override init() {
         super.init()
         centralManager = CBCentralManager(delegate: self, queue: nil)
+        carv2DeviceLeft?.characteristicUpdatePublisher
+            .sink { characteristic in
+                            // 3. Handle the received characteristic update here
+                            print("Received characteristic update in Subscriber Class!")
+                print("Characteristic value: \(characteristic.description)") // `hexString` is a common extension for Data
+                            
+                        }
+            .store(in: &cancellables)
     }
     
     func scan() {
@@ -31,9 +39,6 @@ class BluethoothCentralManager: NSObject, @MainActor CBCentralManagerDelegate {
         }
     }
     
-    func subscribe(servece: CBService) {
-        
-    }
     func connect(carvDevice: CarvDevicePeripheral) {
         let peripheral = carvDevice.peripheral
         peripheral.delegate = carvDevice // デリゲート再設定
@@ -46,10 +51,10 @@ class BluethoothCentralManager: NSObject, @MainActor CBCentralManagerDelegate {
     
     private func addDevice(_ peripheral: CBPeripheral) {
         if peripheral.identifier == Carv2DataPair.leftCharactaristicUUID{
-            self.carv2DeviceLeft = CarvDevicePeripheral(peripheral: peripheral, carv2DataPair: carv2DataPair, carv2AnalyzedDataPairManager: carv2AnalyzedDataPairManager)
+            self.carv2DeviceLeft = CarvDevicePeripheral(peripheral: peripheral)
         }
         if peripheral.identifier == Carv2DataPair.rightCharactaristicUUID{
-            self.carv2DeviceRight = CarvDevicePeripheral(peripheral: peripheral, carv2DataPair: carv2DataPair, carv2AnalyzedDataPairManager: carv2AnalyzedDataPairManager)
+            self.carv2DeviceRight = CarvDevicePeripheral(peripheral: peripheral)
         }
     }
     
@@ -73,7 +78,7 @@ class BluethoothCentralManager: NSObject, @MainActor CBCentralManagerDelegate {
         }
         
         if peripheral.identifier == carv2DeviceRight?.peripheral.identifier{
-            carv2DeviceLeft?.updateConnectionState(.connected)
+            carv2DeviceRight?.updateConnectionState(.connected)
             peripheral.discoverServices([BluethoothCentralManager.targetServiceUUID])
             print("connected")
         }

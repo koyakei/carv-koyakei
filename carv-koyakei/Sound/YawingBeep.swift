@@ -12,34 +12,54 @@ import SwiftUI
 @MainActor
 @Observable
 class YawingBeep: Carv2DataPairDelegate{
+    func carv2DataPairUpdate(_ dataPair: Carv2DataPair, didUpdateLeft oneSideDataData: Carv2Data) {
+        handleRightChange()
+    }
     
-    var isBeeping: Bool = false
+    var isBeeping: Bool = false {
+        didSet{
+            if isBeeping {
+                conductor.start()
+            } else {
+                conductor.stop()
+            }
+        }
+    }
     private var cancellables = Set<AnyCancellable>()
     
     var diffYawingTargetAngle: Float = 2.0
     var conductor : DynamicOscillatorConductor = DynamicOscillatorConductor()
-    init() {
-        conductor.start()
+    init(yawingAngulerRateDiffrential: Float = 0.0) {
     }
-    var carv2DataPair :Carv2DataPair = Carv2DataPair.shared
-    func carv2DataPairUpdate(_ dataPair: Carv2DataPair, didUpdateLeft leftData: Carv2Data) {
-            print("left データが更新されました: \(leftData)")
-            handleRightChange(leftData)
+    var yawingAngulerRateDiffrential : Float = 0.0
+        {
+            didSet {
+                handleRightChange()
+            }
+        }
+    
+    func isInTargetAngleRange() -> Bool {
+        return (-diffYawingTargetAngle...diffYawingTargetAngle).contains(yawingAngulerRateDiffrential )
     }
+    
 
-    private func handleRightChange(_ newValue: Carv2Data) {
-        if isBeeping == false { return }
-        if (-diffYawingTargetAngle...diffYawingTargetAngle).contains(carv2DataPair.yawingAngulerRateDiffrential ) {
+    private func handleRightChange() {
+        if isBeeping == false {
+            conductor.data.isPlaying = false
+            return
+        }
+        if isInTargetAngleRange() {
             conductor.data.isPlaying = false
         } else {
             conductor.data.isPlaying = true
         }
-        if carv2DataPair.yawingAngulerRateDiffrential > 0 {
-            conductor.data.frequency = AUValue(hight(ceil(carv2DataPair.yawingAngulerRateDiffrential * 10)))
+        if yawingAngulerRateDiffrential > 0 {
+            conductor.data.frequency = AUValue(hight(ceil(
+                yawingAngulerRateDiffrential * 10)))
             conductor.changeWaveFormToSin()
         } else {
             conductor.changeWaveFormToTriangle()
-            conductor.data.frequency = AUValue(lowToHigh(-ceil(carv2DataPair.yawingAngulerRateDiffrential * 10)))
+            conductor.data.frequency = AUValue(lowToHigh(-ceil(yawingAngulerRateDiffrential * 10)))
         }
     }
     

@@ -1,14 +1,20 @@
 import SwiftUI
+import Combine
 
 struct ContentView: View {
-    var carv2DataPair: Carv2DataPair = Carv2DataPair.shared
+    var dataStore: Carv2DataPairStore
     var ble :BluethoothCentralManager
-    var yawingBeep: YawingBeep
+    @State var yawingBeep: YawingBeep
     var cameraViewModel = CameraViewModel()
-    
+    @State private var cancellables = Set<AnyCancellable>()
+    init(_ dataStore: Carv2DataPairStore, ble: BluethoothCentralManager) {
+        self.ble = ble
+        self.dataStore = dataStore
+        yawingBeep = YawingBeep(yawingAngulerRateDiffrential: dataStore.carv2DataPair.yawingAngulerRateDiffrential)
+    }
     var body: some View {
         TabView {
-            HomeView(ble: ble, carv2DataPair: carv2DataPair, yawingBeep: yawingBeep)
+            HomeView(ble: ble, dataStore: dataStore, yawingBeep: yawingBeep)
                 .tabItem {
                     Image(systemName: "house.fill")
                     Text("ホーム")
@@ -38,6 +44,4 @@ struct ContentView: View {
         }
     }
 }
-
-
 

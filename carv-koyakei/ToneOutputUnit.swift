@@ -13,18 +13,16 @@ import AudioToolbox
 import SoundpipeAudioKit
 import Combine
 
-
 class DynamicOscillatorConductor {
     let engine = AudioEngine()
     var osc = DynamicOscillator()
     var panner : Panner
     
-    func noteOn(note: MIDINoteNumber) {
+    func noteOn() {
         data.isPlaying = true
-        data.frequency = note.midiNoteToFrequency()
     }
     
-    func noteOff(note: MIDINoteNumber) {
+    func noteOff() {
         data.isPlaying = false
     }
     
