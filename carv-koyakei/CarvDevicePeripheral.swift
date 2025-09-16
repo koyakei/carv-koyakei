@@ -8,6 +8,7 @@
 import Spatial
 import Foundation
 import SwiftUI
+import Combine
 
 @MainActor
 @Observable
@@ -28,6 +29,12 @@ class CarvDevicePeripheral: NSObject, Identifiable,@MainActor CBPeripheralDelega
                 UserDefaults.standard.set(id.uuidString, forKey: "rightCarv2UUID")
             }
         }
+    }
+    
+    private let updatesSubject = PassthroughSubject<Carv2Data, Never>()
+    // 外部には型消去されたPublisher（受け手）を公開する
+    var updates: AnyPublisher<Carv2Data, Never> {
+        updatesSubject.eraseToAnyPublisher()
     }
     
     func setUUID(_ uuid: UUID, _ carv2PripheralSide: Carv2PripheralSide) {

@@ -9,10 +9,25 @@ import AudioKit
 import Foundation
 import Combine
 import SwiftUI
+import Observation
+
+public func withObservationTracking(execute: @Sendable @escaping () -> Void) {
+    Observation.withObservationTracking {
+        execute()
+    } onChange: {
+        DispatchQueue.main.async {
+            withObservationTracking(execute: execute)
+        }
+    }
+}
+
 @MainActor
 class YawingBeep: ObservableObject{
     private var cancellable: AnyCancellable?
-    init() {
+    
+    var carv2DataPair :Carv2DataPair
+    init(carv2DataPair :Carv2DataPair) {
+        self.carv2DataPair = carv2DataPair
         conductor.start()
         cancellable = carv2DataPair.updates
                     .receive(on: RunLoop.main) // メインスレッドで値を受け取ることを保証
@@ -20,7 +35,7 @@ class YawingBeep: ObservableObject{
                         // 値が流れてくるたびにこのクロージャが実行される
                         // handleRightChangeが非同期関数のためTaskで囲む
                         Task {
-                            await self?.handleRightChange(updatedData)
+                            self?.handleRightChange(updatedData)
                         }
                     }
     }
@@ -29,8 +44,6 @@ class YawingBeep: ObservableObject{
     private var cancellables = Set<AnyCancellable>()
     @Published var diffYawingTargetAngle: Double = 2.0
     @ObservedObject var conductor : DynamicOscillatorConductor = DynamicOscillatorConductor()
-    
-    var carv2DataPair :Carv2DataPair = Carv2DataPair.shared
         
     private func handleRightChange(_ newValue: Carv2Data) {
         if isBeeping == false { return }

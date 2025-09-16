@@ -10,25 +10,26 @@ import AVFAudio
 
 @main
 struct carv_koyakeiApp: App {
+    @State private var carv2DataPair: Carv2DataPair
     private var carv1DataPair: Carv1DataPair = Carv1DataPair()
     private var locationManager = LocationManager()
     @Environment(\.scenePhase) var scenePhase
-    @ObservedObject private var yawingBeep: YawingBeep = YawingBeep()
-    private var carv2AnalyzedDataPairManager: Carv2AnalyzedDataPairManager = Carv2AnalyzedDataPairManager(carv2DataPair: Carv2DataPair.shared)
+    @ObservedObject private var yawingBeep: YawingBeep
+    private var carv2AnalyzedDataPairManager: Carv2AnalyzedDataPairManager
     private var bleManager : BluethoothCentralManager
     var body: some Scene {
         WindowGroup {
             ContentView(ble: bleManager, yawingBeep: yawingBeep)
-//                .onChange(of: scenePhase) { oldPhase, newPhase in
-//                    handleScenePhaseChange(newPhase)
-//                }
         }
     }
     
     init(){
-        bleManager = BluethoothCentralManager(carv2AnalyzedDataPairManager:carv2AnalyzedDataPairManager)
+        carv2DataPair = Carv2DataPair.shared
+        
+        yawingBeep = YawingBeep(carv2DataPair: Carv2DataPair.shared)
+        carv2AnalyzedDataPairManager = Carv2AnalyzedDataPairManager(carv2DataPair: Carv2DataPair.shared)
+        bleManager = BluethoothCentralManager(carv2AnalyzedDataPairManager: carv2AnalyzedDataPairManager)
         configureAudioSessionForBackground()
-        bleManager.carv2DeviceLeft?.carv2DataPair.updates
     }
 
     private func configureAudioSessionForBackground() {

@@ -25,11 +25,12 @@ class Carv2DataPair {
     var updates: AnyPublisher<Carv2Data, Never> {
         updatesSubject.eraseToAnyPublisher()
     }
-    var left: Carv2Data{
-        didSet{
-            updatesSubject.send(left)
-        }
-    }
+    var left: Carv2Data
+//    {
+//        didSet{
+//            updatesSubject.send(left)
+//        }
+//    }
 //    // ipad
 //    static let rightCharactaristicUUID = UUID(uuidString: "85A29A4C-09C3-C632-858A-3387339C67CF")
 //    static let leftCharactaristicUUID = UUID(uuidString:  "850D8BCF-3B03-1322-F51C-DD38E961FC1A")
@@ -40,7 +41,7 @@ class Carv2DataPair {
     
     var right: Carv2Data
     
-    private init(){
+    init(){
         left = .init()
         right = .init()
     }
