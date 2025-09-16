@@ -18,6 +18,7 @@ class CarvDevicePeripheral: NSObject, Identifiable,@MainActor CBPeripheralDelega
     var services: [CBService] = []
     var carv2DataPair: Carv2DataPair
     var carv2AnalyzedDataPairManager :Carv2AnalyzedDataPairManager
+    var data: Carv2Data?
     var carv2PripheralSide: Carv2PripheralSide = .right {
         didSet{
             switch carv2PripheralSide {
@@ -146,6 +147,7 @@ class CarvDevicePeripheral: NSObject, Identifiable,@MainActor CBPeripheralDelega
                 
                 if peripheral.identifier == Carv2DataPair.rightCharactaristicUUID{
                     // この戻り値をCSVに出力したい。どうすればいいのか？
+                    data = Carv2Data(value)
                     let _ = self.carv2DataPair.receive(right: Carv2Data(value))
                     
                 }

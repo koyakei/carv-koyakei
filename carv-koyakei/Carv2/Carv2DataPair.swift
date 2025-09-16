@@ -20,6 +20,16 @@ extension Array where Element == Carv2AnalyzedDataPair {
 @MainActor
 @Observable
 class Carv2DataPair {
+    private let updatesSubject = PassthroughSubject<Carv2Data, Never>()
+    // 外部には型消去されたPublisher（受け手）を公開する
+    var updates: AnyPublisher<Carv2Data, Never> {
+        updatesSubject.eraseToAnyPublisher()
+    }
+    var left: Carv2Data{
+        didSet{
+            updatesSubject.send(left)
+        }
+    }
 //    // ipad
 //    static let rightCharactaristicUUID = UUID(uuidString: "85A29A4C-09C3-C632-858A-3387339C67CF")
 //    static let leftCharactaristicUUID = UUID(uuidString:  "850D8BCF-3B03-1322-F51C-DD38E961FC1A")
@@ -27,36 +37,18 @@ class Carv2DataPair {
     static let rightCharactaristicUUID = UUID(uuidString: UserDefaults.standard.string(forKey: "rightCarv2UUID") ?? "85E2946B-0D18-FA01-E1C9-0393EDD9013A")//  UUID(uuidString: "85E2946B-0D18-FA01-E1C9-0393EDD9013A")
     static let leftCharactaristicUUID = UUID(uuidString: UserDefaults.standard.string(forKey: "leftCarv2UUID") ?? "57089C67-2275-E220-B6D3-B16E2639EFD6") // UUID(uuidString:  "57089C67-2275-E220-B6D3-B16E2639EFD6")
     static let periferalName = "CARV 2"
-    var left: Carv2Data {
-        didSet { notifyUpdates() }
-    }
-    var right: Carv2Data {
-        didSet { notifyUpdates() }
-    }
+    
+    var right: Carv2Data
     
     private init(){
         left = .init()
         right = .init()
     }
-    private var updateContinuation: AsyncStream<Carv2DataPair>.Continuation?
-    var updates: AsyncStream<Carv2DataPair> {
-            AsyncStream { continuation in
-                Task { @MainActor in
-                    self.updateContinuation = continuation
-                }
-                
-                // 継続保持解除時の処理（例: インスタンス解放等）
-                continuation.onTermination = { @Sendable _ in
-                    Task { @MainActor in
-                        self.updateContinuation = nil
-                    }
-                }
-            }
-        }
-    private func notifyUpdates() {
-            // メンバ更新時にストリームに現在のselfを送る
-            updateContinuation?.yield(self)
-        }
+    
+//    private func notifyUpdates() {
+//            // メンバ更新時にストリームに現在のselfを送る
+//            updateContinuation?.yield(self)
+//        }
     private var cancellables = Set<AnyCancellable>()
     private var isRecordingCSV = false
     private let  csvExporter = CSVExporter()

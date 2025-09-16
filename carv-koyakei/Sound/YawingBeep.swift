@@ -11,21 +11,25 @@ import Combine
 import SwiftUI
 @MainActor
 class YawingBeep: ObservableObject{
+    private var cancellable: AnyCancellable?
+    init() {
+        conductor.start()
+        cancellable = carv2DataPair.updates
+                    .receive(on: RunLoop.main) // メインスレッドで値を受け取ることを保証
+                    .sink { [weak self] updatedData in
+                        // 値が流れてくるたびにこのクロージャが実行される
+                        // handleRightChangeが非同期関数のためTaskで囲む
+                        Task {
+                            await self?.handleRightChange(updatedData)
+                        }
+                    }
+    }
     
     var isBeeping: Bool = false
     private var cancellables = Set<AnyCancellable>()
-    
     @Published var diffYawingTargetAngle: Double = 2.0
     @ObservedObject var conductor : DynamicOscillatorConductor = DynamicOscillatorConductor()
-    init() {
-        
-        conductor.start()
-        Task { [weak self] in
-            for await newValue in self?.carv2DataPair.updates ?? AsyncStream { _ in } {
-                await self?.handleRightChange(newValue.right)
-            }
-        }
-    }
+    
     var carv2DataPair :Carv2DataPair = Carv2DataPair.shared
         
     private func handleRightChange(_ newValue: Carv2Data) {

@@ -15,10 +15,10 @@ struct carv_koyakeiApp: App {
     @Environment(\.scenePhase) var scenePhase
     @ObservedObject private var yawingBeep: YawingBeep = YawingBeep()
     private var carv2AnalyzedDataPairManager: Carv2AnalyzedDataPairManager = Carv2AnalyzedDataPairManager(carv2DataPair: Carv2DataPair.shared)
-    
+    private var bleManager : BluethoothCentralManager
     var body: some Scene {
         WindowGroup {
-            ContentView(ble: BluethoothCentralManager(carv2AnalyzedDataPairManager:carv2AnalyzedDataPairManager), yawingBeep: yawingBeep)
+            ContentView(ble: bleManager, yawingBeep: yawingBeep)
 //                .onChange(of: scenePhase) { oldPhase, newPhase in
 //                    handleScenePhaseChange(newPhase)
 //                }
@@ -26,7 +26,9 @@ struct carv_koyakeiApp: App {
     }
     
     init(){
+        bleManager = BluethoothCentralManager(carv2AnalyzedDataPairManager:carv2AnalyzedDataPairManager)
         configureAudioSessionForBackground()
+        bleManager.carv2DeviceLeft?.carv2DataPair.updates
     }
 
     private func configureAudioSessionForBackground() {

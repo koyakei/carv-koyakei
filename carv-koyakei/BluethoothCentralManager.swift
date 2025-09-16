@@ -1,4 +1,5 @@
 import CoreBluetooth
+import Combine
 import Spatial
 import Foundation
 import SwiftUI
@@ -23,6 +24,7 @@ class BluethoothCentralManager: NSObject, @MainActor CBCentralManagerDelegate {
         guard centralManager.state == .poweredOn else { return }
         centralManager.scanForPeripherals(withServices: [BluethoothCentralManager.targetServiceUUID], options: nil)
     }
+    
     
     func retrieveAndConnect() {
         let connectedPeripherals = centralManager.retrieveConnectedPeripherals(withServices: [BluethoothCentralManager.targetServiceUUID])
