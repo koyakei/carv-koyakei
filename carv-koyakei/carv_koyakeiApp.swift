@@ -28,7 +28,6 @@ struct carv_koyakeiApp: App {
     init(){
         bleManager = BluethoothCentralManager(carv2AnalyzedDataPairManager:carv2AnalyzedDataPairManager)
         configureAudioSessionForBackground()
-        bleManager.carv2DeviceLeft?.carv2DataPair.updates
     }
 
     private func configureAudioSessionForBackground() {

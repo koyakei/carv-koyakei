@@ -20,7 +20,7 @@ class YawingBeep: ObservableObject{
                         // 値が流れてくるたびにこのクロージャが実行される
                         // handleRightChangeが非同期関数のためTaskで囲む
                         Task {
-                            await self?.handleRightChange(updatedData)
+                            self?.handleRightChange(updatedData)
                         }
                     }
     }
