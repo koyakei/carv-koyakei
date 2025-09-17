@@ -236,8 +236,8 @@
             filePath = "carv-koyakei/Sound/YawingBeep.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "29"
-            endingLineNumber = "29"
+            startingLineNumber = "30"
+            endingLineNumber = "30"
             landmarkName = "YawingBeep"
             landmarkType = "3">
          </BreakpointContent>
@@ -252,8 +252,8 @@
             filePath = "carv-koyakei/Sound/YawingBeep.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "56"
-            endingLineNumber = "56"
+            startingLineNumber = "57"
+            endingLineNumber = "57"
             landmarkName = "YawingBeep"
             landmarkType = "3">
          </BreakpointContent>
@@ -268,8 +268,8 @@
             filePath = "carv-koyakei/Sound/YawingBeep.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "58"
-            endingLineNumber = "58"
+            startingLineNumber = "59"
+            endingLineNumber = "59"
             landmarkName = "hight(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -300,8 +300,8 @@
             filePath = "carv-koyakei/carv_koyakeiApp.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "38"
-            endingLineNumber = "38"
+            startingLineNumber = "35"
+            endingLineNumber = "35"
             landmarkName = "configureAudioSessionForBackground()"
             landmarkType = "7">
          </BreakpointContent>
@@ -316,8 +316,8 @@
             filePath = "carv-koyakei/carv_koyakeiApp.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "39"
-            endingLineNumber = "39"
+            startingLineNumber = "36"
+            endingLineNumber = "36"
             landmarkName = "configureAudioSessionForBackground()"
             landmarkType = "7">
          </BreakpointContent>
@@ -332,8 +332,8 @@
             filePath = "carv-koyakei/carv_koyakeiApp.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "35"
-            endingLineNumber = "35"
+            startingLineNumber = "32"
+            endingLineNumber = "32"
             landmarkName = "configureAudioSessionForBackground()"
             landmarkType = "7">
          </BreakpointContent>
@@ -380,8 +380,8 @@
             filePath = "carv-koyakei/Sound/YawingBeep.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "36"
-            endingLineNumber = "36"
+            startingLineNumber = "37"
+            endingLineNumber = "37"
             landmarkName = "handleRightChange(_:)"
             landmarkType = "7">
          </BreakpointContent>

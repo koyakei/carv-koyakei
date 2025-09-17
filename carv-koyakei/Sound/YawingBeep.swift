@@ -10,7 +10,8 @@ import Foundation
 import Combine
 import SwiftUI
 @MainActor
-class YawingBeep: ObservableObject{
+@Observable
+class YawingBeep{
     private var cancellable: AnyCancellable?
     init() {
         conductor.start()
@@ -27,8 +28,8 @@ class YawingBeep: ObservableObject{
     
     var isBeeping: Bool = false
     private var cancellables = Set<AnyCancellable>()
-    @Published var diffYawingTargetAngle: Double = 2.0
-    @ObservedObject var conductor : DynamicOscillatorConductor = DynamicOscillatorConductor()
+    var diffYawingTargetAngle: Double = 2.0
+    var conductor : DynamicOscillatorConductor = DynamicOscillatorConductor()
     
     var carv2DataPair :Carv2DataPair = Carv2DataPair.shared
         
