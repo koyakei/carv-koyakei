@@ -17,9 +17,8 @@ struct HomeView: View {
     var ble : BluethoothCentralManager
     var carv2DataPair: Carv2DataPair
     @State var yawingBeep: YawingBeep
+    @State var rollingBeep: RollingBeep
     
-    @State var rollingBeep: Bool = false
-    @State var diffRollingTargetAngle: Double = 2.0
     @State private var savedTime: String = ""
     @State private var leftid: String = ""
     var body: some View {
@@ -219,23 +218,23 @@ struct HomeView: View {
                     Text("Yaw Adjustment")
                 }
             }
-//            HStack{
-//                Button(action: {
-//                    rollingBeep.toggle()}){
-//                        Text("rolling beep \(yawingBeep.isBeeping ? "on" : "off")")
-//                    }
-//                Text("Current value: \(diffRollingTargetAngle, specifier: "%.2f")")
-//                    .padding()
-//            }
-//            if rollingBeep {
-//                Slider(
-//                    value: $diffRollingTargetAngle,
-//                    in: 0.0...4.0,
-//                    step: 0.2
-//                ) {
-//                    Text("Rolling Adjustment")
-//                }
-//            }
+            HStack{
+                Button(action: {
+                    rollingBeep.isBeeping.toggle()}){
+                        Text("rolling beep \(rollingBeep.isBeeping ? "on" : "off")")
+                    }
+                Text("Current value: \(yawingBeep.diffYawingTargetAngle, specifier: "%.2f")")
+                    .padding()
+            }
+            if rollingBeep.isBeeping {
+                Slider(
+                    value: $yawingBeep.diffYawingTargetAngle,
+                    in: 0.0...4.0,
+                    step: 0.2
+                ) {
+                    Text("Rolling Adjustment")
+                }
+            }
             HStack{
                 Button(action: { ble.scan() }) {
                     Text("Scan")

@@ -14,11 +14,12 @@ struct carv_koyakeiApp: App {
     private var locationManager = LocationManager()
     @Environment(\.scenePhase) var scenePhase
     private var yawingBeep: YawingBeep = YawingBeep()
+    private var rollingBeep: RollingBeep = RollingBeep()
     private var carv2AnalyzedDataPairManager: Carv2AnalyzedDataPairManager = Carv2AnalyzedDataPairManager(carv2DataPair: Carv2DataPair.shared)
     private var bleManager : BluethoothCentralManager
     var body: some Scene {
         WindowGroup {
-            ContentView(ble: bleManager, yawingBeep: yawingBeep)
+            ContentView(ble: bleManager, yawingBeep: yawingBeep,rollingBeep: rollingBeep)
         }
     }
     
