@@ -9,6 +9,7 @@ import Spatial
 import simd
 import SwiftUI
 import Combine
+
 class Carv2Data{
     let attitude: Rotation3DFloat
     let acceleration: SIMD3<Float>

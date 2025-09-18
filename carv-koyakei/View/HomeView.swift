@@ -49,7 +49,7 @@ struct HomeView: View {
                             Text(Angle2D(radians: carv2DataPair.right.attitude.eulerAngles(order: .xyz).angles.z).degrees.description)
                         }
                         HStack{
-                            Text(Angle2D(radians: ble.carv2AnalyzedDataPairManager.carv2DataPair.left.attitude.eulerAngles(order: .xyz).angles.x).degrees.description)
+                            Text(Angle2D(radians: carv2DataPair.left.attitude.eulerAngles(order: .xyz).angles.x).degrees.description)
                             Text(Angle2D(radians: carv2DataPair.left.attitude.eulerAngles(order: .xyz).angles.y).degrees.description)
                             Text(Angle2D(radians: carv2DataPair.left.attitude.eulerAngles(order: .xyz).angles.z).degrees.description)
                         }

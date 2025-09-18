@@ -17,7 +17,6 @@ class CarvDevicePeripheral: NSObject, Identifiable,@MainActor CBPeripheralDelega
     var connectionState: CBPeripheralState
     var services: [CBService] = []
     var carv2DataPair: Carv2DataPair
-    var carv2AnalyzedDataPairManager :Carv2AnalyzedDataPairManager
     var data: Carv2Data?
     var carv2PripheralSide: Carv2PripheralSide = .right {
         didSet{
@@ -40,12 +39,12 @@ class CarvDevicePeripheral: NSObject, Identifiable,@MainActor CBPeripheralDelega
         }
     }
     
-    init(peripheral: CBPeripheral, carv2DataPair: Carv2DataPair,carv2AnalyzedDataPairManager: Carv2AnalyzedDataPairManager) {
+    init(peripheral: CBPeripheral, carv2DataPair: Carv2DataPair) {
         self.id = peripheral.identifier
         self.peripheral = peripheral
         self.connectionState = peripheral.state
         self.carv2DataPair = carv2DataPair
-        self.carv2AnalyzedDataPairManager = carv2AnalyzedDataPairManager
+        
         super.init()
         self.peripheral.delegate = self
         //　UserDefaults.standard.string(forKey: "leftCarv2UUID")　が空だった場合、現在の値を代入

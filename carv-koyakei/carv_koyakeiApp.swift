@@ -24,7 +24,7 @@ struct carv_koyakeiApp: App {
     }
     
     init(){
-        bleManager = BluethoothCentralManager(carv2AnalyzedDataPairManager:carv2AnalyzedDataPairManager)
+        bleManager = BluethoothCentralManager()
         configureAudioSessionForBackground()
     }
 
