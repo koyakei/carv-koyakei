@@ -88,7 +88,7 @@ class Carv2Data{
 
         let intbyte :[Float] = data.withUnsafeBytes {
             Array(UnsafeBufferPointer<Int16>(start: $0.baseAddress?.assumingMemoryBound(to: Int16.self), count: data.count / MemoryLayout<Int16>.stride))
-        }.map { Float($0)/32768.0 }
+        }.map { Float($0) / (Float(Int16.max) + 1) }
 
         let intbyte3 : [Float] = floatArray(from: data.dropFirst(16))
 //        intbyte[safe:５,default: 0] これがTimeinterval ぽいぞ　なんとか
