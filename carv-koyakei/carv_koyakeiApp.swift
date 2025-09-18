@@ -16,25 +16,10 @@ struct carv_koyakeiApp: App {
     private var yawingBeep: YawingBeep = YawingBeep()
     private var rollingBeep: RollingBeep = RollingBeep()
     private var carv2AnalyzedDataPairManager: Carv2AnalyzedDataPairManager = Carv2AnalyzedDataPairManager(carv2DataPair: Carv2DataPair.shared)
-    private var bleManager : BluethoothCentralManager
+    private var bleManager : BluethoothCentralManager = BluethoothCentralManager()
     var body: some Scene {
         WindowGroup {
             ContentView(ble: bleManager, yawingBeep: yawingBeep,rollingBeep: rollingBeep)
-        }
-    }
-    
-    init(){
-        bleManager = BluethoothCentralManager()
-        configureAudioSessionForBackground()
-    }
-
-    private func configureAudioSessionForBackground() {
-        do {
-            let session = AVAudioSession.sharedInstance()
-            try session.setCategory(.playback, mode: .voiceChat,options: [.allowBluetoothA2DP,.mixWithOthers])
-            try session.setActive(true)
-        } catch {
-            print("Failed to set up AVAudioSession: \(error)")
         }
     }
 }

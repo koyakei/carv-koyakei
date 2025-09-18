@@ -65,8 +65,10 @@ class DynamicOscillatorConductor: ObservableObject {
     func start() {
             osc.amplitude = 1
             do {
-               
                 try engine.start()
+                let session = AVAudioSession.sharedInstance()
+                try session.setCategory(.playback, mode: .voiceChat,options: [.mixWithOthers])
+                try session.setActive(true)
             } catch let err {
                 Log(err)
             }
@@ -76,5 +78,11 @@ class DynamicOscillatorConductor: ObservableObject {
         data.isPlaying = false
         osc.stop()
         engine.stop()
+        do {
+            let session = AVAudioSession.sharedInstance()
+            try session.setActive(false)
+        } catch let err {
+            Log(err)
+        }
     }
 }

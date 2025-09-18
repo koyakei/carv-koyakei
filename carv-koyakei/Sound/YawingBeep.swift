@@ -9,6 +9,7 @@ import AudioKit
 import Foundation
 import Combine
 import SwiftUI
+import AVFAudio
 @MainActor
 @Observable
 class YawingBeep{
@@ -26,12 +27,21 @@ class YawingBeep{
                     }
     }
     
-    var isBeeping: Bool = false
+    var isBeeping: Bool = false {
+        didSet{
+            if isBeeping {
+                conductor.start()
+            } else {
+                conductor.stop()
+            }
+        }
+    }
     private var cancellables = Set<AnyCancellable>()
     var diffYawingTargetAngle: Double = 2.0
     var conductor : DynamicOscillatorConductor = DynamicOscillatorConductor()
     
     var carv2DataPair :Carv2DataPair = Carv2DataPair.shared
+    
         
     private func handleRightChange(_ newValue: Carv2Data) {
         if isBeeping == false { return }
