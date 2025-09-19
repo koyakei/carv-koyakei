@@ -22,9 +22,9 @@ class YawingBeep{
             }
         }
     }
+    
     var diffYawingTargetAngle: Double = 2.0
     var conductor: DynamicOscillatorConductor = DynamicOscillatorConductor()
-    
     var dataManager: DataManager
     private var cancellables = Set<AnyCancellable>()
     init(dataManager: DataManager){
@@ -35,8 +35,8 @@ class YawingBeep{
             }
             .store(in: &cancellables)  //handleDataPairChangeを実行したい
     }
-    private var cancellable: AnyCancellable? = nil
     
+    private var cancellable: AnyCancellable? = nil
     
     private func handleDataPairChange(_ carv2DataPair: Carv2DataPair) {
         if isBeeping == false { return }

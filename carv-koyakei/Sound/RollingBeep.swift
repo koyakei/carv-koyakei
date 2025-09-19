@@ -10,7 +10,6 @@ import Foundation
 import Combine
 import SwiftUI
 @MainActor
-@Observable
 class RollingBeep{
     
     var isBeeping: Bool = false{
@@ -22,13 +21,22 @@ class RollingBeep{
             }
         }
     }
-    private var cancellables = Set<AnyCancellable>()
     var diffYawingTargetAngle: Double = 2.0
     var conductor : DynamicOscillatorConductor = DynamicOscillatorConductor()
+    var dataManager: DataManager
+    private var cancellables = Set<AnyCancellable>()
+    init(dataManager: DataManager){
+        self.dataManager = dataManager
+        dataManager.$carv2DataPair
+            .sink { [weak self] newValue in
+                self?.handleDataPairChange(newValue)
+            }
+            .store(in: &cancellables)  //handleDataPairChangeを実行したい
+    }
+    private var cancellable: AnyCancellable? = nil
     
-    var carv2DataPair :Carv2DataPair = Carv2DataPair.shared
-        
-    private func handleRightChange(_ newValue: Carv2Data) {
+    
+    private func handleDataPairChange(_ carv2DataPair: Carv2DataPair) {
         if isBeeping == false { return }
         if (-diffYawingTargetAngle...diffYawingTargetAngle).contains(Double(carv2DataPair.rollingAngulerRateDiffrential) ) {
             conductor.data.isPlaying = false
