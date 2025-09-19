@@ -8,26 +8,16 @@
 import Spatial
 import Foundation
 import SwiftUI
+import Combine
 
 @MainActor
-@Observable
-class CarvDevicePeripheral: NSObject, Identifiable,@MainActor CBPeripheralDelegate {
+class CarvDevicePeripheral: NSObject, Identifiable,@MainActor CBPeripheralDelegate , ObservableObject{
     let id: UUID
-    let peripheral: CBPeripheral
-    var connectionState: CBPeripheralState
-    var services: [CBService] = []
-    var carv2DataPair: Carv2DataPair
-    var data: Carv2Data?
-    var carv2PripheralSide: Carv2PripheralSide = .right {
-        didSet{
-            switch carv2PripheralSide {
-            case .left:
-                UserDefaults.standard.set(id.uuidString, forKey: "leftCarv2UUID") // device.carv2PripheralSideを　picker から変更してもここが動かない
-            case .right:
-                UserDefaults.standard.set(id.uuidString, forKey: "rightCarv2UUID")
-            }
-        }
-    }
+    @Published var peripheral: CBPeripheral
+    @Published var connectionState: CBPeripheralState
+    @Published var services: [CBService] = []
+    @Published var carv2DataPair: Carv2DataPair
+    @Published var data: Carv2Data?
     
     func setUUID(_ uuid: UUID, _ carv2PripheralSide: Carv2PripheralSide) {
         //        self.carv2PripheralSide = carv2PripheralSide
@@ -48,26 +38,6 @@ class CarvDevicePeripheral: NSObject, Identifiable,@MainActor CBPeripheralDelega
         super.init()
         self.peripheral.delegate = self
         //　UserDefaults.standard.string(forKey: "leftCarv2UUID")　が空だった場合、現在の値を代入
-        
-        if let uuidString = UserDefaults.standard.object(forKey: "leftCarv2UUID"){
-            if let uuid =  UUID(uuidString: uuidString as! String) {
-                if id == uuid {
-                    carv2PripheralSide = .left
-                }
-            } else {
-                UserDefaults.standard.set(id.uuidString, forKey: "leftCarv2UUID")
-            }
-        }
-        
-        if let uuidString = UserDefaults.standard.object(forKey: "rightCarv2UUID"){
-            if let uuid =  UUID(uuidString: uuidString as! String) {
-                if id == uuid {
-                    carv2PripheralSide = .right
-                }
-            } else {
-                UserDefaults.standard.set(id.uuidString, forKey: "rightCarv2UUID")
-            }
-        }
     }
     
     // 特性発見メソッドを実装

@@ -15,7 +15,6 @@ import AVFAudio
 class YawingBeep{
     private var cancellable: AnyCancellable?
     init() {
-        conductor.start()
         cancellable = carv2DataPair.updates
                     .receive(on: RunLoop.main) // メインスレッドで値を受け取ることを保証
                     .sink { [weak self] updatedData in

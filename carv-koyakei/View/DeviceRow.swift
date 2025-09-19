@@ -12,18 +12,6 @@ struct DeviceRow: View {
     let ble: BluethoothCentralManager
     
     var body: some View {
-        VStack {
-            Picker("オプションを選択", selection: .constant(device.carv2PripheralSide)) {
-                ForEach(Carv2PripheralSide.allCases, id: \.self) { option in
-                    Text(option.rawValue).tag(option)
-                }
-            }
-            Button(action: {
-                device.setUUID(device.id, device.carv2PripheralSide)
-            }){
-                Text("set side")
-            }
-        }
         VStack(alignment: .leading) {
             Text(device.id.uuidString)
                 .font(.headline)
@@ -35,29 +23,10 @@ struct DeviceRow: View {
                     Text("Connect")
                 }
                 .disabled(device.connectionState == .connected)
-                
-                
-            }
-            if !device.services.isEmpty {
-                Text("Services:")
-                    .font(.headline)
-                
-                ForEach(device.services, id: \.uuid) { service in
-                    Text(service.uuid.uuidString)
-                        .font(.caption)
-                    Button(action: {
-                        device.subscribeAttitude()
-                    }) {
-                        Text("Subscribe")
-                    }
-                    //                                .disabled(
-                    //                                    device.connectionState != .connected
-                    //                                )
-                    
-                    //                                Button(action: { device.unsubscribeAttitude() }) {
-                    //                                    Text("Unsubscribe")
-                    //                                }
-                    //                                .disabled(device.connectionState == .connected)
+                Button(action: {
+                    device.subscribeAttitude()
+                }) {
+                    Text("Subscribe")
                 }
             }
         }

@@ -236,8 +236,8 @@
             filePath = "carv-koyakei/Sound/YawingBeep.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "47"
-            endingLineNumber = "47"
+            startingLineNumber = "46"
+            endingLineNumber = "46"
             landmarkName = "handleRightChange(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -252,8 +252,8 @@
             filePath = "carv-koyakei/Sound/YawingBeep.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "74"
-            endingLineNumber = "74"
+            startingLineNumber = "73"
+            endingLineNumber = "73"
             landmarkName = "unknown"
             landmarkType = "0">
          </BreakpointContent>
@@ -268,8 +268,8 @@
             filePath = "carv-koyakei/Sound/YawingBeep.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "70"
-            endingLineNumber = "70"
+            startingLineNumber = "69"
+            endingLineNumber = "69"
             landmarkName = "hight(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -288,22 +288,6 @@
             endingLineNumber = "7"
             landmarkName = "unknown"
             landmarkType = "0">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "A30BBC37-5B80-417A-9BA4-2D7D05982D42"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "carv-koyakei/CarvDevicePeripheral.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "26"
-            endingLineNumber = "26"
-            landmarkName = "carv2PripheralSide"
-            landmarkType = "24">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -332,8 +316,8 @@
             filePath = "carv-koyakei/Sound/YawingBeep.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "54"
-            endingLineNumber = "54"
+            startingLineNumber = "53"
+            endingLineNumber = "53"
             landmarkName = "handleRightChange(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -364,8 +348,8 @@
             filePath = "carv-koyakei/Sound/YawingBeep.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "41"
-            endingLineNumber = "41"
+            startingLineNumber = "40"
+            endingLineNumber = "40"
             landmarkName = "YawingBeep"
             landmarkType = "3">
          </BreakpointContent>
@@ -380,8 +364,8 @@
             filePath = "carv-koyakei/Sound/YawingBeep.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "39"
-            endingLineNumber = "39"
+            startingLineNumber = "38"
+            endingLineNumber = "38"
             landmarkName = "YawingBeep"
             landmarkType = "3">
          </BreakpointContent>
@@ -396,8 +380,8 @@
             filePath = "carv-koyakei/Sound/YawingBeep.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "42"
-            endingLineNumber = "42"
+            startingLineNumber = "41"
+            endingLineNumber = "41"
             landmarkName = "YawingBeep"
             landmarkType = "3">
          </BreakpointContent>
