@@ -6,10 +6,10 @@ struct ContentView: View {
     var yawingBeep: YawingBeep
     var rollingBeep: RollingBeep
     var cameraViewModel = CameraViewModel()
-    
+    var dataManager: DataManager
     var body: some View {
         TabView {
-            HomeView(ble: ble, carv2DataPair: carv2DataPair, yawingBeep: yawingBeep,rollingBeep: rollingBeep)
+            HomeView(ble: ble, carv2DataPair: carv2DataPair, yawingBeep: yawingBeep,rollingBeep: rollingBeep,dataManager: dataManager)
                 .tabItem {
                     Image(systemName: "house.fill")
                     Text("ホーム")

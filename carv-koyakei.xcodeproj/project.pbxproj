@@ -102,7 +102,6 @@
 		22A73C6A2D4241AB00C1BF1C = {
 			isa = PBXGroup;
 			children = (
-				22A73C752D4241AB00C1BF1C /* carv-koyakei */,
 				22FA7E2F2D8271BC00D9E8F9 /* .gitignore */,
 				22FA7E2D2D826DCB00D9E8F9 /* carv-koyakei.xcconfig.template */,
 				22FA7D522D8268B100D9E8F9 /* carv-koyakei.xcconfig */,
@@ -110,6 +109,7 @@
 				22A73C872D4241AD00C1BF1C /* carv-koyakeiTests */,
 				22A73C912D4241AD00C1BF1C /* carv-koyakeiUITests */,
 				22A73C742D4241AB00C1BF1C /* Products */,
+				22A73C752D4241AB00C1BF1C /* carv-koyakei */,
 			);
 			sourceTree = "<group>";
 		};

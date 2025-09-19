@@ -12,18 +12,6 @@ import SwiftUI
 @MainActor
 @Observable
 class RollingBeep{
-    private var cancellable: AnyCancellable?
-    init() {
-        cancellable = carv2DataPair.updates
-                    .receive(on: RunLoop.main) // メインスレッドで値を受け取ることを保証
-                    .sink { [weak self] updatedData in
-                        // 値が流れてくるたびにこのクロージャが実行される
-                        // handleRightChangeが非同期関数のためTaskで囲む
-                        Task {
-                            self?.handleRightChange(updatedData)
-                        }
-                    }
-    }
     
     var isBeeping: Bool = false{
         didSet{

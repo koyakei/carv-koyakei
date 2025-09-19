@@ -18,18 +18,8 @@ extension Array where Element == Carv2AnalyzedDataPair {
 }
 
 @MainActor
-@Observable
-class Carv2DataPair {
-    private let updatesSubject = PassthroughSubject<Carv2Data, Never>()
-    // 外部には型消去されたPublisher（受け手）を公開する
-    var updates: AnyPublisher<Carv2Data, Never> {
-        updatesSubject.eraseToAnyPublisher()
-    }
-    var left: Carv2Data{
-        didSet{
-            updatesSubject.send(left)
-        }
-    }
+class Carv2DataPair :ObservableObject{
+    var left: Carv2Data
 //    // ipad
 //    static let rightCharactaristicUUID = UUID(uuidString: "85A29A4C-09C3-C632-858A-3387339C67CF")
 //    static let leftCharactaristicUUID = UUID(uuidString:  "850D8BCF-3B03-1322-F51C-DD38E961FC1A")
@@ -40,9 +30,9 @@ class Carv2DataPair {
     
     var right: Carv2Data
     
-    private init(){
-        left = .init()
-        right = .init()
+    init(left : Carv2Data = .init() , right: Carv2Data = .init()){
+        self.left = left
+        self.right = right
     }
     
 //    private func notifyUpdates() {

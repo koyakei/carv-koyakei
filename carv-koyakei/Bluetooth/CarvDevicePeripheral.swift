@@ -17,17 +17,7 @@ class CarvDevicePeripheral: NSObject, Identifiable,@MainActor CBPeripheralDelega
     @Published var connectionState: CBPeripheralState
     @Published var services: [CBService] = []
     @Published var carv2DataPair: Carv2DataPair
-    @Published var data: Carv2Data?
-    
-    func setUUID(_ uuid: UUID, _ carv2PripheralSide: Carv2PripheralSide) {
-        //        self.carv2PripheralSide = carv2PripheralSide
-        switch carv2PripheralSide {
-        case .left:
-            UserDefaults.standard.set(uuid.uuidString, forKey: "leftCarv2UUID")
-        case .right:
-            UserDefaults.standard.set(uuid.uuidString, forKey: "rightCarv2UUID")
-        }
-    }
+    @Published var data: Data?
     
     init(peripheral: CBPeripheral, carv2DataPair: Carv2DataPair) {
         self.id = peripheral.identifier
@@ -110,20 +100,20 @@ class CarvDevicePeripheral: NSObject, Identifiable,@MainActor CBPeripheralDelega
             print("Error updating value: \(error.localizedDescription)")
             return
         }
+        self.data = characteristic.value
         if let value = characteristic.value {
             if characteristic.service?.peripheral?.name == Carv1DataPair.periferalName{
             } else if characteristic.service?.peripheral?.name == Carv2DataPair.periferalName {
                 
-                if peripheral.identifier == Carv2DataPair.rightCharactaristicUUID{
-                    // この戻り値をCSVに出力したい。どうすればいいのか？
-                    data = Carv2Data(value)
-                    let _ = self.carv2DataPair.receive(right: Carv2Data(value))
-                    
-                }
-                if peripheral.identifier == Carv2DataPair.leftCharactaristicUUID {
-                    let _ = self.carv2DataPair.receive(left: Carv2Data(value))
-                    
-                }
+//                if peripheral.identifier == Carv2DataPair.rightCharactaristicUUID{
+//                    // この戻り値をCSVに出力したい。どうすればいいのか？
+//                    let _ = self.carv2DataPair.receive(right: Carv2Data(value))
+//                    
+//                }
+//                if peripheral.identifier == Carv2DataPair.leftCharactaristicUUID {
+//                    let _ = self.carv2DataPair.receive(left: Carv2Data(value))
+//                    
+//                }
             }
             
             

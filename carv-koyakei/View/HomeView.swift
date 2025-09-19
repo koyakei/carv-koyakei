@@ -14,10 +14,11 @@ import AudioKit
 
 
 struct HomeView: View {
-    var ble : BluethoothCentralManager
+    @StateObject var ble : BluethoothCentralManager
     var carv2DataPair: Carv2DataPair
     @State var yawingBeep: YawingBeep
     @State var rollingBeep: RollingBeep
+    @StateObject var dataManager: DataManager
     
     @State private var savedTime: String = ""
     @State private var leftid: String = ""
@@ -44,18 +45,18 @@ struct HomeView: View {
 //                            Text(Angle2D(radians: carv2DataPair.right.leftRealityKitRotation3.eulerAngles(order: .xyz).angles.z).degrees.description)
 //                        }
                         HStack{
-                            Text(Angle2D(radians: carv2DataPair.right.attitude.eulerAngles(order: .xyz).angles.x).degrees.description)
-                            Text(Angle2D(radians: carv2DataPair.right.attitude.eulerAngles(order: .xyz).angles.y).degrees.description)
-                            Text(Angle2D(radians: carv2DataPair.right.attitude.eulerAngles(order: .xyz).angles.z).degrees.description)
+                            Text(Angle2D(radians: dataManager.carv2DataPair.right.attitude.eulerAngles(order: .xyz).angles.x).degrees.description)
+                            Text(Angle2D(radians: dataManager.carv2DataPair.right.attitude.eulerAngles(order: .xyz).angles.y).degrees.description)
+                            Text(Angle2D(radians: dataManager.carv2DataPair.right.attitude.eulerAngles(order: .xyz).angles.z).degrees.description)
                         }
                         HStack{
-                            Text(Angle2D(radians: carv2DataPair.left.attitude.eulerAngles(order: .xyz).angles.x).degrees.description)
-                            Text(Angle2D(radians: carv2DataPair.left.attitude.eulerAngles(order: .xyz).angles.y).degrees.description)
-                            Text(Angle2D(radians: carv2DataPair.left.attitude.eulerAngles(order: .xyz).angles.z).degrees.description)
+                            Text(Angle2D(radians: dataManager.carv2DataPair.left.attitude.eulerAngles(order: .xyz).angles.x).degrees.description)
+                            Text(Angle2D(radians: dataManager.carv2DataPair.left.attitude.eulerAngles(order: .xyz).angles.y).degrees.description)
+                            Text(Angle2D(radians: dataManager.carv2DataPair.left.attitude.eulerAngles(order: .xyz).angles.z).degrees.description)
                         }
             HStack{
                 VStack{
-                                        Text( carv2DataPair.left.angularVelocity.x.formatted(.number.precision(.fractionLength(1))))
+                    Text( dataManager.carv2DataPair.left.angularVelocity.x.formatted(.number.precision(.fractionLength(1))))
                                         Text( carv2DataPair.left.angularVelocity.y.formatted(.number.precision(.fractionLength(1))))
                                         Text( carv2DataPair.left.angularVelocity.z.formatted(.number.precision(.fractionLength(1))))
                 }

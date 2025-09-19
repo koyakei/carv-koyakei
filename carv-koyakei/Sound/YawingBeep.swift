@@ -11,20 +11,7 @@ import Combine
 import SwiftUI
 import AVFAudio
 @MainActor
-@Observable
 class YawingBeep{
-    private var cancellable: AnyCancellable?
-    init() {
-        cancellable = carv2DataPair.updates
-                    .receive(on: RunLoop.main) // メインスレッドで値を受け取ることを保証
-                    .sink { [weak self] updatedData in
-                        // 値が流れてくるたびにこのクロージャが実行される
-                        // handleRightChangeが非同期関数のためTaskで囲む
-                        Task {
-                            self?.handleRightChange(updatedData)
-                        }
-                    }
-    }
     
     var isBeeping: Bool = false {
         didSet{
@@ -35,14 +22,23 @@ class YawingBeep{
             }
         }
     }
-    private var cancellables = Set<AnyCancellable>()
     var diffYawingTargetAngle: Double = 2.0
-    var conductor : DynamicOscillatorConductor = DynamicOscillatorConductor()
+    var conductor: DynamicOscillatorConductor = DynamicOscillatorConductor()
     
-    var carv2DataPair :Carv2DataPair = Carv2DataPair.shared
+    var dataManager: DataManager
+    private var cancellables = Set<AnyCancellable>()
+    init(dataManager: DataManager){
+        self.dataManager = dataManager
+        dataManager.$carv2DataPair
+            .sink { [weak self] newValue in
+                self?.handleDataPairChange(newValue)
+            }
+            .store(in: &cancellables)  //handleDataPairChangeを実行したい
+    }
+    private var cancellable: AnyCancellable? = nil
     
-        
-    private func handleRightChange(_ newValue: Carv2Data) {
+    
+    private func handleDataPairChange(_ carv2DataPair: Carv2DataPair) {
         if isBeeping == false { return }
         if (-diffYawingTargetAngle...diffYawingTargetAngle).contains(Double(carv2DataPair.yawingAngulerRateDiffrential) ) {
             conductor.data.isPlaying = false

@@ -4,14 +4,13 @@ import Spatial
 import Foundation
 import SwiftUI
 
-@Observable
 @MainActor
-class BluethoothCentralManager: NSObject, @MainActor CBCentralManagerDelegate {
-    var carv2DeviceLeft: CarvDevicePeripheral? = nil
-    var carv2DeviceRight: CarvDevicePeripheral? = nil
+class BluethoothCentralManager: NSObject, @MainActor CBCentralManagerDelegate , ObservableObject{
+    @Published var carv2DeviceLeft: CarvDevicePeripheral? = nil
+    @Published var carv2DeviceRight: CarvDevicePeripheral? = nil
     
-    var carv2DataPair : Carv2DataPair = Carv2DataPair.shared
-    var centralManager: CBCentralManager!
+    @Published var carv2DataPair : Carv2DataPair = Carv2DataPair.shared
+    @Published var centralManager: CBCentralManager!
     static let targetServiceUUID = CBUUID(string: "2DFBFFFF-960D-4909-8D28-F353CB168E8A")
     override init() {
         super.init()
@@ -31,9 +30,6 @@ class BluethoothCentralManager: NSObject, @MainActor CBCentralManagerDelegate {
         }
     }
     
-    func subscribe(servece: CBService) {
-        
-    }
     func connect(carvDevice: CarvDevicePeripheral) {
         let peripheral = carvDevice.peripheral
         peripheral.delegate = carvDevice // デリゲート再設定
