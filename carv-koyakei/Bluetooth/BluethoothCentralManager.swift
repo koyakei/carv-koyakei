@@ -32,7 +32,7 @@ class BluethoothCentralManager: NSObject, @MainActor CBCentralManagerDelegate , 
     
     func connect(carvDevice: CarvDevicePeripheral) {
         let peripheral = carvDevice.peripheral
-        peripheral.delegate = carvDevice 
+        peripheral.delegate = carvDevice
         centralManager.connect(carvDevice.peripheral, options: nil)
     }
     
@@ -63,13 +63,11 @@ class BluethoothCentralManager: NSObject, @MainActor CBCentralManagerDelegate , 
     
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
         if peripheral.identifier == carv2DeviceLeft?.peripheral.identifier{
-            carv2DeviceLeft?.updateConnectionState(.connected)
             peripheral.discoverServices([BluethoothCentralManager.targetServiceUUID])
             print("connected")
         }
         
         if peripheral.identifier == carv2DeviceRight?.peripheral.identifier{
-            carv2DeviceLeft?.updateConnectionState(.connected)
             peripheral.discoverServices([BluethoothCentralManager.targetServiceUUID])
             print("connected")
         }
@@ -77,12 +75,10 @@ class BluethoothCentralManager: NSObject, @MainActor CBCentralManagerDelegate , 
     
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: (any Error)?) {
         if peripheral.identifier == carv2DeviceLeft?.peripheral.identifier{
-            carv2DeviceLeft?.updateConnectionState(.disconnected)
             print(peripheral.identifier)
             print("disconnected")
         }
         if peripheral.identifier == carv2DeviceRight?.peripheral.identifier{
-            carv2DeviceRight?.updateConnectionState(.disconnected)
             print(peripheral.identifier)
             print("disconnected")
         }

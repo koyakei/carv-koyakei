@@ -14,13 +14,11 @@ import Combine
 class CarvDevicePeripheral: NSObject, Identifiable,@MainActor CBPeripheralDelegate , ObservableObject{
     let id: UUID
     @Published var peripheral: CBPeripheral
-    @Published var connectionState: CBPeripheralState
     @Published var data: Data?
     
     init(peripheral: CBPeripheral) {
         self.id = peripheral.identifier
         self.peripheral = peripheral
-        self.connectionState = peripheral.state
         super.init()
         self.peripheral.delegate = self
         //　UserDefaults.standard.string(forKey: "leftCarv2UUID")　が空だった場合、現在の値を代入
@@ -39,11 +37,6 @@ class CarvDevicePeripheral: NSObject, Identifiable,@MainActor CBPeripheralDelega
         }
     }
     
-    func updateConnectionState(_ state: CBPeripheralState) {
-        DispatchQueue.main.async {
-            self.connectionState = state
-        }
-    }
     
     func subscribeAttitude() {
         guard let characteristic = findCharacteristic(periferalName: peripheral.name!) else {
