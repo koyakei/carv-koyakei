@@ -55,9 +55,6 @@ class Carv2DataPair :ObservableObject{
     func isInclineInEndOfTurn(standardTurn: [any OutsideSkiRollAngle] = []) -> Bool {
         return self.currentTurn.last?.isTurnSwitching ?? false
     }
-    
-    
-    
    
     // z がヨーイング角速度の同調　左足前テレマークでの　parallel ski
     var angulerVelocityDiffrencialForTelemarkLeftSideFont: Vector3DFloat {
@@ -153,58 +150,6 @@ class Carv2DataPair :ObservableObject{
 //     同じやつをここに移植
     func parallelAngleByAttitude() -> Angle2DFloat{
         return (left.leftRealityKitRotation.inverse * right.rightRealityKitRotation).angle
-    }
-    
-    func receive(left data: Carv2Data)  -> Carv2AnalyzedDataPair {
-        self.left = data
-        let isTurnSwitching: Bool = turnSwitchingTimingFinder.handle(zRotationAngle: Double(unitedYawingAngle), timeInterval: data.recordetTime)
-        let oneTurnDiffAngleEuller = oneTurnDiffreentialFinder.handle(isTurnSwitched: isTurnSwitching, currentTurnSwitchAngle: analyzedDataPair.unitedAttitude)
-        let turnPhasePercantageByAngle =  FindTurnPhaseBy100.init().handle(currentRotationEullerAngleFromTurnSwitching: CurrentDiffrentialFinder.init().handle(lastTurnSwitchAngle: lastTurnSwitchingUnitedAttitude, currentQuaternion: analyzedDataPair.unitedAttitude), oneTurnDiffrentialAngle: oneTurnDiffAngleEuller)
-        if isTurnSwitching {
-            leftSingleTurnSequence.removeAll()
-            rightSingleTurnSequence.removeAll()
-            beforeLastTurnSwitchingUnitedAttitude = lastTurnSwitchingUnitedAttitude
-            lastTurnSwitchingUnitedAttitude = unitedAttitude
-            numberOfTurn = numberOfTurn + 1
-            turnPhaseByTime.turnSwitched(currentTime: data.recordetTime)
-        }
-        analyzedDataPair.left = Carv2AnalyzedData(attitude: data.leftRealityKitRotation, acceleration: data.acceleration, angularVelocity: data.angularVelocity)
-        analyzedDataPair.numberOfTurns = numberOfTurn
-        analyzedDataPair.percentageOfTurnsByAngle = Float(turnPhasePercantageByAngle)
-        analyzedDataPair.percentageOfTurnsByTime = turnPhaseByTime.handle(currentTime: data.recordetTime)
-        analyzedDataPair.recordetTime = data.recordetTime
-        analyzedDataPair.isTurnSwitching = isTurnSwitching
-        if isRecordingCSV {
-            csvExporter.write(analyzedDataPair)
-        }
-        receive(data: analyzedDataPair)
-        return analyzedDataPair
-    }
-    
-    func receive(right data: Carv2Data)  -> Carv2AnalyzedDataPair {
-        self.right = data
-        let isTurnSwitching: Bool = turnSwitchingTimingFinder.handle(zRotationAngle: Double(unitedYawingAngle), timeInterval: data.recordetTime)
-        let oneTurnDiffAngleEuller = oneTurnDiffreentialFinder.handle(isTurnSwitched: isTurnSwitching, currentTurnSwitchAngle: analyzedDataPair.unitedAttitude)
-        let turnPhasePercantageByAngle =  FindTurnPhaseBy100.init().handle(currentRotationEullerAngleFromTurnSwitching: CurrentDiffrentialFinder.init().handle(lastTurnSwitchAngle: lastTurnSwitchingUnitedAttitude, currentQuaternion: analyzedDataPair.unitedAttitude), oneTurnDiffrentialAngle: oneTurnDiffAngleEuller)
-        if isTurnSwitching {
-            leftSingleTurnSequence.removeAll()
-            rightSingleTurnSequence.removeAll()
-            beforeLastTurnSwitchingUnitedAttitude = lastTurnSwitchingUnitedAttitude
-            lastTurnSwitchingUnitedAttitude = unitedAttitude
-            numberOfTurn = numberOfTurn + 1
-            turnPhaseByTime.turnSwitched(currentTime: data.recordetTime)
-        }
-        analyzedDataPair.right = Carv2AnalyzedData(attitude: data.rightRealityKitRotation, acceleration: data.acceleration, angularVelocity: data.angularVelocity)
-        analyzedDataPair.numberOfTurns = numberOfTurn
-        analyzedDataPair.percentageOfTurnsByAngle = Float(turnPhasePercantageByAngle)
-        analyzedDataPair.percentageOfTurnsByTime = turnPhaseByTime.handle(currentTime: data.recordetTime)
-        analyzedDataPair.recordetTime = data.recordetTime
-        analyzedDataPair.isTurnSwitching = isTurnSwitching
-        if isRecordingCSV {
-            csvExporter.write(analyzedDataPair)
-        }
-        receive(data: analyzedDataPair)
-        return analyzedDataPair
     }
 }
 

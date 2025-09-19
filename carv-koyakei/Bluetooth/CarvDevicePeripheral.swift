@@ -15,16 +15,12 @@ class CarvDevicePeripheral: NSObject, Identifiable,@MainActor CBPeripheralDelega
     let id: UUID
     @Published var peripheral: CBPeripheral
     @Published var connectionState: CBPeripheralState
-    @Published var services: [CBService] = []
-    @Published var carv2DataPair: Carv2DataPair
     @Published var data: Data?
     
-    init(peripheral: CBPeripheral, carv2DataPair: Carv2DataPair) {
+    init(peripheral: CBPeripheral) {
         self.id = peripheral.identifier
         self.peripheral = peripheral
         self.connectionState = peripheral.state
-        self.carv2DataPair = carv2DataPair
-        
         super.init()
         self.peripheral.delegate = self
         //　UserDefaults.standard.string(forKey: "leftCarv2UUID")　が空だった場合、現在の値を代入
@@ -86,9 +82,6 @@ class CarvDevicePeripheral: NSObject, Identifiable,@MainActor CBPeripheralDelega
             return
         }
         
-        DispatchQueue.main.async {
-            self.services = peripheral.services ?? []
-        }
         
         for service in peripheral.services ?? [] {
             peripheral.discoverCharacteristics(nil, for: service)
@@ -101,23 +94,6 @@ class CarvDevicePeripheral: NSObject, Identifiable,@MainActor CBPeripheralDelega
             return
         }
         self.data = characteristic.value
-        if let value = characteristic.value {
-            if characteristic.service?.peripheral?.name == Carv1DataPair.periferalName{
-            } else if characteristic.service?.peripheral?.name == Carv2DataPair.periferalName {
-                
-//                if peripheral.identifier == Carv2DataPair.rightCharactaristicUUID{
-//                    // この戻り値をCSVに出力したい。どうすればいいのか？
-//                    let _ = self.carv2DataPair.receive(right: Carv2Data(value))
-//                    
-//                }
-//                if peripheral.identifier == Carv2DataPair.leftCharactaristicUUID {
-//                    let _ = self.carv2DataPair.receive(left: Carv2Data(value))
-//                    
-//                }
-            }
-            
-            
-        }
     }
     public func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: (any Error)?) {
         print("peripheral:didUpdateNotificationStateFor: \(characteristic)")
@@ -125,7 +101,6 @@ class CarvDevicePeripheral: NSObject, Identifiable,@MainActor CBPeripheralDelega
             print("error: \(error)")
         }
         print("通知状態更新: \(characteristic.isNotifying ? "有効" : "無効")")
-        
     }
     
 }
