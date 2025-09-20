@@ -210,6 +210,18 @@ struct HomeView: View {
                 Text("Current value: \(yawingBeep.diffYawingTargetAngle, specifier: "%.2f")")
                     .padding()
             }
+            Slider(
+                value: $dataManager.switchingAngluerRateDegree,
+                in: 0.0...30,
+                step: 1
+            ) {
+                Text("Switching angle by degree")
+            }
+            Button(action: {
+                dataManager.skytechMode.toggle()
+            }){
+                Text("Skytech mode \(dataManager.skytechMode ? "on" : "off")")
+            }
             if yawingBeep.isBeeping {
                 Slider(
                     value: $yawingBeep.diffYawingTargetAngle,

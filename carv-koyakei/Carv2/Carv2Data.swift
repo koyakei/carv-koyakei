@@ -10,7 +10,7 @@ import simd
 import SwiftUI
 import Combine
 
-class Carv2Data{
+class Carv2Data:Encodable{
     let attitude: Rotation3DFloat
     let acceleration: SIMD3<Float>
     let angularVelocity : SIMD3<Float>

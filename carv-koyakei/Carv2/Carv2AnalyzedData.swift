@@ -8,7 +8,7 @@ import Spatial
 import Foundation
 
 
-struct Carv2AnalyzedDataPair {
+struct Carv2AnalyzedDataPair:Encodable {
     var left: Carv2Data
     var right: Carv2Data
     
