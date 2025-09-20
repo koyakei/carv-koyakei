@@ -22,8 +22,7 @@ class TurnPhaseByTime {
 }
 
 
-protocol OutsideSkiRollAngle: Identifiable{
-    var id : UUID {get}
+protocol OutsideSkiRollAngle{
     var outsideSkiRollAngle: Float {get}
     var recordetTime: TimeInterval  {get}
 }

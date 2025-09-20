@@ -14,7 +14,10 @@ class Carv2Data{
     let attitude: Rotation3DFloat
     let acceleration: SIMD3<Float>
     let angularVelocity : SIMD3<Float>
-    let recordetTime: TimeInterval = Date.now.timeIntervalSince1970
+    let recordetTime: Date = Date.now
+    var rollAngle: Float {attitude.eulerAngles(order: .xyz).angles.z}
+    var yawAngle: Float {attitude.eulerAngles(order: .xyz).angles.y}
+    var pitchAngle: Float {attitude.eulerAngles(order: .xyz).angles.z}
     init(){
         attitude = .identity
         acceleration = .zero

@@ -7,20 +7,17 @@
 import Spatial
 import Foundation
 
-struct Carv2AnalyzedData {
-    var attitude: Rotation3DFloat
-    var acceleration: SIMD3<Float>
-    var angularVelocity : SIMD3<Float>
-    let recordetTime: TimeInterval = Date.now.timeIntervalSince1970
-    var rollAngle: Float {attitude.eulerAngles(order: .xyz).angles.z}
-    var yawAngle: Float {attitude.eulerAngles(order: .xyz).angles.y}
-    var pitchAngle: Float {attitude.eulerAngles(order: .xyz).angles.z}
-}
 
-struct Carv2AnalyzedDataPair :Identifiable, OutsideSkiRollAngle{
-    let id = UUID()
-    var left: Carv2AnalyzedData
-    var right: Carv2AnalyzedData
+struct Carv2AnalyzedDataPair {
+    var left: Carv2Data
+    var right: Carv2Data
+    
+    var recordetTime: Date
+    var isTurnSwitching: Bool
+    
+    var percentageOfTurnsByAngle: Float
+    var percentageOfTurnsByTime: TimeInterval
+    
     var yawingSide: TurnYawingSide {
         get{
             switch unitedYawingAngle {
@@ -37,7 +34,7 @@ struct Carv2AnalyzedDataPair :Identifiable, OutsideSkiRollAngle{
         return outsideSki.rollAngle + Float(Angle2D(degrees: 90).radians)
     }
     
-    var outsideSki: Carv2AnalyzedData {
+    var outsideSki: Carv2Data {
         if yawingSide == .LeftYawing {
             return left
         } else {
@@ -45,7 +42,7 @@ struct Carv2AnalyzedDataPair :Identifiable, OutsideSkiRollAngle{
         }
     }
     
-    var insideSki: Carv2AnalyzedData {
+    var insideSki: Carv2Data {
         if yawingSide == .RightYawing {
             return right
         } else {
@@ -53,18 +50,13 @@ struct Carv2AnalyzedDataPair :Identifiable, OutsideSkiRollAngle{
         }
     }
     
-    var isTurnSwitching: Bool
     var unitedAttitude : Rotation3DFloat {
         Rotation3DFloat.slerp(from: left.attitude, to: right.attitude, t: 0.5)
     }
-    var percentageOfTurnsByAngle: Float
-    var percentageOfTurnsByTime: Double
     var unitedYawingAngle : Float {
         left.angularVelocity.y + right.angularVelocity.y
     }
     var yawingAngulerRateDiffrential: Float { Float(right.angularVelocity.y - left.angularVelocity.y)}
-    var numberOfTurns: Int
-    var recordetTime: TimeInterval
     var unifiedDiffrentialAttitudeFromLeftToRight: Rotation3DFloat {
         left.attitude.inverse * right.attitude
     }

@@ -19,29 +19,15 @@ extension Array where Element == Carv2AnalyzedDataPair {
 
 @MainActor
 class Carv2DataPair :ObservableObject{
-    var left: Carv2Data
-//    // ipad
-//    static let rightCharactaristicUUID = UUID(uuidString: "85A29A4C-09C3-C632-858A-3387339C67CF")
-//    static let leftCharactaristicUUID = UUID(uuidString:  "850D8BCF-3B03-1322-F51C-DD38E961FC1A")
-    // iphone
-    static let rightCharactaristicUUID = UUID(uuidString: UserDefaults.standard.string(forKey: "rightCarv2UUID") ?? "85E2946B-0D18-FA01-E1C9-0393EDD9013A")//  UUID(uuidString: "85E2946B-0D18-FA01-E1C9-0393EDD9013A")
-    static let leftCharactaristicUUID = UUID(uuidString: UserDefaults.standard.string(forKey: "leftCarv2UUID") ?? "57089C67-2275-E220-B6D3-B16E2639EFD6") // UUID(uuidString:  "57089C67-2275-E220-B6D3-B16E2639EFD6")
-    static let periferalName = "CARV 2"
-    
-    var right: Carv2Data
-    
-    init(left : Carv2Data = .init() , right: Carv2Data = .init()){
+    let left: Carv2Data
+    let right: Carv2Data
+    let recordedTime: Date
+    init(left : Carv2Data = .init() , right: Carv2Data = .init(), recordedTime: Date = .init()){
         self.left = left
         self.right = right
+        self.recordedTime = recordedTime
     }
     
-//    private func notifyUpdates() {
-//            // メンバ更新時にストリームに現在のselfを送る
-//            updateContinuation?.yield(self)
-//        }
-    private var cancellables = Set<AnyCancellable>()
-    private var isRecordingCSV = false
-    private let  csvExporter = CSVExporter()
     private var numberOfTurn : Int = 0
     public static let shared: Carv2DataPair = .init()
     
@@ -51,7 +37,7 @@ class Carv2DataPair :ObservableObject{
     var turnDiffrencial: Rotation3DFloat{
         beforeLastTurnSwitchingUnitedAttitude.inverse * lastTurnSwitchingUnitedAttitude
     }
-    //ターン後半30%で内筒しているかどうか
+    //ターン後半30%で内倒しているかどうか
     func isInclineInEndOfTurn(standardTurn: [any OutsideSkiRollAngle] = []) -> Bool {
         return self.currentTurn.last?.isTurnSwitching ?? false
     }
@@ -73,19 +59,6 @@ class Carv2DataPair :ObservableObject{
     var 右側基準の左足の角速度 : Vector3DFloat {
         return Vector3DFloat.init(x: -left.angularVelocity.x, y: -left.angularVelocity.z, z: left.angularVelocity.y).rotated(by: unifiedDiffrentialAttitudeFromRightToLeft)
     }
-   
-    
-    func receive(data: Carv2AnalyzedDataPair){
-        currentTurn.append(data)
-        if currentTurn.count > 200 { // 20fps * 3 が最大だろう　２００は楽勝
-            currentTurn.removeFirst()
-        }
-        
-        if data.isTurnSwitching {
-            self.beforeTurn = self.currentTurn
-            self.currentTurn = []
-        }
-    }
     
     var yawingSide: TurnYawingSide {
         get{
@@ -99,10 +72,6 @@ class Carv2DataPair :ObservableObject{
             }
         }
     }
-    
-    var leftSingleTurnSequence: [Carv2AnalyzedData] = []
-    var rightSingleTurnSequence: [Carv2AnalyzedData] = []
-    var analyzedDataPair : Carv2AnalyzedDataPair = .init(left: .init(attitude: .identity, acceleration: .one, angularVelocity: .one), right: .init(attitude: .identity, acceleration: .one, angularVelocity: .one), isTurnSwitching: false,percentageOfTurnsByAngle: .zero, percentageOfTurnsByTime: Date.now.timeIntervalSince1970, numberOfTurns: .zero, recordetTime: Date.now.timeIntervalSince1970)
     var turnSideChangingPeriodFinder: TurnSideChangingPeriodFinder =
             TurnSideChangingPeriodFinder.init()
     var turnSwitchingDirectionFinder: TurnSwitchingDirectionFinder = TurnSwitchingDirectionFinder.init()
@@ -123,16 +92,16 @@ class Carv2DataPair :ObservableObject{
         left.angularVelocity.y + right.angularVelocity.y
     }
     
-    func startCSVRecording() {
-        isRecordingCSV = true
-        csvExporter.open( CSVExporter.makeFilePath(fileAlias: "carv2_raw_data"))
-        numberOfTurn = 0
-    }
-    func stopCSVRecording() {
-        csvExporter.close()
-        isRecordingCSV = false
-        numberOfTurn = 0
-    }
+//    func startCSVRecording() {
+//        isRecordingCSV = true
+//        csvExporter.open( CSVExporter.makeFilePath(fileAlias: "carv2_raw_data"))
+//        numberOfTurn = 0
+//    }
+//    func stopCSVRecording() {
+//        csvExporter.close()
+//        isRecordingCSV = false
+//        numberOfTurn = 0
+//    }
     var currentTurnPhaseByTime: Double = 0
     
     var unifiedDiffrentialAttitudeFromRightToLeft: Rotation3DFloat {

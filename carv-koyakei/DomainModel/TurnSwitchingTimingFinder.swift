@@ -9,31 +9,11 @@ import Spatial
 import SwiftUI
 import Combine
 class TurnSwitchingTimingFinder:ObservableObject{
-    @Published var lastTurnSiwtchedTimeInterval = Date.now.timeIntervalSince1970
     let minimumTurnPeriod : TimeInterval = 0.4
-    let rotationNoizeRange: Range<Double> = (Measurement(value: -15
-                                            , unit: UnitAngle.degrees)
-                                    .converted(to: .radians).value)..<Measurement(value: 15
-                                                                                  , unit: UnitAngle.degrees)
-                                                                          .converted(to: .radians).value
-    func handle(zRotationAngle: Double, timeInterval : TimeInterval)-> Bool{
-        if rotationNoizeRange ~= zRotationAngle
-            && (Date.now.timeIntervalSince1970 - lastTurnSiwtchedTimeInterval) > minimumTurnPeriod {
-            lastTurnSiwtchedTimeInterval = timeInterval
-            return true
-        }
-        return false
-    }
-}
-import simd
-
-extension simd_quatd{
-    var simd_quatf: simd_quatf{
-        return simd.simd_quatf(
-            ix: Float(self.vector.x),
-            iy: Float(self.vector.y),
-            iz: Float(self.vector.z),
-            r: Float(self.vector.w)
-        )
+    let rotationNoizeRange : Range<Float> = Angle2DFloat(degrees: -15).radians..<Angle2DFloat(degrees: 15).radians
+    
+    func handle(zRotationAngle: Float, timeInterval : TimeInterval,currentFrameTime: TimeInterval ,lastTurnSiwtchedTimeInterval : TimeInterval)-> Bool{
+        rotationNoizeRange ~= zRotationAngle
+            && (currentFrameTime - lastTurnSiwtchedTimeInterval) > minimumTurnPeriod
     }
 }

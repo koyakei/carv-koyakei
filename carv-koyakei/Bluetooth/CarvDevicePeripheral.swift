@@ -11,7 +11,7 @@ import SwiftUI
 import Combine
 
 @MainActor
-class CarvDevicePeripheral: NSObject, Identifiable,@MainActor CBPeripheralDelegate , ObservableObject{
+final class CarvDevicePeripheral: NSObject, Identifiable,@MainActor CBPeripheralDelegate , ObservableObject{
     let id: UUID
     @Published var peripheral: CBPeripheral
     @Published var data: Data?
@@ -21,7 +21,6 @@ class CarvDevicePeripheral: NSObject, Identifiable,@MainActor CBPeripheralDelega
         self.peripheral = peripheral
         super.init()
         self.peripheral.delegate = self
-        //　UserDefaults.standard.string(forKey: "leftCarv2UUID")　が空だった場合、現在の値を代入
     }
     
     // 特性発見メソッドを実装
