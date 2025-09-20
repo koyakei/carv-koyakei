@@ -9,6 +9,7 @@ final class DataManager :ObservableObject {
     @Published var carv2DataPair: Carv2AnalyzedDataPair = .init()
     @Published var latestNotCompletedTurnCarv2AnalyzedDataPairs: [Carv2AnalyzedDataPair]  = []
     @Published var finishedTurnDataArray: [SingleFinishedTurnData] = []
+    @Published var skytechMode: Bool = false
     private var lastFinishedTrunData: SingleFinishedTurnData {
         get {
             finishedTurnDataArray.last ?? .init(nuberOfTrun: 0, turnPhases: [])
@@ -19,6 +20,16 @@ final class DataManager :ObservableObject {
         self.bluethoothCentralManager = bluethoothCentralManager
         subscribe()
     }
+    
+    //スカイテックモードと通常モードを分けよう。
+    func isTurnSwitchInNomal(carvDataPair: Carv2DataPair) -> Bool{
+        if skytechMode {
+            (Angle2DFloat(degrees: -15).radians..<Angle2DFloat(degrees: 15).radians ~= carvDataPair.rollingAngulerRateDiffrential && carvDataPair.recordedTime.timeIntervalSince1970 - self.lastFinishedTrunData.turnEndedTime.timeIntervalSince1970 > 0.4)
+        } else {
+            (Angle2DFloat(degrees: -15).radians..<Angle2DFloat(degrees: 15).radians ~= carvDataPair.unitedYawingAngle && carvDataPair.recordedTime.timeIntervalSince1970 - self.lastFinishedTrunData.turnEndedTime.timeIntervalSince1970 > 0.4)
+        }
+    }
+    
     
     private func subscribe() {
         bluethoothCentralManager.$carv2DeviceLeft
@@ -31,8 +42,8 @@ final class DataManager :ObservableObject {
                     .compactMap { $0 }
                     .combineLatest(right.$data.compactMap { $0 })
                     .map { leftData, rightData in
-                        let carvDatePair = Carv2DataPair(left: Carv2Data(leftData), right: Carv2Data(rightData))
-                        return Carv2AnalyzedDataPair(left: carvDatePair.left, right: carvDatePair.right, recordetTime: carvDatePair.recordedTime, isTurnSwitching: (Angle2DFloat(degrees: -15).radians..<Angle2DFloat(degrees: 15).radians ~= carvDatePair.unitedYawingAngle && carvDatePair.recordedTime.timeIntervalSince1970 - self.lastFinishedTrunData.turnEndedTime.timeIntervalSince1970 > 0.4), percentageOfTurnsByAngle: abs((carvDatePair.unitedAttitude * self.lastFinishedTrunData.lastPhaseOfTune.unitedAttitude.inverse).angle.radians) / abs(self.lastFinishedTrunData.diffrencialAngleFromStartToEnd.radians), percentageOfTurnsByTime: abs((carvDatePair.recordedTime.timeIntervalSince1970 - self.lastFinishedTrunData.turnEndedTime.timeIntervalSince1970) / self.lastFinishedTrunData.turnDuration))
+                        let carvDataPair = Carv2DataPair(left: Carv2Data(leftData), right: Carv2Data(rightData))
+                        return Carv2AnalyzedDataPair(left: carvDataPair.left, right: carvDataPair.right, recordetTime: carvDataPair.recordedTime, isTurnSwitching: self.isTurnSwitchInNomal(carvDataPair: carvDataPair), percentageOfTurnsByAngle: abs((carvDataPair.unitedAttitude * self.lastFinishedTrunData.lastPhaseOfTune.unitedAttitude.inverse).angle.radians) / abs(self.lastFinishedTrunData.diffrencialAngleFromStartToEnd.radians), percentageOfTurnsByTime: abs((carvDataPair.recordedTime.timeIntervalSince1970 - self.lastFinishedTrunData.turnEndedTime.timeIntervalSince1970) / self.lastFinishedTrunData.turnDuration))
                     }
                     .eraseToAnyPublisher()
             }
