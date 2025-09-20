@@ -14,8 +14,8 @@ class BluethoothCentralManager: NSObject, @MainActor CBCentralManagerDelegate , 
     let rightCharactaristicUUID = UUID(uuidString: UserDefaults.standard.string(forKey: "rightCarv2UUID") ?? "85E2946B-0D18-FA01-E1C9-0393EDD9013A")//  UUID(uuidString: "85E2946B-0D18-FA01-E1C9-0393EDD9013A")
     let leftCharactaristicUUID = UUID(uuidString: UserDefaults.standard.string(forKey: "leftCarv2UUID") ?? "57089C67-2275-E220-B6D3-B16E2639EFD6") // UUID(uuidString:  "57089C67-2275-E220-B6D3-B16E2639EFD6")
     static let periferalName = "CARV 2"
-    @Published var carv2DeviceLeft: CarvDevicePeripheral? = nil
-    @Published var carv2DeviceRight: CarvDevicePeripheral? = nil
+    @Published var carv2DeviceLeft: Carv2DevicePeripheral? = nil
+    @Published var carv2DeviceRight: Carv2DevicePeripheral? = nil
     
     var centralManager: CBCentralManager!
     static let targetServiceUUID = CBUUID(string: "2DFBFFFF-960D-4909-8D28-F353CB168E8A")
@@ -37,22 +37,22 @@ class BluethoothCentralManager: NSObject, @MainActor CBCentralManagerDelegate , 
         }
     }
     
-    func connect(carvDevice: CarvDevicePeripheral) {
+    func connect(carvDevice: Carv2DevicePeripheral) {
         let peripheral = carvDevice.peripheral
         peripheral.delegate = carvDevice
         centralManager.connect(carvDevice.peripheral, options: nil)
     }
     
-    func disconnect(carvDevice: CarvDevicePeripheral) {
+    func disconnect(carvDevice: Carv2DevicePeripheral) {
         centralManager.cancelPeripheralConnection(carvDevice.peripheral)
     }
     
     private func addDevice(_ peripheral: CBPeripheral) {
         if peripheral.identifier == leftCharactaristicUUID{
-            self.carv2DeviceLeft = CarvDevicePeripheral(peripheral: peripheral)
+            self.carv2DeviceLeft = Carv2DevicePeripheral(peripheral: peripheral)
         }
         if peripheral.identifier == rightCharactaristicUUID{
-            self.carv2DeviceRight = CarvDevicePeripheral(peripheral: peripheral)
+            self.carv2DeviceRight = Carv2DevicePeripheral(peripheral: peripheral)
         }
     }
     

@@ -8,7 +8,7 @@
 import Foundation
 import CoreBluetooth
 
-class BLEPeripheral : NSObject, CBPeripheralManagerDelegate {
+class Carv1DevicePeripheral : NSObject, CBPeripheralManagerDelegate {
 
     let CHARACTERISTIC_UUID = CBUUID(string:"D74E4C2A-4D3F-DDE6-04AD-568063771B11")
     let SERVICE_UUID = CBUUID(string:"2DFBFFFF-960D-4909-8D28-F353CB168E8A")

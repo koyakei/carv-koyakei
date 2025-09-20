@@ -11,7 +11,7 @@ import SwiftUI
 import Combine
 
 @MainActor
-final class CarvDevicePeripheral: NSObject, Identifiable,@MainActor CBPeripheralDelegate , ObservableObject{
+final class Carv2DevicePeripheral: NSObject, Identifiable,@MainActor CBPeripheralDelegate , ObservableObject{
     let id: UUID
     @Published var peripheral: CBPeripheral
     @Published var data: Data?

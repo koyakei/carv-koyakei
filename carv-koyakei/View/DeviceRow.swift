@@ -8,7 +8,7 @@ import SwiftUI
 import CoreBluetooth
 
 struct DeviceRow: View {
-    @StateObject var device: CarvDevicePeripheral
+    @StateObject var device: Carv2DevicePeripheral
     let ble: BluethoothCentralManager
     
     var body: some View {
