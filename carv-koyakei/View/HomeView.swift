@@ -15,7 +15,7 @@ import AudioKit
 
 struct HomeView: View {
     @StateObject var ble : BluethoothCentralManager
-    var carv2DataPair: Carv2DataPair
+    
     @State var yawingBeep: YawingBeep
     @State var rollingBeep: RollingBeep
     @StateObject var dataManager: DataManager
@@ -57,23 +57,23 @@ struct HomeView: View {
             HStack{
                 VStack{
                     Text( dataManager.carv2DataPair.left.angularVelocity.x.formatted(.number.precision(.fractionLength(1))))
-                                        Text( carv2DataPair.left.angularVelocity.y.formatted(.number.precision(.fractionLength(1))))
-                                        Text( carv2DataPair.left.angularVelocity.z.formatted(.number.precision(.fractionLength(1))))
+                    Text( dataManager.carv2DataPair.left.angularVelocity.y.formatted(.number.precision(.fractionLength(1))))
+                    Text( dataManager.carv2DataPair.left.angularVelocity.z.formatted(.number.precision(.fractionLength(1))))
                 }
                 VStack{
-                                        Text( carv2DataPair.left.acceleration.x.formatted(.number.precision(.fractionLength(1))))
-                                        Text( carv2DataPair.left.acceleration.y.formatted(.number.precision(.fractionLength(1))))
-                                        Text( carv2DataPair.left.acceleration.z.formatted(.number.precision(.fractionLength(1))))
+                    Text( dataManager.carv2DataPair.left.acceleration.x.formatted(.number.precision(.fractionLength(1))))
+                    Text( dataManager.carv2DataPair.left.acceleration.y.formatted(.number.precision(.fractionLength(1))))
+                    Text( dataManager.carv2DataPair.left.acceleration.z.formatted(.number.precision(.fractionLength(1))))
                 }
                 VStack{
-                                        Text( carv2DataPair.right.angularVelocity.x.formatted(.number.precision(.fractionLength(1))))
-                                        Text( carv2DataPair.right.angularVelocity.y.formatted(.number.precision(.fractionLength(1))))
-                                        Text( carv2DataPair.right.angularVelocity.z.formatted(.number.precision(.fractionLength(1))))
+                    Text( dataManager.carv2DataPair.right.angularVelocity.x.formatted(.number.precision(.fractionLength(1))))
+                    Text( dataManager.carv2DataPair.right.angularVelocity.y.formatted(.number.precision(.fractionLength(1))))
+                    Text( dataManager.carv2DataPair.right.angularVelocity.z.formatted(.number.precision(.fractionLength(1))))
                 }
                 VStack{
-                                        Text( carv2DataPair.right.acceleration.x.formatted(.number.precision(.fractionLength(1))))
-                                        Text( carv2DataPair.right.acceleration.y.formatted(.number.precision(.fractionLength(1))))
-                                        Text( carv2DataPair.right.acceleration.z.formatted(.number.precision(.fractionLength(1))))
+                    Text( dataManager.carv2DataPair.right.acceleration.x.formatted(.number.precision(.fractionLength(1))))
+                    Text( dataManager.carv2DataPair.right.acceleration.y.formatted(.number.precision(.fractionLength(1))))
+                    Text( dataManager.carv2DataPair.right.acceleration.z.formatted(.number.precision(.fractionLength(1))))
                 }
 //                VStack{
 //                    Text( carv2DataPair.right.初期姿勢に対しての角速度Right.x.formatted(.number.precision(.fractionLength(1))))

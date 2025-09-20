@@ -1,7 +1,6 @@
 import SwiftUI
 
 struct ContentView: View {
-    var carv2DataPair: Carv2DataPair = Carv2DataPair.shared
     var ble :BluethoothCentralManager
     var yawingBeep: YawingBeep
     var rollingBeep: RollingBeep
@@ -9,7 +8,7 @@ struct ContentView: View {
     var dataManager: DataManager
     var body: some View {
         TabView {
-            HomeView(ble: ble, carv2DataPair: carv2DataPair, yawingBeep: yawingBeep,rollingBeep: rollingBeep,dataManager: dataManager)
+            HomeView(ble: ble, yawingBeep: yawingBeep,rollingBeep: rollingBeep,dataManager: dataManager)
                 .tabItem {
                     Image(systemName: "house.fill")
                     Text("ホーム")
