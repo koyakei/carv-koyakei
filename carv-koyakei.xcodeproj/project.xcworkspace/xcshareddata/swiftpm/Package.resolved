@@ -1,13 +1,13 @@
 {
-  "originHash" : "89fa89897c49518c469b1758ea8761ed675e5ebd7655f2f35976865f95b596e5",
+  "originHash" : "fe1624b754922150e916c95e8c1d8b9703b6e621316a63883b2b2778642a971e",
   "pins" : [
     {
       "identity" : "audiokit",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/AudioKit/AudioKit.git",
+      "location" : "https://github.com/AudioKit/AudioKit",
       "state" : {
-        "revision" : "2ebd422855e4645d3169f83d1765d1c8196b4f46",
-        "version" : "5.6.4"
+        "revision" : "5b3fd238ef8ee95c9842ca4ea83ca58ee151e630",
+        "version" : "5.6.5"
       }
     },
     {
@@ -51,8 +51,17 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/AudioKit/SoundpipeAudioKit.git",
       "state" : {
-        "revision" : "ee7d9542078ae48b24744a67c0350a12f9de354b",
-        "version" : "5.6.1"
+        "revision" : "efc0d67d3e19578b84d47cac4df72c497fb2173e",
+        "version" : "5.7.3"
+      }
+    },
+    {
+      "identity" : "tonic",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/AudioKit/Tonic",
+      "state" : {
+        "revision" : "227c89ea047f928787bec571e487239547f21fe6",
+        "version" : "2.1.0"
       }
     }
   ],
