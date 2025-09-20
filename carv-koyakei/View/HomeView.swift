@@ -201,6 +201,7 @@ struct HomeView: View {
 //            }
 //            .padding()
 //
+            Text("number of turn \(dataManager.numberOfTurn.description)")
             HStack{
                 Text(yawingBeep.conductor.data.isPlaying.description)
                 Button(action: {
