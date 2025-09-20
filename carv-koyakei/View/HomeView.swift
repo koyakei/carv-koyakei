@@ -222,6 +222,13 @@ struct HomeView: View {
             }){
                 Text("Skytech mode \(dataManager.skytechMode ? "on" : "off")")
             }
+            
+            Button(action: {
+                dataManager.expoert()
+            }){
+                Text("export JSON")
+            }
+            
             if yawingBeep.isBeeping {
                 Slider(
                     value: $yawingBeep.diffYawingTargetAngle,
