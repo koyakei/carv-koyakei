@@ -28,19 +28,6 @@ class Carv2DataPair :ObservableObject{
         self.recordedTime = recordedTime
     }
     
-    private var numberOfTurn : Int = 0
-    public static let shared: Carv2DataPair = .init()
-    
-    var currentTurn: [Carv2AnalyzedDataPair] = []
-    var beforeTurn: [Carv2AnalyzedDataPair] = []
-    
-    var turnDiffrencial: Rotation3DFloat{
-        beforeLastTurnSwitchingUnitedAttitude.inverse * lastTurnSwitchingUnitedAttitude
-    }
-    //ターン後半30%で内倒しているかどうか
-    func isInclineInEndOfTurn(standardTurn: [any OutsideSkiRollAngle] = []) -> Bool {
-        return self.currentTurn.last?.isTurnSwitching ?? false
-    }
    
     // z がヨーイング角速度の同調　左足前テレマークでの　parallel ski
     var angulerVelocityDiffrencialForTelemarkLeftSideFont: Vector3DFloat {
@@ -72,14 +59,6 @@ class Carv2DataPair :ObservableObject{
             }
         }
     }
-    var turnSideChangingPeriodFinder: TurnSideChangingPeriodFinder =
-            TurnSideChangingPeriodFinder.init()
-    var turnSwitchingDirectionFinder: TurnSwitchingDirectionFinder = TurnSwitchingDirectionFinder.init()
-    var turnSwitchingTimingFinder: TurnSwitchingTimingFinder = TurnSwitchingTimingFinder.init()
-    var lastTurnSwitchingUnitedAttitude: Rotation3DFloat = .identity
-    var beforeLastTurnSwitchingUnitedAttitude: Rotation3DFloat = .identity
-    var oneTurnDiffreentialFinder: OneTurnDiffrentialFinder = OneTurnDiffrentialFinder.init()
-    var turnPhaseByTime:TurnPhaseByTime = TurnPhaseByTime.init()
     var unitedAttitude:Rotation3DFloat {
         Rotation3DFloat.slerp(from: left.leftRealityKitRotation, to: right.rightRealityKitRotation, t: 0.5)
     }
@@ -91,18 +70,6 @@ class Carv2DataPair :ObservableObject{
     var unitedYawingAngle : Float {
         left.angularVelocity.y + right.angularVelocity.y
     }
-    
-//    func startCSVRecording() {
-//        isRecordingCSV = true
-//        csvExporter.open( CSVExporter.makeFilePath(fileAlias: "carv2_raw_data"))
-//        numberOfTurn = 0
-//    }
-//    func stopCSVRecording() {
-//        csvExporter.close()
-//        isRecordingCSV = false
-//        numberOfTurn = 0
-//    }
-    var currentTurnPhaseByTime: Double = 0
     
     var unifiedDiffrentialAttitudeFromRightToLeft: Rotation3DFloat {
         right.rightRealityKitRotation.inverse * left.leftRealityKitRotation

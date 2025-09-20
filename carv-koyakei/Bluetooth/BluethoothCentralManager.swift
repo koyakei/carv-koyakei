@@ -17,7 +17,6 @@ class BluethoothCentralManager: NSObject, @MainActor CBCentralManagerDelegate , 
     @Published var carv2DeviceLeft: CarvDevicePeripheral? = nil
     @Published var carv2DeviceRight: CarvDevicePeripheral? = nil
     
-    var carv2DataPair : Carv2DataPair = Carv2DataPair.shared
     var centralManager: CBCentralManager!
     static let targetServiceUUID = CBUUID(string: "2DFBFFFF-960D-4909-8D28-F353CB168E8A")
     override init() {

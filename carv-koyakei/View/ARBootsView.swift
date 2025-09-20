@@ -11,9 +11,8 @@ import Charts
 import Spatial
 
 struct ARBootsView: View {
-    var carv2DataPair : Carv2DataPair = Carv2DataPair.shared
+    var carv2DataPair : Carv2DataPair
     @Bindable var cameraManager = CameraManager()
-    var carv2AnalyzedDataPairManager = Carv2AnalyzedDataPairManager.init(carv2DataPair: Carv2DataPair.shared)
     @State private var currentScale: CGFloat = 3.0
     @State private var initialScale: CGFloat = 3.0
     let leftAnchorName = "leftAnchor"
@@ -263,6 +262,3 @@ struct VisualEffectBlur: UIViewRepresentable {
     }
 }
 
-#Preview {
-    ARBootsView()
-}

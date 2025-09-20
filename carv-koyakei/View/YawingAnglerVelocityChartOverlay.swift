@@ -5,7 +5,6 @@ import Spatial
 
 struct YawingAnglerVelocityChartOverlay: View {
     var cameraViewModel: CameraViewModel
-    var carv2DataPair: Carv2DataPair = Carv2DataPair.shared
     
     
     var body: some View {
@@ -13,7 +12,7 @@ struct YawingAnglerVelocityChartOverlay: View {
             // カメラプレビュー
             CameraPreview(session: cameraViewModel.session)
                 .edgesIgnoringSafeArea(.all)
-            Text(carv2DataPair.currentTurn.count.description).foregroundStyle(.green)
+//            Text(carv2DataPair.currentTurn.count.description).foregroundStyle(.green)
             // チャートオーバーレイ
             VStack {
                 
