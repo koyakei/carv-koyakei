@@ -38,7 +38,7 @@ class YawingBeep{
     
     private var cancellable: AnyCancellable? = nil
     
-    private func handleDataPairChange(_ carv2DataPair: Carv2DataPair) {
+    private func handleDataPairChange(_ carv2DataPair: Carv2AnalyzedDataPair) {
         if isBeeping == false { return }
         if (-diffYawingTargetAngle...diffYawingTargetAngle).contains(Double(carv2DataPair.yawingAngulerRateDiffrential) ) {
             conductor.data.isPlaying = false

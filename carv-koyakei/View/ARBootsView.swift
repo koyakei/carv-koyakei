@@ -191,62 +191,62 @@ struct ARBootsView: View {
     // 外足のロール角度を重ねて表示
     private var chartOverlay: some View {
         VStack(alignment: .leading) {
-            Text("ロール角比較")
-                        .font(.caption.bold())
-                        .foregroundStyle(.secondary)
-                    
-                    Chart {
-                        // 前回ターン（青い折れ線）
-                        ForEach(carv2DataPair.beforeTurn) { data in
-                            PointMark(
-                                x: .value("フェーズ", abs(data.percentageOfTurnsByTime)),
-                                y: .value("角度", abs(data.outsideSkiRollAngle))
-                            )
-                            .interpolationMethod(.catmullRom)
-                            .foregroundStyle(.blue)
-                        }
-                        
-                        // 現在ターン（赤いポイント）
-                        ForEach(carv2DataPair.currentTurn) { data in
-                            PointMark(
-                                x: .value("フェーズ", data.percentageOfTurnsByTime),
-                                y: .value("角度", abs(data.outsideSkiRollAngle))
-                            )
-                            .interpolationMethod(.catmullRom)
-                            .foregroundStyle(.red)
-                        }
-                    }
-                    .chartXScale(domain: 0...1)
-                    .chartXAxis {
-                        AxisMarks(values: [0, 0.2, 0.4, 0.6, 0.8, 1.0]) { value in
-                            AxisGridLine()
-                            AxisTick()
-                            AxisValueLabel {
-                                if let doubleValue = value.as(Double.self) {
-                                    Text("\(doubleValue, format: .number.precision(.fractionLength(2)))")
-                                }
-                            }
-                        }
-                    }
-                    .chartYAxis {
-                        AxisMarks(values: [0, Double.pi/6, Double.pi/3, Double.pi/2]) { value in
-                                AxisValueLabel {
-                                    if let doubleValue = value.as(Double.self) {
-                                        if doubleValue == 0 {
-                                            Text("0°")
-                                        } else if doubleValue == Double.pi/6 {
-                                            Text("30°")
-                                        } else if doubleValue == Double.pi/3 {
-                                            Text("60°")
-                                        } else if doubleValue == Double.pi/2 {
-                                            Text("90°")
-                                        }
-                                    }
-                                }
-                            }
-                    }
-                    .chartYScale(domain: 0...(Double.pi/2))
-                    .frame(width: 300, height: 150)
+//            Text("ロール角比較")
+//                        .font(.caption.bold())
+//                        .foregroundStyle(.secondary)
+//                    
+//                    Chart {
+//                        // 前回ターン（青い折れ線）
+//                        ForEach(carv2DataPair.beforeTurn) { data in
+//                            PointMark(
+//                                x: .value("フェーズ", abs(data.percentageOfTurnsByTime)),
+//                                y: .value("角度", abs(data.outsideSkiRollAngle))
+//                            )
+//                            .interpolationMethod(.catmullRom)
+//                            .foregroundStyle(.blue)
+//                        }
+//                        
+//                        // 現在ターン（赤いポイント）
+//                        ForEach(carv2DataPair.currentTurn) { data in
+//                            PointMark(
+//                                x: .value("フェーズ", data.percentageOfTurnsByTime),
+//                                y: .value("角度", abs(data.outsideSkiRollAngle))
+//                            )
+//                            .interpolationMethod(.catmullRom)
+//                            .foregroundStyle(.red)
+//                        }
+//                    }
+//                    .chartXScale(domain: 0...1)
+//                    .chartXAxis {
+//                        AxisMarks(values: [0, 0.2, 0.4, 0.6, 0.8, 1.0]) { value in
+//                            AxisGridLine()
+//                            AxisTick()
+//                            AxisValueLabel {
+//                                if let doubleValue = value.as(Double.self) {
+//                                    Text("\(doubleValue, format: .number.precision(.fractionLength(2)))")
+//                                }
+//                            }
+//                        }
+//                    }
+//                    .chartYAxis {
+//                        AxisMarks(values: [0, Double.pi/6, Double.pi/3, Double.pi/2]) { value in
+//                                AxisValueLabel {
+//                                    if let doubleValue = value.as(Double.self) {
+//                                        if doubleValue == 0 {
+//                                            Text("0°")
+//                                        } else if doubleValue == Double.pi/6 {
+//                                            Text("30°")
+//                                        } else if doubleValue == Double.pi/3 {
+//                                            Text("60°")
+//                                        } else if doubleValue == Double.pi/2 {
+//                                            Text("90°")
+//                                        }
+//                                    }
+//                                }
+//                            }
+//                    }
+//                    .chartYScale(domain: 0...(Double.pi/2))
+//                    .frame(width: 300, height: 150)
         }
     }
 }

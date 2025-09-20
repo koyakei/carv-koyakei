@@ -16,11 +16,10 @@ struct carv_koyakeiApp: App {
     @Environment(\.scenePhase) var scenePhase
     private var yawingBeep: YawingBeep
     private var rollingBeep: RollingBeep
-    private var carv2AnalyzedDataPairManager: Carv2AnalyzedDataPairManager = Carv2AnalyzedDataPairManager(carv2DataPair: Carv2DataPair.shared)
     private var dataManager: DataManager
     private var bleManager : BluethoothCentralManager = BluethoothCentralManager()
     init() {
-        dataManager = DataManager(bluethoothCentralManager: bleManager, carv2DataPair: Carv2DataPair.shared)
+        dataManager = DataManager(bluethoothCentralManager: bleManager)
         self.yawingBeep = YawingBeep(dataManager: dataManager)
         self.rollingBeep = RollingBeep(dataManager: dataManager)
     }

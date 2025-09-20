@@ -18,6 +18,15 @@ struct Carv2AnalyzedDataPair {
     var percentageOfTurnsByAngle: Float
     var percentageOfTurnsByTime: TimeInterval
     
+    init(left: Carv2Data = .init(), right: Carv2Data = .init(), recordetTime: Date = Date.now, isTurnSwitching: Bool = false, percentageOfTurnsByAngle: Float = 0, percentageOfTurnsByTime: TimeInterval = 0) {
+        self.left = left
+        self.right = right
+        self.recordetTime = recordetTime
+        self.isTurnSwitching = isTurnSwitching
+        self.percentageOfTurnsByAngle = percentageOfTurnsByAngle
+        self.percentageOfTurnsByTime = percentageOfTurnsByTime
+    }
+    
     var yawingSide: TurnYawingSide {
         get{
             switch unitedYawingAngle {
@@ -60,4 +69,7 @@ struct Carv2AnalyzedDataPair {
     var unifiedDiffrentialAttitudeFromLeftToRight: Rotation3DFloat {
         left.attitude.inverse * right.attitude
     }
+    // ローリングの方向を　realitykit 用の変換コードを一つの行列変換で表現したやつを掛けて揃えなきゃいけないんだけど、やってない。
+    // ここでサボると加速度の変換がおかしなことになる。
+    var rollingAngulerRateDiffrential: Float { Float(right.angularVelocity.x + left.angularVelocity.x)}
 }
