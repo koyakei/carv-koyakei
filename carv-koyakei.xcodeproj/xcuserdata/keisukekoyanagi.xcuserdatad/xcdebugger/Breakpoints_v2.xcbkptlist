@@ -348,8 +348,8 @@
             filePath = "carv-koyakei/DataManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "93"
-            endingLineNumber = "93"
+            startingLineNumber = "99"
+            endingLineNumber = "99"
             landmarkName = "expoert()"
             landmarkType = "7">
          </BreakpointContent>
@@ -358,46 +358,16 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "85E739C9-4BCC-4CCE-9E63-6EF0BD5076E9"
-            shouldBeEnabled = "No"
+            shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "carv-koyakei/DataManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "97"
-            endingLineNumber = "97"
+            startingLineNumber = "103"
+            endingLineNumber = "103"
             landmarkName = "expoert()"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "85E739C9-4BCC-4CCE-9E63-6EF0BD5076E9 - ce8199579b99abfb"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "carv_koyakei.DataManager.expoert() -&gt; ()"
-                  moduleName = "carv-koyakei.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/keisukekoyanagi/Documents/carv-koyakei/carv-koyakei/DataManager.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "98"
-                  endingLineNumber = "98">
-               </Location>
-               <Location
-                  uuid = "85E739C9-4BCC-4CCE-9E63-6EF0BD5076E9 - ce8199579b99abda"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "carv_koyakei.DataManager.expoert() -&gt; ()"
-                  moduleName = "carv-koyakei.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/keisukekoyanagi/Documents/carv-koyakei/carv-koyakei/DataManager.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "97"
-                  endingLineNumber = "97">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

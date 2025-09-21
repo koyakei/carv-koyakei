@@ -13,7 +13,7 @@ final class DataManager :ObservableObject {
     
     private var lastFinishedTrunData: SingleFinishedTurnData {
         get {
-            finishedTurnDataArray.last ?? .init(nuberOfTrun: 0, turnPhases: [])
+            finishedTurnDataArray.last ?? .init(numberOfTrun: 0, turnPhases: [])
         }
     }
     
@@ -56,7 +56,7 @@ final class DataManager :ObservableObject {
                 self.carv2DataPair = dataPair
                 self.latestNotCompletedTurnCarv2AnalyzedDataPairs.append(dataPair)
                 if dataPair.isTurnSwitching {
-                    self.finishedTurnDataArray.append(.init(nuberOfTrun: self.numberOfTurn, turnPhases: self.latestNotCompletedTurnCarv2AnalyzedDataPairs))
+                    self.finishedTurnDataArray.append(.init(numberOfTrun: self.numberOfTurn, turnPhases: self.latestNotCompletedTurnCarv2AnalyzedDataPairs))
                     self.latestNotCompletedTurnCarv2AnalyzedDataPairs.removeAll()
                     self.numberOfTurn += 1
                 }
@@ -72,6 +72,12 @@ final class DataManager :ObservableObject {
 //            }
 //        }
     }
+    
+    // To convert:
+    func flatten(turnData: SingleFinishedTurnData) -> [TurnPhase] {
+        return turnData.turnPhases.map { TurnPhase(numberOfTurn: turnData.numberOfTrun, turnPhase: $0) }
+    }
+    
     func expoert(){
         do {
             let encoder = JSONEncoder()
@@ -80,15 +86,15 @@ final class DataManager :ObservableObject {
 //            encoder.outputFormatting = .prettyPrinted  整形JSONにしたい場合
               
             // データをJSONにエンコード
-            let jsonData = try encoder.encode(finishedTurnDataArray)
+            let jsonData = try encoder.encode(finishedTurnDataArray.map{flatten(turnData: $0)}.flatMap(\.self))
             let df = DateFormatter()
-                df.dateFormat = "yyyy年MM月dd日 HH:mm:ss"
+                df.dateFormat = "yyyy年MM月dd日HH:mm:ss"
         
             // 保存先URL (例: Documentsディレクトリ下のperson.json)
             let fileManager = FileManager.default
             let urls = fileManager.urls(for: .documentDirectory, in: .userDomainMask)
             if let documentURL = urls.first {
-                let fileURL = documentURL.appendingPathComponent("runData\(df.string(from: finishedTurnDataArray[safe: 0, default: SingleFinishedTurnData.init(nuberOfTrun: 0, turnPhases: [])].turnStartedTime)).json")
+                let fileURL = documentURL.appendingPathComponent("runData\(df.string(from: finishedTurnDataArray[safe: 1, default: SingleFinishedTurnData.init(numberOfTrun: 0, turnPhases: [])].turnStartedTime)).json")
                 // ファイルへ書き込み
                 try jsonData.write(to: fileURL)
                 print("JSONファイルを保存しました: \(fileURL)")
@@ -145,8 +151,16 @@ private struct EncodableTurnPhase: Encodable {
     }
 }
 
+
+struct TurnPhase : Encodable{
+    let numberOfTurn: Int
+    let turnPhase: Carv2AnalyzedDataPair
+}
+
+
+
 struct SingleFinishedTurnData: Encodable {
-    let nuberOfTrun: Int
+    let numberOfTrun: Int
     let turnPhases: [Carv2AnalyzedDataPair]
 
     var turnStartedTime: Date {
@@ -179,7 +193,7 @@ struct SingleFinishedTurnData: Encodable {
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(nuberOfTrun, forKey: .numberOfTrun)
+        try container.encode(numberOfTrun, forKey: .numberOfTrun)
         try container.encode(turnStartedTime, forKey: .turnStartedTime)
         try container.encode(turnEndedTime, forKey: .turnEndedTime)
         try container.encode(turnDuration, forKey: .turnDuration)
