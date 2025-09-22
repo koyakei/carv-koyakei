@@ -7,112 +7,93 @@
 
 import Foundation
 import CoreBluetooth
+import Combine
 
-class Carv1DevicePeripheral : NSObject, CBPeripheralManagerDelegate {
-
-    let CHARACTERISTIC_UUID = CBUUID(string:"D74E4C2A-4D3F-DDE6-04AD-568063771B11")
-    let SERVICE_UUID = CBUUID(string:"2DFBFFFF-960D-4909-8D28-F353CB168E8A")
-    let LOCAL_NAME = "⛷CARV"
-
-    private var peripheralManager : CBPeripheralManager?
-    private var characteristic: CBMutableCharacteristic
-    private var ready = false
-
-    public override init(){
-        characteristic = CBMutableCharacteristic(
-            type: CHARACTERISTIC_UUID,
-            properties: CBCharacteristicProperties.read.union(CBCharacteristicProperties.notify),
-            value:nil,
-            permissions:CBAttributePermissions.readable)
-
+@MainActor
+class Carv1DevicePeripheral : NSObject, Identifiable, CBPeripheralDelegate , ObservableObject{
+    let id: UUID
+    @Published var peripheral: CBPeripheral
+    @Published var data: Data?
+    let periferalName = "⛷CARV"
+    
+    init(peripheral: CBPeripheral) {
+        self.id = peripheral.identifier
+        self.peripheral = peripheral
         super.init()
-
-        peripheralManager = CBPeripheralManager(delegate: self, queue: nil)
+        self.peripheral.delegate = self
     }
-
-    public func update(_ data: Data?) -> Bool {
-        if(ready){
-            if let d = data{
-                characteristic.value = d
-                return peripheralManager!.updateValue(d, for: characteristic, onSubscribedCentrals: nil)
-            }else{
-                print("data is null")
-            }
-        }else{
-            print("not ready")
+    
+    // 特性発見メソッドを実装
+    public func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: (any Error)?) {
+        if let error = error {
+            print("特性発見エラー: \(error.localizedDescription)")
+            return
         }
-        return false
-    }
-
-
-
-    /*
-     CBPeripheralManagerDelegate
-    */
-
-    public func peripheralManagerDidUpdateState(_ peripheral: CBPeripheralManager){
-        switch (peripheral.state){
-        case .poweredOn:
-            print("PeripheralManager state is ok")
-
-            let service = CBMutableService(type: SERVICE_UUID, primary: true)
-            service.characteristics = [characteristic]
-            peripheralManager!.add(service)
-            ready = true
-
-        default:
-            print("PeripheralManager state is ng:", peripheral.state)
-            ready = false
+        
+        guard let characteristics = service.characteristics else { return }
+        for characteristic in characteristics {
+            print("発見された特性: \(characteristic.uuid)")
         }
     }
-
-    public func peripheralManager(_ peripheral: CBPeripheralManager, didAdd service: CBService, error: (any Error)?){
-        if(error != nil){
-            print("Add Service error:", error!)
-        }else{
-            print("Add Service ok")
-            peripheral.startAdvertising([
-                CBAdvertisementDataLocalNameKey: LOCAL_NAME,
-                CBAdvertisementDataServiceUUIDsKey: [SERVICE_UUID]
-                ])
+    
+    
+    func subscribeAttitude() {
+        guard let characteristic = findCharacteristic(periferalName: peripheral.name!) else {
+            print("Characteristic not found")
+            return
+        }
+        
+        // 通知サポートチェックを追加
+        guard characteristic.properties.contains(.notify) else {
+            print("Characteristic does not support notifications")
+            return
+        }
+        
+        self.peripheral.setNotifyValue(true, for: characteristic)
+        
+        print("Subscribe initiated")
+    }
+    
+    func unsubscribeAttitude() {
+        guard let characteristic = findCharacteristic(periferalName: peripheral.name!) else { return }
+        peripheral.setNotifyValue(false, for: characteristic)
+    }
+    
+    private func findCharacteristic(periferalName : String) -> CBCharacteristic? {
+        guard let service = peripheral.services?.first(where: { $0.peripheral?.name == periferalName }) else {
+            print("no service")
+            return nil }
+        return service.characteristics?.first
+    }
+    
+    // MARK: - CBPeripheralDelegate
+    
+    func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: (any Error)?) {
+        if let error = error {
+            print("Error discovering services: \(error.localizedDescription)")
+            return
+        }
+        
+        
+        for service in peripheral.services ?? [] {
+            peripheral.discoverCharacteristics(nil, for: service)
         }
     }
-
-    public func peripheralManagerDidStartAdvertising(_ peripheral: CBPeripheralManager, error: (any Error)?){
-        if(error != nil){
-            print("Start Advertising error:", error!)
-        }else{
-            print("Start Advertising ok")
+    
+    @MainActor func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: (any Error)?) {
+        if let error = error {
+            print("Error updating value: \(error.localizedDescription)")
+            return
         }
+        self.data = characteristic.value
     }
-
-    public func peripheralManager(_ peripheral: CBPeripheralManager, didReceiveRead request: CBATTRequest){
-        var value: Data?
-        switch request.characteristic.uuid {
-        case characteristic.uuid:
-            value = characteristic.value
-
-        default: break
+    public func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: (any Error)?) {
+        print("peripheral:didUpdateNotificationStateFor: \(characteristic)")
+        if let error = error {
+            print("error: \(error)")
         }
-
-        if let v = value{
-            if (request.offset > v.count) {
-                peripheral.respond(to: request, withResult: CBATTError.invalidOffset)
-                print("Read fail: invalid offset")
-                return;
-            }
-
-            request.value = v.subdata(
-                in: Range(uncheckedBounds: (request.offset, v.count - request.offset))
-            )
-            peripheral.respond(to: request, withResult: CBATTError.success)
-            print("Read success")
-        }else{
-            print("Read fail: wrong characteristic uuid:", request.characteristic.uuid)
-        }
+        print("通知状態更新: \(characteristic.isNotifying ? "有効" : "無効")")
     }
-
-    public func peripheralManager(_ peripheral: CBPeripheralManager, central: CBCentral, didSubscribeTo characteristic: CBCharacteristic){
-        print("Subscribe to", characteristic.uuid)
-    }
+    
 }
+

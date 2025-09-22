@@ -11,7 +11,6 @@ import Combine
 
 @main
 struct carv_koyakeiApp: App {
-    private var carv1DataPair: Carv1DataPair = Carv1DataPair()
     private var locationManager = LocationManager()
     @Environment(\.scenePhase) var scenePhase
     private var yawingBeep: YawingBeep

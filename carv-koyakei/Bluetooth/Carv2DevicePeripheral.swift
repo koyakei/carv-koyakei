@@ -15,7 +15,6 @@ final class Carv2DevicePeripheral: NSObject, Identifiable,@MainActor CBPeriphera
     let id: UUID
     @Published var peripheral: CBPeripheral
     @Published var data: Data?
-    
     init(peripheral: CBPeripheral) {
         self.id = peripheral.identifier
         self.peripheral = peripheral

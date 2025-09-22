@@ -5,21 +5,22 @@ import Foundation
 import SwiftUI
 
 @MainActor
-class BluethoothCentralManager: NSObject, @MainActor CBCentralManagerDelegate , ObservableObject{
+class Carv1BluethoothCentralManager: NSObject, @MainActor CBCentralManagerDelegate , ObservableObject{
     
 //    // ipad
 //    static let rightCharactaristicUUID = UUID(uuidString: "85A29A4C-09C3-C632-858A-3387339C67CF")
 //    static let leftCharactaristicUUID = UUID(uuidString:  "850D8BCF-3B03-1322-F51C-DD38E961FC1A")
     // iphone
-    let rightCharactaristicUUID = UUID(uuidString: UserDefaults.standard.string(forKey: "rightCarv2UUID") ?? "85E2946B-0D18-FA01-E1C9-0393EDD9013A")//  UUID(uuidString: "85E2946B-0D18-FA01-E1C9-0393EDD9013A")
+    let rightCharactaristicUUID = UUID(uuidString:"D74E4C2A-4D3F-DDE6-04AD-568063771B11")
     let leftCharactaristicUUID = UUID(uuidString: UserDefaults.standard.string(forKey: "leftCarv2UUID") ?? "57089C67-2275-E220-B6D3-B16E2639EFD6") // UUID(uuidString:  "57089C67-2275-E220-B6D3-B16E2639EFD6")
     
-    static let periferalName = "CARV 2"
-    @Published var carv2DeviceLeft: Carv2DevicePeripheral? = nil
-    @Published var carv2DeviceRight: Carv2DevicePeripheral? = nil
+    static let periferalName = "⛷CARV"
+    @Published var carv1DeviceLeft: Carv1DevicePeripheral? = nil
+    @Published var carv1DeviceRight: Carv1DevicePeripheral? = nil
     
     var centralManager: CBCentralManager!
-    static let targetServiceUUID = CBUUID(string: "2DFBFFFF-960D-4909-8D28-F353CB168E8A")
+    let targetDataSubscribeServiceUUID = CBUUID(string: "2DFBFFFF-960D-4909-8D28-F353CB168E8A")
+    let targetDataWriteServiceUUID  = CBUUID(string: "2DFBFFFF-960D-4909-8D28-F353CB168E8A")
     override init() {
         super.init()
         centralManager = CBCentralManager(delegate: self, queue: nil)
@@ -50,10 +51,10 @@ class BluethoothCentralManager: NSObject, @MainActor CBCentralManagerDelegate , 
     
     private func addDevice(_ peripheral: CBPeripheral) {
         if peripheral.identifier == leftCharactaristicUUID{
-            self.carv2DeviceLeft = Carv2DevicePeripheral(peripheral: peripheral)
+            self.carv1DeviceLeft = Carv1DevicePeripheral(peripheral: peripheral)
         }
         if peripheral.identifier == rightCharactaristicUUID{
-            self.carv2DeviceRight = Carv2DevicePeripheral(peripheral: peripheral)
+            self.carv1DeviceRight = Carv1DevicePeripheral(peripheral: peripheral)
         }
     }
     
@@ -70,23 +71,23 @@ class BluethoothCentralManager: NSObject, @MainActor CBCentralManagerDelegate , 
     }
     
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
-        if peripheral.identifier == carv2DeviceLeft?.peripheral.identifier{
-            peripheral.discoverServices([BluethoothCentralManager.targetServiceUUID])
+        if peripheral.identifier == carv1DeviceLeft?.peripheral.identifier{
+            peripheral.discoverServices([self.targetDataSubscribeServiceUUID])
             print("connected")
         }
         
-        if peripheral.identifier == carv2DeviceRight?.peripheral.identifier{
-            peripheral.discoverServices([BluethoothCentralManager.targetServiceUUID])
+        if peripheral.identifier == carv1DeviceRight?.peripheral.identifier{
+            peripheral.discoverServices([self.targetDataSubscribeServiceUUID])
             print("connected")
         }
     }
     
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: (any Error)?) {
-        if peripheral.identifier == carv2DeviceLeft?.peripheral.identifier{
+        if peripheral.identifier == carv1DeviceLeft?.peripheral.identifier{
             print(peripheral.identifier)
             print("disconnected")
         }
-        if peripheral.identifier == carv2DeviceRight?.peripheral.identifier{
+        if peripheral.identifier == carv1DeviceRight?.peripheral.identifier{
             print(peripheral.identifier)
             print("disconnected")
         }

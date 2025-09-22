@@ -3,28 +3,29 @@ import Foundation
 import Spatial
 
 @MainActor
-final class DataManager :ObservableObject {
-    let bluethoothCentralManager: BluethoothCentralManager
+final class Carv1DataManager :ObservableObject {
+    let bluethoothCentralManager: Carv1BluethoothCentralManager
     private var cancellables = Set<AnyCancellable>()
-    @Published var carv2DataPair: Carv2AnalyzedDataPair = .init()
-    @Published var latestNotCompletedTurnCarv2AnalyzedDataPairs: [Carv2AnalyzedDataPair]  = []
-    @Published var finishedTurnDataArray: [SingleFinishedTurnData] = []
+    @Published var carvDataPair: Carv1AnalyzedDataPair = .init()
+    @Published var latestNotCompletedTurnCarvAnalyzedDataPairs: [Carv1AnalyzedDataPair]  = []
+    @Published var finishedTurnDataArray: [Carv1SingleFinishedTurnData] = []
     @Published var skytechMode: Bool = false
-    
-    private var lastFinishedTrunData: SingleFinishedTurnData {
+    @Published var calibration基準値Right :[UInt8] = [UInt8](repeating: 0xff, count: 38)
+    @Published var calibration基準値Left :[UInt8] = [UInt8](repeating: 0xff, count: 38)
+    private var lastFinishedTrunData: Carv1SingleFinishedTurnData {
         get {
             finishedTurnDataArray.last ?? .init(numberOfTrun: 0, turnPhases: [])
         }
     }
     
-    init(bluethoothCentralManager: BluethoothCentralManager) {
+    init(bluethoothCentralManager: Carv1BluethoothCentralManager) {
         self.bluethoothCentralManager = bluethoothCentralManager
         subscribe()
     }
     
     @Published var switchingAngluerRateDegree: Float = 15
     //スカイテックモードと通常モードを分けよう。
-    func isTurnSwitchInNomal(carvDataPair: Carv2DataPair) -> Bool{
+    func isTurnSwitchInNomal(carvDataPair: Carv1DataPair) -> Bool{
         if skytechMode {
             (Angle2DFloat(degrees: -switchingAngluerRateDegree).radians..<Angle2DFloat(degrees: switchingAngluerRateDegree).radians ~= carvDataPair.rollingAngulerRateDiffrential && carvDataPair.recordedTime.timeIntervalSince1970 - self.lastFinishedTrunData.turnEndedTime.timeIntervalSince1970 > 0.4)
         } else {
@@ -34,39 +35,55 @@ final class DataManager :ObservableObject {
     
     @Published var numberOfTurn = 0
     
+    private func percentageOfTurnsByAngle(_ carvDataPair: Carv1DataPair)-> Float{
+        abs((carvDataPair.unitedAttitude * self.lastFinishedTrunData.lastPhaseOfTune.unitedAttitude.inverse).angle.radians) / abs(self.lastFinishedTrunData.diffrencialAngleFromStartToEnd.radians)
+    }
+    private func percentageOfTurnsByTime(_ carvDataPair: Carv1DataPair)-> Double{
+        abs((carvDataPair.recordedTime.timeIntervalSince1970 - self.lastFinishedTrunData.turnEndedTime.timeIntervalSince1970) / self.lastFinishedTrunData.turnDuration)
+    }
     private func subscribe() {
-        bluethoothCentralManager.$carv2DeviceLeft
-            .combineLatest(bluethoothCentralManager.$carv2DeviceRight)
-            .compactMap { left, right in
-                left.flatMap { l in right.map { r in (l, r) } }
+        bluethoothCentralManager.$carv1DeviceLeft
+            .combineLatest(bluethoothCentralManager.$carv1DeviceRight)
+            .compactMap { (left: Carv1DevicePeripheral?, right: Carv1DevicePeripheral?) -> (Carv1DevicePeripheral, Carv1DevicePeripheral)? in
+                guard let l = left, let r = right else { return nil }
+                return (l, r)
             }
-            .flatMap { left, right in
+            .flatMap { [unowned self] (left: Carv1DevicePeripheral, right: Carv1DevicePeripheral) -> AnyPublisher<Carv1AnalyzedDataPair, Never> in
                 left.$data
-                    .compactMap { $0 }
-                    .combineLatest(right.$data.compactMap { $0 })
-                    .map { leftData, rightData in
-                        let carvDataPair = Carv2DataPair(left: Carv2Data(leftData), right: Carv2Data(rightData))
-                        return Carv2AnalyzedDataPair(left: carvDataPair.left, right: carvDataPair.right, recordetTime: carvDataPair.recordedTime, isTurnSwitching: self.isTurnSwitchInNomal(carvDataPair: carvDataPair), percentageOfTurnsByAngle: abs((carvDataPair.unitedAttitude * self.lastFinishedTrunData.lastPhaseOfTune.unitedAttitude.inverse).angle.radians) / abs(self.lastFinishedTrunData.diffrencialAngleFromStartToEnd.radians), percentageOfTurnsByTime: abs((carvDataPair.recordedTime.timeIntervalSince1970 - self.lastFinishedTrunData.turnEndedTime.timeIntervalSince1970) / self.lastFinishedTrunData.turnDuration))
+                    .compactMap { (leftData: Data?) -> Data? in leftData }
+                    .combineLatest(
+                        right.$data.compactMap { (rightData: Data?) -> Data? in rightData }
+                    )
+                    .map { (leftData: Data, rightData: Data) -> Carv1AnalyzedDataPair in
+                        let carvDataPair = Carv1DataPair(left: Carv1Data(leftData, self.calibration基準値Left), right: Carv1Data(rightData, self.calibration基準値Right))
+                        return Carv1AnalyzedDataPair(
+                            left: carvDataPair.left,
+                            right: carvDataPair.right,
+                            recordetTime: carvDataPair.recordedTime,
+                            isTurnSwitching: self.isTurnSwitchInNomal(carvDataPair: carvDataPair),
+                            percentageOfTurnsByAngle: self.percentageOfTurnsByAngle(carvDataPair),
+                            percentageOfTurnsByTime: self.percentageOfTurnsByTime(carvDataPair)
+                        )
                     }
                     .eraseToAnyPublisher()
             }
-            .receive(on: ImmediateScheduler.shared)
-            .sink { [weak self] (dataPair: Carv2AnalyzedDataPair) in
-                guard let self = self else { return }
-                self.carv2DataPair = dataPair
-                self.latestNotCompletedTurnCarv2AnalyzedDataPairs.append(dataPair)
-                if dataPair.isTurnSwitching {
-                    self.finishedTurnDataArray.append(.init(numberOfTrun: self.numberOfTurn, turnPhases: self.latestNotCompletedTurnCarv2AnalyzedDataPairs))
-                    self.latestNotCompletedTurnCarv2AnalyzedDataPairs.removeAll()
-                    self.numberOfTurn += 1
-                }
-            }
-            .store(in: &cancellables)
+//            .receive(on: ImmediateScheduler.shared)
+//            .sink { [weak self] (dataPair: Carv1AnalyzedDataPair) in
+//                guard let self = self else { return }
+//                self.carvDataPair = dataPair
+//                self.latestNotCompletedTurnCarvAnalyzedDataPairs.append(dataPair)
+//                if dataPair.isTurnSwitching {
+//                    self.finishedTurnDataArray.append(.init(numberOfTrun: self.numberOfTurn, turnPhases: self.latestNotCompletedTurnCarvAnalyzedDataPairs))
+//                    self.latestNotCompletedTurnCarvAnalyzedDataPairs.removeAll()
+//                    self.numberOfTurn += 1
+//                }
+//            }
+//            .store(in: &cancellables)
     }
     
     // To convert:
-    func flatten(turnData: SingleFinishedTurnData) -> [TurnPhase] {
-        return turnData.turnPhases.map { TurnPhase(numberOfTurn: turnData.numberOfTrun, turnPhase: $0) }
+    func flatten(turnData: Carv1SingleFinishedTurnData) -> [Carv1TurnPhase] {
+        return turnData.turnPhases.map { Carv1TurnPhase(numberOfTurn: turnData.numberOfTrun, turnPhase: $0) }
     }
     
     func expoert(){
@@ -94,7 +111,7 @@ final class DataManager :ObservableObject {
             let fileManager = FileManager.default
             let urls = fileManager.urls(for: .documentDirectory, in: .userDomainMask)
             if let documentURL = urls.first {
-                let fileURL = documentURL.appendingPathComponent("runData\(df.string(from: finishedTurnDataArray[safe: 1, default: SingleFinishedTurnData.init(numberOfTrun: 0, turnPhases: [])].turnStartedTime)).json")
+                let fileURL = documentURL.appendingPathComponent("runData\(df.string(from: finishedTurnDataArray[safe: 1, default: Carv1SingleFinishedTurnData.init(numberOfTrun: 0, turnPhases: [])].turnStartedTime)).json")
                 // ファイルへ書き込み
                 try jsonData.write(to: fileURL)
                 print("JSONファイルを保存しました: \(fileURL)")
@@ -131,7 +148,8 @@ final class DataManager :ObservableObject {
 
 import Spatial
 
-private struct EncodableTurnPhase: Encodable {
+
+struct Carv1EncodableTurnPhase: Encodable {
     let timestamp: Date
     let isTurnSwitching: Bool
     let percentageOfTurnsByAngle: Float
@@ -139,28 +157,28 @@ private struct EncodableTurnPhase: Encodable {
     // Fallback numeric snapshots for attitudes/angles if available; optional to avoid failures
     let unitedAttitudeAngleRadians: Float?
 
-    init(from phase: Carv2AnalyzedDataPair) {
+    init(from phase: Carv1AnalyzedDataPair) {
         self.timestamp = phase.recordetTime
         self.isTurnSwitching = phase.isTurnSwitching
         self.percentageOfTurnsByAngle = phase.percentageOfTurnsByAngle
         self.percentageOfTurnsByTime = phase.percentageOfTurnsByTime
         // Try to derive a single representative angle in radians if possible; if the type doesn't expose it, leave nil
         // Assuming `unitedAttitude.angle.radians` exists per usage above
-        self.unitedAttitudeAngleRadians = Float(phase.unitedAttitude.angle.radians)
+        self.unitedAttitudeAngleRadians = phase.unitedAttitude.angle.radians
     }
 }
 
 
-struct TurnPhase : Encodable{
+struct Carv1TurnPhase : Encodable{
     let numberOfTurn: Int
-    let turnPhase: Carv2AnalyzedDataPair
+    let turnPhase: Carv1AnalyzedDataPair
 }
 
 
-
-struct SingleFinishedTurnData: Encodable {
+@MainActor
+struct Carv1SingleFinishedTurnData: Encodable {
     let numberOfTrun: Int
-    let turnPhases: [Carv2AnalyzedDataPair]
+    let turnPhases: [Carv1AnalyzedDataPair]
 
     var turnStartedTime: Date {
         firstPhaseOfTune.recordetTime
@@ -174,11 +192,12 @@ struct SingleFinishedTurnData: Encodable {
     var diffrencialAngleFromStartToEnd: Angle2DFloat {
         (lastPhaseOfTune.unitedAttitude * firstPhaseOfTune.unitedAttitude.inverse).angle
     }
-    var firstPhaseOfTune: Carv2AnalyzedDataPair {
-        turnPhases[safe: 0, default: Carv2AnalyzedDataPair(left: .init(), right: .init(), recordetTime: Date(timeIntervalSince1970: 0), isTurnSwitching: true, percentageOfTurnsByAngle: 0, percentageOfTurnsByTime: 0)]
+    var firstPhaseOfTune: Carv1AnalyzedDataPair {
+        turnPhases[safe: 0, default: Carv1AnalyzedDataPair(left: .init(), right: .init(), recordetTime: Date(timeIntervalSince1970: 0), isTurnSwitching: true, percentageOfTurnsByAngle: 0, percentageOfTurnsByTime: 0)]
     }
-    var lastPhaseOfTune: Carv2AnalyzedDataPair {
-        turnPhases[safe: turnPhases.endIndex - 1, default: Carv2AnalyzedDataPair(left: .init(), right: .init(), recordetTime: Date(timeIntervalSince1970: 1), isTurnSwitching: true, percentageOfTurnsByAngle: 0, percentageOfTurnsByTime: 0)]
+    
+    var lastPhaseOfTune: Carv1AnalyzedDataPair {
+        turnPhases[safe: turnPhases.endIndex - 1, default: Carv1AnalyzedDataPair(left: .init(), right: .init(), recordetTime: Date(timeIntervalSince1970: 1), isTurnSwitching: true, percentageOfTurnsByAngle: 0, percentageOfTurnsByTime: 0)]
     }
 
     enum CodingKeys: String, CodingKey {
@@ -199,7 +218,7 @@ struct SingleFinishedTurnData: Encodable {
         // Encode only the radians (Float) to avoid encoding non-Encodable angle type
         try container.encode(Float(diffrencialAngleFromStartToEnd.radians), forKey: .diffrencialAngleFromStartToEndRadians)
         // Map phases into encodable DTOs
-        let encodablePhases = turnPhases.map { EncodableTurnPhase(from: $0) }
+        let encodablePhases = turnPhases.map { Carv1EncodableTurnPhase(from: $0) }
         try container.encode(encodablePhases, forKey: .phases)
     }
 }
