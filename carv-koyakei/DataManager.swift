@@ -62,15 +62,6 @@ final class DataManager :ObservableObject {
                 }
             }
             .store(in: &cancellables)
-        
-//        $carv2DataPair.sink { (dataPair : Carv2AnalyzedDataPair) in
-//            self.latestNotCompletedTurnCarv2AnalyzedDataPairs.append(dataPair)
-//            if dataPair.isTurnSwitching{
-//                self.finishedTurnDataArray.append(.init(nuberOfTrun: self.numberOfTurn, turnPhases: self.latestNotCompletedTurnCarv2AnalyzedDataPairs))
-//                self.latestNotCompletedTurnCarv2AnalyzedDataPairs.removeAll()
-//                self.numberOfTurn += 1
-//            }
-//        }
     }
     
     // To convert:

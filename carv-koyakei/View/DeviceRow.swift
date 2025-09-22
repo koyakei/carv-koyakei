@@ -27,6 +27,11 @@ struct DeviceRow: View {
                 }) {
                     Text("Subscribe")
                 }
+                Button(action: {
+                    device.unsubscribeAttitude()
+                }) {
+                    Text("unsubscribe")
+                }
             }
         }
     }
