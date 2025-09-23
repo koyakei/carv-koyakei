@@ -244,14 +244,14 @@ struct HomeView: View {
                     rollingBeep.isBeeping.toggle()}){
                         Text("rolling beep \(rollingBeep.isBeeping ? "on" : "off")")
                     }
-                Text("Current value: \(yawingBeep.diffYawingTargetAngle, specifier: "%.2f")")
+                Text("Current value: \(rollingBeep.diffYawingTargetAngle, specifier: "%.2f")")
                     .padding()
             }
             if rollingBeep.isBeeping {
                 Slider(
-                    value: $yawingBeep.diffYawingTargetAngle,
-                    in: 0.0...4.0,
-                    step: 0.2
+                    value: $rollingBeep.diffYawingTargetAngle,
+                    in: 0.0...2.0,
+                    step: 0.1
                 ) {
                     Text("Rolling Adjustment")
                 }
