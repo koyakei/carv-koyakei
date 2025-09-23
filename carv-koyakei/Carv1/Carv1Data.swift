@@ -21,26 +21,26 @@ import Combine
 final class Carv1Data:Encodable{
     let attitude: Rotation3DFloat
     let acceleration: SIMD3<Float>
-    let pressure: [UInt8] //= [UInt8](repeating: 0xff, count: 38)
-    let rawPressure: [UInt8] //= [UInt8](repeating: 0xff, count: 38)
+    let pressure: [Float] //= [UInt8](repeating: 0xff, count: 38)
+    let rawPressure: [Float] //= [UInt8](repeating: 0xff, count: 38)
     let angularVelocity: SIMD3<Float>
     let recordedTime: Date = Date.now
     
     init(){
         attitude = .identity
         acceleration = .zero
-        pressure = [UInt8](repeating: 0xff, count: 38)
+        pressure = [Float](repeating: 0xff, count: 38)
         rawPressure = pressure
         angularVelocity = .zero
     }
     
-    @MainActor init(_ data: Data, _ calibrationPressure:[UInt8]) {
+    @MainActor init(_ data: Data, _ calibrationPressure:[Float]) {
         guard data.count >= 19 else {
             fatalError("データ長が不足しています")
         }
         
         self.rawPressure = data.subdata(in: 1..<39).withUnsafeBytes { rawBuffer in
-            rawBuffer.bindMemory(to: UInt8.self).map { UInt8($0)}
+            rawBuffer.bindMemory(to: UInt8.self).map { Float($0)}
         }
         let intbyte :[Float] = data.dropFirst(51).withUnsafeBytes {
             Array(UnsafeBufferPointer<Int16>(start: $0.baseAddress?.assumingMemoryBound(to: Int16.self), count: data.count / MemoryLayout<Int16>.stride))

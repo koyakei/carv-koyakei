@@ -10,8 +10,8 @@ final class Carv1DataManager :ObservableObject {
     @Published var latestNotCompletedTurnCarvAnalyzedDataPairs: [Carv1AnalyzedDataPair]  = []
     @Published var finishedTurnDataArray: [Carv1SingleFinishedTurnData] = []
     @Published var skytechMode: Bool = false
-    @Published var calibration基準値Right :[UInt8] = [UInt8](repeating: 0xff, count: 38)
-    @Published var calibration基準値Left :[UInt8] = [UInt8](repeating: 0xff, count: 38)
+    @Published var calibration基準値Right :[Float] = [Float](repeating: 0, count: 38)
+    @Published var calibration基準値Left :[Float] = [Float](repeating: 0, count: 38)
     private var lastFinishedTrunData: Carv1SingleFinishedTurnData {
         get {
             finishedTurnDataArray.last ?? .init(numberOfTrun: 0, turnPhases: [])
@@ -21,6 +21,18 @@ final class Carv1DataManager :ObservableObject {
     init(bluethoothCentralManager: Carv1BluethoothCentralManager) {
         self.bluethoothCentralManager = bluethoothCentralManager
         subscribe()
+    }
+    
+    func calibratePressureLeft(){
+        $carvDataPair.buffer(size: 15, prefetch: .byRequest, whenFull: .dropOldest)
+            .map { data in
+                data.left.pressure
+            }.reduce([Float](repeating: 0, count: 38), +)
+            .map { data in
+                data.map{ Float($0) / 15}
+            }.sink { [weak self] averagedArray in
+                self?.calibration基準値Right = averagedArray
+            }.store(in: &cancellables)
     }
     
     @Published var switchingAngluerRateDegree: Float = 15
