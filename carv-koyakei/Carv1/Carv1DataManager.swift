@@ -30,9 +30,11 @@ final class Carv1DataManager :ObservableObject {
             }.reduce([Float](repeating: 0, count: 38), +)
             .map { data in
                 data.map{ Float($0) / 15}
-            }.sink { [weak self] averagedArray in
-                self?.calibration基準値Right = averagedArray
-            }.store(in: &cancellables)
+            }.assign(to: \.calibration基準値Right, on: self)
+//            .sink { [weak self] averagedArray in
+//                self?.calibration基準値Right = averagedArray
+//            }
+            .store(in: &cancellables)
     }
     
     @Published var switchingAngluerRateDegree: Float = 15
