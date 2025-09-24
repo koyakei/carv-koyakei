@@ -16,6 +16,7 @@ struct carv_koyakeiApp: App {
     private var yawingBeep: YawingBeep
     private var rollingBeep: RollingBeep
     private var dataManager: DataManager
+    private var carv1DataManager: Carv1DataManager = Carv1DataManager(bluethoothCentralManager: Carv1BluethoothCentralManager())
     private var bleManager : BluethoothCentralManager = BluethoothCentralManager()
     init() {
         dataManager = DataManager(bluethoothCentralManager: bleManager)

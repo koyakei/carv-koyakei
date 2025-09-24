@@ -39,13 +39,13 @@ class Carv1BluethoothCentralManager: NSObject, @MainActor CBCentralManagerDelega
         }
     }
     
-    func connect(carvDevice: Carv2DevicePeripheral) {
+    func connect(carvDevice: Carv1DevicePeripheral) {
         let peripheral = carvDevice.peripheral
         peripheral.delegate = carvDevice
         centralManager.connect(carvDevice.peripheral, options: nil)
     }
     
-    func disconnect(carvDevice: Carv2DevicePeripheral) {
+    func disconnect(carvDevice: Carv1DevicePeripheral) {
         centralManager.cancelPeripheralConnection(carvDevice.peripheral)
     }
     

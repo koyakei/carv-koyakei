@@ -6,6 +6,7 @@ struct ContentView: View {
     var rollingBeep: RollingBeep
     var cameraViewModel = CameraViewModel()
     var dataManager: DataManager
+    var carv1DataManager: Carv1DataManager
     var body: some View {
         TabView {
             HomeView(ble: ble, yawingBeep: yawingBeep,rollingBeep: rollingBeep,dataManager: dataManager)
@@ -18,11 +19,11 @@ struct ContentView: View {
 //                    Image(systemName: "person.fill")
 //                    Text("AR")
 //                }
-//            FootPressureView()
-//                .tabItem {
-//                    Image(systemName: "person.fill")
-//                    Text("pressure")
-//                }
+            FootPressureView(carv1DataManager: carv1DataManager)
+                .tabItem {
+                    Image(systemName: "person.fill")
+                    Text("pressure")
+                }
             switch cameraViewModel.status {
                     case .configured:
                         YawingAnglerVelocityChartOverlay(cameraViewModel: cameraViewModel).tabItem {
