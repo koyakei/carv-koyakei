@@ -19,6 +19,11 @@ struct ContentView: View {
 //                    Image(systemName: "person.fill")
 //                    Text("AR")
 //                }
+            Carv1View(dataManager: carv1DataManager)
+                .tabItem {
+                    Image(systemName: "person.fill")
+                    Text("pressure")
+                }
             FootPressureView(carv1DataManager: carv1DataManager)
                 .tabItem {
                     Image(systemName: "person.fill")

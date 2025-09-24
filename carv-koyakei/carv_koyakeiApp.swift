@@ -25,7 +25,7 @@ struct carv_koyakeiApp: App {
     }
     var body: some Scene {
         WindowGroup {
-            ContentView(ble: bleManager, yawingBeep: yawingBeep,rollingBeep: rollingBeep,dataManager: dataManager)
+            ContentView(ble: bleManager, yawingBeep: yawingBeep,rollingBeep: rollingBeep,dataManager: dataManager, carv1DataManager: carv1DataManager)
         }
     }
 }
