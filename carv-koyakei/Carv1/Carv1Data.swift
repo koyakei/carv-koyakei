@@ -25,7 +25,11 @@ final class Carv1Data:Encodable{
     let rawPressure: [Float] //= [UInt8](repeating: 0xff, count: 38)
     let angularVelocity: SIMD3<Float>
     let recordedTime: Date = Date.now
-    
+    var amountOfPressure: Float {
+        get {
+            pressure.reduce(0, +)
+        }
+    }
     init(){
         attitude = .identity
         acceleration = .zero

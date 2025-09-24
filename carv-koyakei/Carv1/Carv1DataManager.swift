@@ -1,6 +1,7 @@
 import Combine
 import Foundation
 import Spatial
+import SwiftUI
 
 @MainActor
 final class Carv1DataManager :ObservableObject {
@@ -30,10 +31,12 @@ final class Carv1DataManager :ObservableObject {
             }.reduce([Float](repeating: 0, count: 38), +)
             .map { data in
                 data.map{ Float($0) / 15}
-            }.assign(to: \.calibration基準値Right, on: self)
-//            .sink { [weak self] averagedArray in
-//                self?.calibration基準値Right = averagedArray
-//            }
+            }.sink(receiveCompletion: {
+                value in
+                Alert(title: Text("Result"), message: Text("test"), dismissButton: .default(Text("OK")))
+            }, receiveValue: {value in
+                self.calibration基準値Left = value
+            })
             .store(in: &cancellables)
     }
     

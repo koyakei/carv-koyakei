@@ -8,7 +8,7 @@
 import SwiftUI
 import AudioKit
 struct FootPressureView: View {
-    var carv1DataPair :Carv1DataPair
+    var carv1DataManager: Carv1DataManager
     let points: [(x: CGFloat, y: CGFloat)] = [
         (0.4, 0.1),(0.5, 0.1),
         (0.35, 0.15),(0.5, 0.15),(0.6, 0.15),
@@ -24,22 +24,27 @@ struct FootPressureView: View {
         (0.5, 0.9)
     ]
     var body: some View {
-                    Button(action: {
+        Button(action: {
+            carv1DataManager.calibratePressureLeft()
                     }){
-                        Text("Calibrate")
+                        Text("Left Calibrate")
+                    }
+        
+        Button(action: { carv1DataManager.calibratePressureLeft()
+                    }){
+                        Text("Right Calibrate")
                     }
         HStack{
             GeometryReader { geometry in
                 ZStack {
                     Color.blue // 背景色
-                    
-                    ForEach(0..<points.count, id: \.self) { index in
+                    ForEach(0..<carv1DataManager.carvDataPair.left.pressure.count, id: \.self) { index in
                         let point = points[index]
                         let size = min(geometry.size.width, geometry.size.height)
                         let x = point.x * size
                         let y = point.y * size
                         Circle()
-                            .fill(Color(white: (Double(carv1DataPair.left.pressure[index]) / 60.0) ))
+                            .fill(Color(white: (Double(carv1DataManager.carvDataPair.left.pressure[index]) / 60.0) ))
                             .frame(width: size * 0.03, height: size * 0.03)
                             .position(x: x, y: y)
                     }
@@ -49,13 +54,15 @@ struct FootPressureView: View {
             GeometryReader { geometry in
                 ZStack {
                     Color.blue // 背景色
-                    
-                    ForEach(0..<points.count, id: \.self) { index in
+                    ForEach(0..<carv1DataManager.carvDataPair.right.pressure.count, id: \.self) { index in
                         let point = points[index]
                         let size = min(geometry.size.width, geometry.size.height)
                         let x = point.x * size
                         let y = point.y * size
-                        Text(carv1DataPair.left.pressure[index].hex).position(x: x, y: y)
+                        Circle()
+                            .fill(Color(white: (Double(carv1DataManager.carvDataPair.right.pressure[index]) / 60.0) ))
+                            .frame(width: size * 0.03, height: size * 0.03)
+                            .position(x: x, y: y)
                     }
                 }
             }
