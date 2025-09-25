@@ -11,8 +11,10 @@ class Carv1BluethoothCentralManager: NSObject, @MainActor CBCentralManagerDelega
 //    static let rightCharactaristicUUID = UUID(uuidString: "85A29A4C-09C3-C632-858A-3387339C67CF")
 //    static let leftCharactaristicUUID = UUID(uuidString:  "850D8BCF-3B03-1322-F51C-DD38E961FC1A")
     // iphone
-    let rightCharactaristicUUID = UUID(uuidString:"D74E4C2A-4D3F-DDE6-04AD-568063771B11")
-    let leftCharactaristicUUID = UUID(uuidString: UserDefaults.standard.string(forKey: "leftCarv2UUID") ?? "57089C67-2275-E220-B6D3-B16E2639EFD6") // UUID(uuidString:  "57089C67-2275-E220-B6D3-B16E2639EFD6")
+    let rightCharactaristicUUID = UUID(uuidString:"5A5433BD-A1AA-84B1-1F54-B05E46B9D94B")
+    let leftCharactaristicUUID = UUID(uuidString: "DEF38F61-34D1-8014-1A70-50B5A63B377D")
+//    5A5433BD-A1AA-84B1-1F54-B05E46B9D94B
+//    DEF38F61-34D1-8014-1A70-50B5A63B377D
     
     static let periferalName = "⛷CARV"
     @Published var carv1DeviceLeft: Carv1DevicePeripheral? = nil
@@ -20,7 +22,6 @@ class Carv1BluethoothCentralManager: NSObject, @MainActor CBCentralManagerDelega
     
     var centralManager: CBCentralManager!
     let targetDataSubscribeServiceUUID = CBUUID(string: "2DFBFFFF-960D-4909-8D28-F353CB168E8A")
-    let targetDataWriteServiceUUID  = CBUUID(string: "2DFBFFFF-960D-4909-8D28-F353CB168E8A")
     override init() {
         super.init()
         centralManager = CBCentralManager(delegate: self, queue: nil)
@@ -28,12 +29,12 @@ class Carv1BluethoothCentralManager: NSObject, @MainActor CBCentralManagerDelega
     
     func scan() {
         guard centralManager.state == .poweredOn else { return }
-        centralManager.scanForPeripherals(withServices: [BluethoothCentralManager.targetServiceUUID], options: nil)
+        centralManager.scanForPeripherals(withServices: [self.targetDataSubscribeServiceUUID], options: nil)
     }
     
     
     func retrieveAndConnect() {
-        let connectedPeripherals = centralManager.retrieveConnectedPeripherals(withServices: [BluethoothCentralManager.targetServiceUUID])
+        let connectedPeripherals = centralManager.retrieveConnectedPeripherals(withServices: [self.targetDataSubscribeServiceUUID])
         for peripheral in connectedPeripherals {
             addDevice(peripheral)
         }

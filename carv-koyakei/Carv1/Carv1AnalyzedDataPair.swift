@@ -17,19 +17,20 @@ import Spatial
 import simd
 import SwiftUI
 
-struct Carv1AnalyzedDataPair:Encodable {
-    var left: Carv1Data
-    var right: Carv1Data
+class Carv1AnalyzedDataPair: Encodable{
+    let left: Carv1Data
+    let right: Carv1Data
     
-    var recordetTime: Date
-    var isTurnSwitching: Bool
+    let recordetTime: Date
+    let isTurnSwitching: Bool
     
-    var percentageOfTurnsByAngle: Float
-    var percentageOfTurnsByTime: TimeInterval
+    let percentageOfTurnsByAngle: Float
+    let percentageOfTurnsByTime: TimeInterval
     
-    init(left: Carv1Data = .init(), right: Carv1Data = .init(), recordetTime: Date = Date.now, isTurnSwitching: Bool = false, percentageOfTurnsByAngle: Float = 0, percentageOfTurnsByTime: TimeInterval = 0) {
-        self.left = left
-        self.right = right
+    
+    init(left: Carv1RawData = .init(), right: Carv1RawData = .init(), recordetTime: Date = Date.now, isTurnSwitching: Bool = false, percentageOfTurnsByAngle: Float = 0, percentageOfTurnsByTime: TimeInterval = 0, leftPressureOffset: [Float] =  [Float](repeating: 0, count: 32), rightPressureOffset: [Float] = [Float](repeating: 0, count: 32)) {
+        self.left = Carv1Data(rawData: left, pressureOffset: leftPressureOffset)
+        self.right = Carv1Data(rawData: right, pressureOffset: rightPressureOffset)
         self.recordetTime = recordetTime
         self.isTurnSwitching = isTurnSwitching
         self.percentageOfTurnsByAngle = percentageOfTurnsByAngle
@@ -75,8 +76,6 @@ struct Carv1AnalyzedDataPair:Encodable {
     var unifiedDiffrentialAttitudeFromLeftToRight: Rotation3DFloat {
         left.attitude.inverse * right.attitude
     }
-    // ローリングの方向を　realitykit 用の変換コードを一つの行列変換で表現したやつを掛けて揃えなきゃいけないんだけど、やってない。
-    // ここでサボると加速度の変換がおかしなことになる。
     var rollingAngulerRateDiffrential: Float { Float(right.angularVelocity.x + left.angularVelocity.x)}
 }
 

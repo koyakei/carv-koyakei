@@ -10,7 +10,7 @@ import CoreBluetooth
 import Combine
 
 @MainActor
-class Carv1DevicePeripheral : NSObject, Identifiable, CBPeripheralDelegate , ObservableObject{
+class Carv1DevicePeripheral : NSObject, Identifiable,@MainActor CBPeripheralDelegate , ObservableObject{
     let id: UUID
     @Published var peripheral: CBPeripheral
     @Published var data: Data?

@@ -7,7 +7,8 @@ import SwiftUI
 final class Carv1DataManager :ObservableObject {
     let bluethoothCentralManager: Carv1BluethoothCentralManager
     private var cancellables = Set<AnyCancellable>()
-    @Published var carvDataPair: Carv1AnalyzedDataPair = .init()
+    @Published var carvRawDataPair:Carv1RawDataPair = .init()
+    @Published var carvDataPair: Carv1AnalyzedDataPair = .init(leftPressureOffset: [Float](repeating: 0, count: 38), rightPressureOffset: [Float](repeating: 0, count: 38))
     @Published var latestNotCompletedTurnCarvAnalyzedDataPairs: [Carv1AnalyzedDataPair]  = []
     @Published var finishedTurnDataArray: [Carv1SingleFinishedTurnData] = []
     @Published var skytechMode: Bool = false
@@ -25,9 +26,9 @@ final class Carv1DataManager :ObservableObject {
     }
     
     func calibratePressureLeft(){
-        $carvDataPair.buffer(size: 15, prefetch: .byRequest, whenFull: .dropOldest)
+        $carvRawDataPair.buffer(size: 15, prefetch: .byRequest, whenFull: .dropOldest)
             .map { data in
-                data.left.pressure
+                data.left.rawPressure
             }.reduce([Float](repeating: 0, count: 38), +)
             .map { data in
                 data.map{ Float($0) / 15}
@@ -42,60 +43,67 @@ final class Carv1DataManager :ObservableObject {
     
     @Published var switchingAngluerRateDegree: Float = 15
     //スカイテックモードと通常モードを分けよう。
-    func isTurnSwitchInNomal(carvDataPair: Carv1DataPair) -> Bool{
+    func isTurnSwitchInNomal(recordedTime: Date) -> Bool{
+        let range = Angle2DFloat(degrees: -switchingAngluerRateDegree).radians ..< Angle2DFloat(degrees: switchingAngluerRateDegree).radians
         if skytechMode {
-            (Angle2DFloat(degrees: -switchingAngluerRateDegree).radians..<Angle2DFloat(degrees: switchingAngluerRateDegree).radians ~= carvDataPair.rollingAngulerRateDiffrential && carvDataPair.recordedTime.timeIntervalSince1970 - self.lastFinishedTrunData.turnEndedTime.timeIntervalSince1970 > 0.4)
+            return range ~= carvDataPair.rollingAngulerRateDiffrential &&
+            (recordedTime.timeIntervalSince1970 - self.lastFinishedTrunData.turnEndedTime.timeIntervalSince1970) > 0.4
         } else {
-            (Angle2DFloat(degrees: -switchingAngluerRateDegree).radians..<Angle2DFloat(degrees: switchingAngluerRateDegree).radians ~= carvDataPair.unitedYawingAngle && carvDataPair.recordedTime.timeIntervalSince1970 - self.lastFinishedTrunData.turnEndedTime.timeIntervalSince1970 > 0.4)
+            return range ~= carvDataPair.unitedYawingAngle &&
+            (recordedTime.timeIntervalSince1970 - self.lastFinishedTrunData.turnEndedTime.timeIntervalSince1970) > 0.4
         }
     }
     
     @Published var numberOfTurn = 0
-    
-    private func percentageOfTurnsByAngle(_ carvDataPair: Carv1DataPair)-> Float{
+    @Published var carvRawDataPiar = Carv1RawDataPair.init()
+    private func percentageOfTurnsByAngle(_ carvDataPair: Carv1RawDataPair)-> Float{
         abs((carvDataPair.unitedAttitude * self.lastFinishedTrunData.lastPhaseOfTune.unitedAttitude.inverse).angle.radians) / abs(self.lastFinishedTrunData.diffrencialAngleFromStartToEnd.radians)
     }
-    private func percentageOfTurnsByTime(_ carvDataPair: Carv1DataPair)-> Double{
-        abs((carvDataPair.recordedTime.timeIntervalSince1970 - self.lastFinishedTrunData.turnEndedTime.timeIntervalSince1970) / self.lastFinishedTrunData.turnDuration)
+    private func percentageOfTurnsByTime(_ carvDataPair: Carv1RawDataPair)-> Double{
+        abs((carvDataPair.recordedDate.timeIntervalSince1970 - self.lastFinishedTrunData.turnEndedTime.timeIntervalSince1970) / self.lastFinishedTrunData.turnDuration)
     }
     private func subscribe() {
         bluethoothCentralManager.$carv1DeviceLeft
             .combineLatest(bluethoothCentralManager.$carv1DeviceRight)
-            .compactMap { (left: Carv1DevicePeripheral?, right: Carv1DevicePeripheral?) -> (Carv1DevicePeripheral, Carv1DevicePeripheral)? in
-                guard let l = left, let r = right else { return nil }
-                return (l, r)
+            .compactMap { left, right in
+                left.flatMap { l in right.map { r in (l, r) } }
             }
-            .flatMap { [unowned self] (left: Carv1DevicePeripheral, right: Carv1DevicePeripheral) -> AnyPublisher<Carv1AnalyzedDataPair, Never> in
+            .flatMap {  (left: Carv1DevicePeripheral, right: Carv1DevicePeripheral) in
                 left.$data
                     .compactMap { (leftData: Data?) -> Data? in leftData }
                     .combineLatest(
                         right.$data.compactMap { (rightData: Data?) -> Data? in rightData }
-                    )
-                    .map { (leftData: Data, rightData: Data) -> Carv1AnalyzedDataPair in
-                        let carvDataPair = Carv1DataPair(left: Carv1Data(leftData, self.calibration基準値Left), right: Carv1Data(rightData, self.calibration基準値Right))
-                        return Carv1AnalyzedDataPair(
-                            left: carvDataPair.left,
-                            right: carvDataPair.right,
-                            recordetTime: carvDataPair.recordedTime,
-                            isTurnSwitching: self.isTurnSwitchInNomal(carvDataPair: carvDataPair),
-                            percentageOfTurnsByAngle: self.percentageOfTurnsByAngle(carvDataPair),
-                            percentageOfTurnsByTime: self.percentageOfTurnsByTime(carvDataPair)
-                        )
+                    ).filter{ leftData, rightData in
+                        leftData.first == 0x0A && rightData.first == 0x0A}
+                    .map { (leftData: Data, rightData: Data)  in
+                        return Carv1RawDataPair(left: Carv1RawData(leftData), right: Carv1RawData(rightData))
                     }
-                    .eraseToAnyPublisher()
             }
-//            .receive(on: ImmediateScheduler.shared)
-//            .sink { [weak self] (dataPair: Carv1AnalyzedDataPair) in
-//                guard let self = self else { return }
-//                self.carvDataPair = dataPair
-//                self.latestNotCompletedTurnCarvAnalyzedDataPairs.append(dataPair)
-//                if dataPair.isTurnSwitching {
-//                    self.finishedTurnDataArray.append(.init(numberOfTrun: self.numberOfTurn, turnPhases: self.latestNotCompletedTurnCarvAnalyzedDataPairs))
-//                    self.latestNotCompletedTurnCarvAnalyzedDataPairs.removeAll()
-//                    self.numberOfTurn += 1
-//                }
-//            }
-//            .store(in: &cancellables)
+            .assign(to: \.carvRawDataPiar, on: self)
+            .store(in: &cancellables)
+        
+        $carvRawDataPiar.map {
+            let recordedDate: Date = $0.left.recordedTime.timeIntervalSince1970 > $0.right.recordedTime.timeIntervalSince1970 ? $0.left.recordedTime : $0.right.recordedTime
+                                    return Carv1AnalyzedDataPair(
+                                        left: $0.left,
+                                        right: $0.right,
+                                        recordetTime: recordedDate,
+                                        isTurnSwitching: self.isTurnSwitchInNomal(recordedTime: recordedDate),
+                                        percentageOfTurnsByAngle: self.percentageOfTurnsByAngle($0),
+                                        percentageOfTurnsByTime: self.percentageOfTurnsByTime($0)
+                                    )
+        }
+            .sink { [weak self] (dataPair: Carv1AnalyzedDataPair) in
+                guard let self = self else { return }
+                self.carvDataPair = dataPair
+                self.latestNotCompletedTurnCarvAnalyzedDataPairs.append(dataPair)
+                if dataPair.isTurnSwitching {
+                    self.finishedTurnDataArray.append(.init(numberOfTrun: self.numberOfTurn, turnPhases: self.latestNotCompletedTurnCarvAnalyzedDataPairs))
+                    self.latestNotCompletedTurnCarvAnalyzedDataPairs.removeAll()
+                    self.numberOfTurn += 1
+                }
+            }
+            .store(in: &cancellables)
     }
     
     // To convert:
@@ -160,6 +168,15 @@ final class Carv1DataManager :ObservableObject {
             }
         }
     }
+    class DevicePair: ObservableObject {
+        @Published var left: Carv1DevicePeripheral?
+        @Published var right: Carv1DevicePeripheral?
+        init(left: Carv1DevicePeripheral? = nil, right: Carv1DevicePeripheral? = nil) {
+            self.left = left
+            self.right = right
+        }
+    }
+
 }
 
 
