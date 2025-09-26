@@ -524,8 +524,8 @@
             filePath = "carv-koyakei/Carv1/Carv1RawData.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "60"
-            endingLineNumber = "60"
+            startingLineNumber = "64"
+            endingLineNumber = "64"
             landmarkName = "init(_:)"
             landmarkType = "7">
          </BreakpointContent>

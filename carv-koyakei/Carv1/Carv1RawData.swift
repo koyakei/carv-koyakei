@@ -52,11 +52,15 @@ final class Carv1RawData:Encodable{
         }.map { Float($0) / (Float(Int16.max) + 1) }
         
         
-        fordebug = data.dropFirst(3)
+        let test = data.dropFirst(3)
             .withUnsafeBytes {
-            Array(UnsafeBufferPointer<Int16>(start: $0.baseAddress?.assumingMemoryBound(to: Int16.self), count: data.count / MemoryLayout<Int16>.stride))
-        }.map { Float($0)   }
-        recordedAtFromBootDevice = Double(fordebug[12])
+            Array(UnsafeBufferPointer<Int32>(start: $0.baseAddress?.assumingMemoryBound(to: Int32.self), count: data.count / MemoryLayout<Int32>.stride))
+        }[7]
+        
+        fordebug = [Float(test),Float(test >> 5),Float(test) / (Float(UInt16.max) + 1) * 12,Float(test >> 3) / 256, Float(test) / (Float(UInt8.max) + 1) / 8
+                    ,Float(test) / 128,Float(test) / 1000, Float(test) / (Float(UInt16.max) + 1),Float(test) / (Float(UInt16.max) + 1) * 4,Float(test >> 4)
+        ]
+        recordedAtFromBootDevice = Double(Float(test) / 1000)
         attitude =
 //       /* Rotation3DFloat(eulerAngles: EulerAnglesFloat(x: Angle2DFloat(radians: intbyte[safe:0,default: 0]), y: Angle2DFloat(radians: i*/ntbyte[safe:1,default: 0]), z: Angle2DFloat(radians: intbyte[safe:2,default: 0]), order: .xyz))
         Rotation3DFloat.init(simd_quatf(vector: simd_float4(intbyte[safe:25,default: 0], intbyte[safe:26,default: 0], intbyte[safe:27,default: 0], intbyte[safe:28,default: 0])))
