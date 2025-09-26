@@ -39,33 +39,15 @@ struct FootPressureView: View {
                 }
             }
             HStack{
-//                GeometryReader { geometry in
-//                    ZStack {
-//                        
-//                        Color.blue // 背景色
-//                        ForEach(0..<carv1DataManager.carvDataPair.left.pressure.count, id: \.self) { index in
-//                            let point = points[index]
-//                            let size = min(geometry.size.width, geometry.size.height)
-//                            let x = point.x * size
-//                            let y = point.y * size
-//                            Text(carv1DataManager.carvDataPair.left.pressure[index].description)
-////                            Circle()
-////                                .fill(Color(white: (Double(carv1DataManager.carvDataPair.left.pressure[index]) / 60.0) ))
-////                                .frame(width: size * 0.03, height: size * 0.03)
-////                                .position(x: x, y: y)
-//                        }
-//                    }
-//                }
-//                .edgesIgnoringSafeArea(.all)
                 GeometryReader { geometry in
                     ZStack {
                         Color.blue // 背景色
-                        ForEach(0..<carv1DataManager.carvDataPair.right.pressure.count, id: \.self) { index in
+                        ForEach(0..<carv1DataManager.carvDataPair.left.pressure.count, id: \.self) { index in
                             let point = points[index]
                             let size = min(geometry.size.width, geometry.size.height)
                             let x = point.x * size
                             let y = point.y * size
-                            Text(carv1DataManager.carvDataPair.right.pressure[index].description).position(x: x, y: y)
+                            Text(carv1DataManager.carvDataPair.left.pressure[index].description).position(x: x, y: y)
 //                            Circle()
 //                                .fill(
 //                                    Color(white: (Double(carv1DataManager.carvDataPair.right.pressure[index]) / 60.0) )
@@ -76,6 +58,63 @@ struct FootPressureView: View {
                     }
                 }
                 .edgesIgnoringSafeArea(.all)
+                GeometryReader { geometry in
+                    ZStack {
+                        Color.blue // 背景色
+                        ForEach(0..<carv1DataManager.carvDataPair.right.pressure.count, id: \.self) { index in
+                            let point = points[index]
+                            let size = min(geometry.size.width, geometry.size.height)
+                            let x = point.x * size
+                            let y = point.y * size
+                            Text(carv1DataManager.carvDataPair.right.pressure[index].description).position(x: x, y: y)
+                            //                            Circle()
+                            //                                .fill(
+                            //                                    Color(white: (Double(carv1DataManager.carvDataPair.right.pressure[index]) / 60.0) )
+                            //                                )
+                            //                                .frame(width: size * 0.03, height: size * 0.03)
+                            //                                .position(x: x, y: y)
+                        }
+                    }
+                }.edgesIgnoringSafeArea(.all)
+            }
+            HStack{
+                GeometryReader { geometry in
+                    ZStack {
+                        
+                        Color.blue // 背景色
+                        ForEach(0..<carv1DataManager.calibration基準値Left.count, id: \.self) { index in
+                            let point = points[index]
+                            let size = min(geometry.size.width, geometry.size.height)
+                            let x = point.x * size
+                            let y = point.y * size
+                            Text(carv1DataManager.calibration基準値Left[index].description).position(x: x, y: y)
+                            //                            Circle()
+                            //                                .fill(Color(white: (Double(carv1DataManager.carvDataPair.left.pressure[index]) / 60.0) ))
+                            //                                .frame(width: size * 0.03, height: size * 0.03)
+                            //                                .position(x: x, y: y)
+                        }
+                    }
+                }
+                .edgesIgnoringSafeArea(.all)
+                
+                    GeometryReader { geometry in
+                        ZStack {
+                            
+                            Color.blue // 背景色
+                            ForEach(0..<carv1DataManager.calibration基準値Right.count, id: \.self) { index in
+                                let point = points[index]
+                                let size = min(geometry.size.width, geometry.size.height)
+                                let x = point.x * size
+                                let y = point.y * size
+                                Text(carv1DataManager.calibration基準値Right[index].description).position(x: x, y: y)
+    //                            Circle()
+    //                                .fill(Color(white: (Double(carv1DataManager.carvDataPair.left.pressure[index]) / 60.0) ))
+    //                                .frame(width: size * 0.03, height: size * 0.03)
+    //                                .position(x: x, y: y)
+                            }
+                        }
+                    }
+                    .edgesIgnoringSafeArea(.all)
             }
         }
     }

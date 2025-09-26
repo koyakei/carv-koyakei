@@ -8,12 +8,12 @@ final class Carv1DataManager :ObservableObject {
     let bluethoothCentralManager: Carv1BluethoothCentralManager
     private var cancellables = Set<AnyCancellable>()
     @Published var carvRawDataPair:Carv1RawDataPair = .init()
-    @Published var carvDataPair: Carv1AnalyzedDataPair = .init(leftPressureOffset: [Float](repeating: 0, count: 38), rightPressureOffset: [Float](repeating: 0, count: 38))
+    @Published var carvDataPair: Carv1AnalyzedDataPair = .init(leftPressureOffset: [Float](repeating: 0, count: 36), rightPressureOffset: [Float](repeating: 0, count: 36))
     @Published var latestNotCompletedTurnCarvAnalyzedDataPairs: [Carv1AnalyzedDataPair]  = []
     @Published var finishedTurnDataArray: [Carv1SingleFinishedTurnData] = []
     @Published var skytechMode: Bool = false
-    @Published var calibration基準値Right :[Float] = [Float](repeating: 0, count: 38)
-    @Published var calibration基準値Left :[Float] = [Float](repeating: 0, count: 38)
+    @Published var calibration基準値Right :[Float] = [Float](repeating: 0, count: 36)
+    @Published var calibration基準値Left :[Float] = [Float](repeating: 0, count: 36)
     private var lastFinishedTrunData: Carv1SingleFinishedTurnData {
         get {
             finishedTurnDataArray.last ?? .init(numberOfTrun: 0, turnPhases: [])
@@ -26,17 +26,24 @@ final class Carv1DataManager :ObservableObject {
     }
     
     func calibratePressureLeft(){
-        $carvRawDataPair.buffer(size: 15, prefetch: .byRequest, whenFull: .dropOldest)
-            .map { data in
-                data.left.rawPressure
-            }.reduce([Float](repeating: 0, count: 38), +)
-            .map { data in
-                data.map{ Float($0) / 15}
-            }.sink(receiveCompletion: {
-                value in
-                Alert(title: Text("Result"), message: Text("test"), dismissButton: .default(Text("OK")))
-            }, receiveValue: {value in
-                self.calibration基準値Left = value
+        // Collect 15 left rawPressure arrays, average them element-wise, then store as calibration baseline
+        $carvRawDataPair
+            .map { $0.left.rawPressure }
+            .collect(25)
+            .map {
+                arrays -> [Float] in
+                guard let first = arrays.first else { return [] }
+                var sum = [Float](repeating: 0, count: first.count)
+                for arr in arrays {
+                    for i in 0..<first.count {
+                        sum[i] += arr[i]
+                    }
+                }
+                let count = Float(arrays.count)
+                return sum.map { $0 / count }
+            }.first()
+            .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] avg in
+                self?.calibration基準値Left = avg
             })
             .store(in: &cancellables)
     }
@@ -55,7 +62,6 @@ final class Carv1DataManager :ObservableObject {
     }
     
     @Published var numberOfTurn = 0
-    @Published var carvRawDataPiar = Carv1RawDataPair.init()
     private func percentageOfTurnsByAngle(_ carvDataPair: Carv1RawDataPair)-> Float{
         abs((carvDataPair.unitedAttitude * self.lastFinishedTrunData.lastPhaseOfTune.unitedAttitude.inverse).angle.radians) / abs(self.lastFinishedTrunData.diffrencialAngleFromStartToEnd.radians)
     }
@@ -79,10 +85,10 @@ final class Carv1DataManager :ObservableObject {
                         return Carv1RawDataPair(left: Carv1RawData(leftData), right: Carv1RawData(rightData))
                     }
             }
-            .assign(to: \.carvRawDataPiar, on: self)
+            .assign(to: \.carvRawDataPair, on: self)
             .store(in: &cancellables)
         
-        $carvRawDataPiar.map {
+        $carvRawDataPair.map {
             let recordedDate: Date = $0.left.recordedTime.timeIntervalSince1970 > $0.right.recordedTime.timeIntervalSince1970 ? $0.left.recordedTime : $0.right.recordedTime
                                     return Carv1AnalyzedDataPair(
                                         left: $0.left,
