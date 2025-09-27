@@ -121,16 +121,14 @@ struct ARBootsView: View {
                     return }
                 arrowLeft.setOrientation(
                     dataManager.carv2DataPair.left.leftRealityKitRotation.quaternion
-                              
                 , relativeTo: nil)
                 guard let arrowRight = content.entities.first(where: {$0.name == "worldAnchor"})?.children.first(where: { $0.name == rightAnchorName })else  { return }
+                
                 arrowRight.setOrientation(dataManager.carv2DataPair.right.rightRealityKitRotation.quaternion
                               , relativeTo: nil)
-                
                 guard let arrowUnified = content.entities.first(where: {$0.name == "worldAnchor"})?.children.first(where: { $0.name == unifiedAnchorName })else  { return }
                 arrowUnified.setOrientation(dataManager.carv2DataPair.unifiedDiffrentialAttitudeFromRightToLeft.quaternion
                                , relativeTo: nil)
-                
             }
             .gesture(magnificationGesture)
             .overlay(alignment: .bottom){

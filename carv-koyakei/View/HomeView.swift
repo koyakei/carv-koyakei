@@ -41,29 +41,29 @@ struct HomeView: View {
 //                                        Text(Angle2D(radians: carv2DataPair.beforeTurn.fallLineAttitude.eulerAngles(order: .xyz).angles.z).degrees.description)
 //                                    }
                                     HStack{
-                                        Text(Angle2D(radians: dataManager.carv2DataPair.left.leftRealityKitRotation.eulerAngles(order: .xyz).angles.x).degrees.description)
-                                        Text(Angle2D(radians: dataManager.carv2DataPair.left.leftRealityKitRotation.eulerAngles(order: .xyz).angles.y).degrees.description)
-                                        Text(Angle2D(radians: dataManager.carv2DataPair.left.leftRealityKitRotation.eulerAngles(order: .xyz).angles.z).degrees.description)
+                                        Text(Angle2D(radians: dataManager.carv2DataPair.left.leftRealityKitRotation.eulerAngles(order: .xyz).angles.x).degrees.formatted(.number.precision(.fractionLength(1))))
+                                        Text(Angle2D(radians: dataManager.carv2DataPair.left.leftRealityKitRotation.eulerAngles(order: .xyz).angles.y).degrees.formatted(.number.precision(.fractionLength(1))))
+                                        Text(Angle2D(radians: dataManager.carv2DataPair.left.leftRealityKitRotation.eulerAngles(order: .xyz).angles.z).degrees.formatted(.number.precision(.fractionLength(1))))
                                     }
                                     HStack{
-                                        Text(Angle2D(radians: dataManager.carv2DataPair.right.rightRealityKitRotation.eulerAngles(order: .xyz).angles.x).degrees.description)
-                                        Text(Angle2D(radians: dataManager.carv2DataPair.right.rightRealityKitRotation.eulerAngles(order: .xyz).angles.y).degrees.description)
-                                        Text(Angle2D(radians: dataManager.carv2DataPair.right.rightRealityKitRotation.eulerAngles(order: .xyz).angles.z).degrees.description)
+                                        Text(Angle2D(radians: dataManager.carv2DataPair.right.rightRealityKitRotation.eulerAngles(order: .xyz).angles.x).degrees.formatted(.number.precision(.fractionLength(1))))
+                                        Text(Angle2D(radians: dataManager.carv2DataPair.right.rightRealityKitRotation.eulerAngles(order: .xyz).angles.y).degrees.formatted(.number.precision(.fractionLength(1))))
+                                        Text(Angle2D(radians: dataManager.carv2DataPair.right.rightRealityKitRotation.eulerAngles(order: .xyz).angles.z).degrees.formatted(.number.precision(.fractionLength(1))))
                                     }
                                     HStack{
-                                        Text(Angle2D(radians: dataManager.carv2DataPair.right.leftRealityKitRotation3.eulerAngles(order: .xyz).angles.x).degrees.description)
-                                        Text(Angle2D(radians: dataManager.carv2DataPair.right.leftRealityKitRotation3.eulerAngles(order: .xyz).angles.y).degrees.description)
-                                        Text(Angle2D(radians: dataManager.carv2DataPair.right.leftRealityKitRotation3.eulerAngles(order: .xyz).angles.z).degrees.description)
+                                        Text(Angle2D(radians: dataManager.carv2DataPair.right.leftRealityKitRotation3.eulerAngles(order: .xyz).angles.x).degrees.formatted(.number.precision(.fractionLength(1))))
+                                        Text(Angle2D(radians: dataManager.carv2DataPair.right.leftRealityKitRotation3.eulerAngles(order: .xyz).angles.y).degrees.formatted(.number.precision(.fractionLength(1))))
+                                        Text(Angle2D(radians: dataManager.carv2DataPair.right.leftRealityKitRotation3.eulerAngles(order: .xyz).angles.z).degrees.formatted(.number.precision(.fractionLength(1))))
                                     }
             HStack{
-                Text(Angle2D(radians: dataManager.carv2DataPair.right.attitude.eulerAngles(order: .xyz).angles.x).degrees.description)
-                Text(Angle2D(radians: dataManager.carv2DataPair.right.attitude.eulerAngles(order: .xyz).angles.y).degrees.description)
-                Text(Angle2D(radians: dataManager.carv2DataPair.right.attitude.eulerAngles(order: .xyz).angles.z).degrees.description)
+                Text(Angle2D(radians: dataManager.carv2DataPair.right.attitude.eulerAngles(order: .xyz).angles.x).degrees.formatted(.number.precision(.fractionLength(1))))
+                Text(Angle2D(radians: dataManager.carv2DataPair.right.attitude.eulerAngles(order: .xyz).angles.y).degrees.formatted(.number.precision(.fractionLength(1))))
+                Text(Angle2D(radians: dataManager.carv2DataPair.right.attitude.eulerAngles(order: .xyz).angles.z).degrees.formatted(.number.precision(.fractionLength(1))))
             }
             HStack{
-                Text(Angle2D(radians: dataManager.carv2DataPair.left.attitude.eulerAngles(order: .xyz).angles.x).degrees.description)
-                Text(Angle2D(radians: dataManager.carv2DataPair.left.attitude.eulerAngles(order: .xyz).angles.y).degrees.description)
-                Text(Angle2D(radians: dataManager.carv2DataPair.left.attitude.eulerAngles(order: .xyz).angles.z).degrees.description)
+                Text(Angle2D(radians: dataManager.carv2DataPair.left.attitude.eulerAngles(order: .xyz).angles.x).degrees.formatted(.number.precision(.fractionLength(1))))
+                Text(Angle2D(radians: dataManager.carv2DataPair.left.attitude.eulerAngles(order: .xyz).angles.y).degrees.formatted(.number.precision(.fractionLength(1))))
+                Text(Angle2D(radians: dataManager.carv2DataPair.left.attitude.eulerAngles(order: .xyz).angles.z).degrees.formatted(.number.precision(.fractionLength(1))))
             }
             HStack{
                 VStack{
