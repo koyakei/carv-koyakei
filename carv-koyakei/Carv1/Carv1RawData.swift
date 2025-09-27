@@ -41,8 +41,6 @@ final class Carv1RawData:Encodable{
         guard data.count >= 19 else {
             fatalError("データ長が不足しています")
         }
-        
-        
         self.rawPressure = data.subdata(in: 35..<50).withUnsafeBytes { rawBuffer in
             rawBuffer.bindMemory(to: UInt8.self).map { Float($0)}
         }
@@ -63,7 +61,6 @@ final class Carv1RawData:Encodable{
         ]
         recordedAtFromBootDevice = Double(Float(test) / 1000)
         attitude =
-//       /* Rotation3DFloat(eulerAngles: EulerAnglesFloat(x: Angle2DFloat(radians: intbyte[safe:0,default: 0]), y: Angle2DFloat(radians: i*/ntbyte[safe:1,default: 0]), z: Angle2DFloat(radians: intbyte[safe:2,default: 0]), order: .xyz))
         Rotation3DFloat.init(simd_quatf(vector: simd_float4(intbyte[safe:25,default: 0], intbyte[safe:26,default: 0], intbyte[safe:27,default: 0], intbyte[safe:28,default: 0])))
         acceleration = SIMD3<Float>(x: intbyte[safe:29,default: 0] * 16, y: intbyte[safe:30,default: 0]  * 16, z: intbyte[safe:31,default: 0] * 16)
         angularVelocity = SIMD3<Float>(x: intbyte[safe:32,default: 0] * .pi * 500, y: intbyte[safe:33,default: 0]  * .pi * 500, z: intbyte[safe:34,default: 0] * .pi * 500)

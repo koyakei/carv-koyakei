@@ -11,7 +11,7 @@ import Charts
 import Spatial
 
 struct ARBootsView: View {
-    var carv2DataPair : Carv2DataPair
+    @StateObject var dataManager: DataManager
     @Bindable var cameraManager = CameraManager()
     @State private var currentScale: CGFloat = 3.0
     @State private var initialScale: CGFloat = 3.0
@@ -120,15 +120,15 @@ struct ARBootsView: View {
                 guard let arrowLeft = content.entities.first(where: {$0.name == "worldAnchor"})?.children.first(where: { $0.name == leftAnchorName }) else {
                     return }
                 arrowLeft.setOrientation(
-                    carv2DataPair.left.leftRealityKitRotation.quaternion
+                    dataManager.carv2DataPair.left.leftRealityKitRotation.quaternion
                               
                 , relativeTo: nil)
                 guard let arrowRight = content.entities.first(where: {$0.name == "worldAnchor"})?.children.first(where: { $0.name == rightAnchorName })else  { return }
-                arrowRight.setOrientation(carv2DataPair.right.rightRealityKitRotation.quaternion
+                arrowRight.setOrientation(dataManager.carv2DataPair.right.rightRealityKitRotation.quaternion
                               , relativeTo: nil)
                 
                 guard let arrowUnified = content.entities.first(where: {$0.name == "worldAnchor"})?.children.first(where: { $0.name == unifiedAnchorName })else  { return }
-                arrowUnified.setOrientation(carv2DataPair.unifiedDiffrentialAttitudeFromRightToLeft.quaternion
+                arrowUnified.setOrientation(dataManager.carv2DataPair.unifiedDiffrentialAttitudeFromRightToLeft.quaternion
                                , relativeTo: nil)
                 
             }
@@ -144,32 +144,32 @@ struct ARBootsView: View {
 //                                .padding(.bottom, 10)
                 HStack{
                     VStack{
-                        Text( carv2DataPair.angulerVelocityDiffrencialForTelemarkLeftSideFont.x.formatted(.number.precision(.fractionLength(1))))
-                        Text( carv2DataPair.angulerVelocityDiffrencialForTelemarkLeftSideFont.y.formatted(.number.precision(.fractionLength(1))))
-                        Text( carv2DataPair.angulerVelocityDiffrencialForTelemarkLeftSideFont.z.formatted(.number.precision(.fractionLength(1))))
+                        Text( dataManager.carv2DataPair.angulerVelocityDiffrencialForTelemarkLeftSideFont.x.formatted(.number.precision(.fractionLength(1))))
+                        Text( dataManager.carv2DataPair.angulerVelocityDiffrencialForTelemarkLeftSideFont.y.formatted(.number.precision(.fractionLength(1))))
+                        Text( dataManager.carv2DataPair.angulerVelocityDiffrencialForTelemarkLeftSideFont.z.formatted(.number.precision(.fractionLength(1))))
                     }
                     VStack{
-                        Text( carv2DataPair.左側基準の右足の角速度.x.formatted(.number.precision(.fractionLength(1))))
-                        Text( carv2DataPair.左側基準の右足の角速度.y.formatted(.number.precision(.fractionLength(1))))
-                        Text( carv2DataPair.左側基準の右足の角速度.z.formatted(.number.precision(.fractionLength(1))))
+                        Text( dataManager.carv2DataPair.左側基準の右足の角速度.x.formatted(.number.precision(.fractionLength(1))))
+                        Text( dataManager.carv2DataPair.左側基準の右足の角速度.y.formatted(.number.precision(.fractionLength(1))))
+                        Text( dataManager.carv2DataPair.左側基準の右足の角速度.z.formatted(.number.precision(.fractionLength(1))))
                     }
                     
                     VStack{
-                        Text( carv2DataPair.angulerVelocityDiffrencialForTelemarkRightSideFont.x.formatted(.number.precision(.fractionLength(1))))
-                        Text( carv2DataPair.angulerVelocityDiffrencialForTelemarkRightSideFont.y.formatted(.number.precision(.fractionLength(1))))
-                        Text( carv2DataPair.angulerVelocityDiffrencialForTelemarkRightSideFont.z.formatted(.number.precision(.fractionLength(1))))
+                        Text( dataManager.carv2DataPair.angulerVelocityDiffrencialForTelemarkRightSideFont.x.formatted(.number.precision(.fractionLength(1))))
+                        Text( dataManager.carv2DataPair.angulerVelocityDiffrencialForTelemarkRightSideFont.y.formatted(.number.precision(.fractionLength(1))))
+                        Text( dataManager.carv2DataPair.angulerVelocityDiffrencialForTelemarkRightSideFont.z.formatted(.number.precision(.fractionLength(1))))
                     }
                    
                     
                     VStack{
-                        Text( carv2DataPair.left.angularVelocity.x.formatted(.number.precision(.fractionLength(1))))
-                        Text( carv2DataPair.left.angularVelocity.y.formatted(.number.precision(.fractionLength(1))))
-                        Text( carv2DataPair.left.angularVelocity.z.formatted(.number.precision(.fractionLength(1))))
+                        Text( dataManager.carv2DataPair.left.angularVelocity.x.formatted(.number.precision(.fractionLength(1))))
+                        Text( dataManager.carv2DataPair.left.angularVelocity.y.formatted(.number.precision(.fractionLength(1))))
+                        Text( dataManager.carv2DataPair.left.angularVelocity.z.formatted(.number.precision(.fractionLength(1))))
                     }
                     VStack{
-                        Text( carv2DataPair.right.angularVelocity.x.formatted(.number.precision(.fractionLength(1))))
-                        Text( carv2DataPair.right.angularVelocity.y.formatted(.number.precision(.fractionLength(1))))
-                        Text( carv2DataPair.right.angularVelocity.z.formatted(.number.precision(.fractionLength(1))))
+                        Text( dataManager.carv2DataPair.right.angularVelocity.x.formatted(.number.precision(.fractionLength(1))))
+                        Text( dataManager.carv2DataPair.right.angularVelocity.y.formatted(.number.precision(.fractionLength(1))))
+                        Text( dataManager.carv2DataPair.right.angularVelocity.z.formatted(.number.precision(.fractionLength(1))))
                     }
                 }
             }

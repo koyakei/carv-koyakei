@@ -15,11 +15,11 @@ struct ContentView: View {
                     Image(systemName: "house.fill")
                     Text("ホーム")
                 }
-//            ARBootsView()
-//                .tabItem {
-//                    Image(systemName: "person.fill")
-//                    Text("AR")
-//                }
+            ARBootsView(dataManager: dataManager)
+                .tabItem {
+                    Image(systemName: "person.fill")
+                    Text("AR")
+                }
             Carv1View(dataManager: carv1DataManager,ble: carv1Ble)
                 .tabItem {
                     Text("carv1")

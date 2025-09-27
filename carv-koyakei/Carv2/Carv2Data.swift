@@ -10,7 +10,7 @@ import simd
 import SwiftUI
 import Combine
 
-class Carv2Data:Encodable{
+final class Carv2Data:Encodable{
     let attitude: Rotation3DFloat
     let acceleration: SIMD3<Float>
     let angularVelocity : SIMD3<Float>
@@ -18,10 +18,12 @@ class Carv2Data:Encodable{
     var rollAngle: Float {attitude.eulerAngles(order: .xyz).angles.z}
     var yawAngle: Float {attitude.eulerAngles(order: .xyz).angles.y}
     var pitchAngle: Float {attitude.eulerAngles(order: .xyz).angles.z}
+    let forDebug: [Float]
     init(){
         attitude = .identity
         acceleration = .zero
         angularVelocity = .zero
+        forDebug = []
     }
 
     // 右側　x 前上　+ 　後上ー 　左は逆
@@ -63,7 +65,6 @@ class Carv2Data:Encodable{
     var rightRealityKitRotation: Rotation3DFloat {
         let p = ProjectiveTransform3DFloat(scale: Size3DFloat(vector: [-1,-1,-1]),rotation: Rotation3DFloat(simd_quatd(real: 1, imag: [1.0,1.0,1.0]).normalized))
         return Rotation3DFloat.init(simd_quatf(vector:p.matrix * attitude.vector))
-//            .rotated(by: Rotation3D(angle: Angle2D(radians: .pi), axis: RotationAxis3D(vector: [0,1,0])))
     }
     
     var leftRealityKitRotation: Rotation3DFloat {
@@ -79,7 +80,9 @@ class Carv2Data:Encodable{
     }
     
     public init(_ data: Data) {
-        let intbyte :[Float] = data.withUnsafeBytes {
+        let intbyte :[Float] = data
+            .dropFirst(1)
+            .withUnsafeBytes {
             Array(UnsafeBufferPointer<Int16>(start: $0.baseAddress?.assumingMemoryBound(to: Int16.self), count: data.count / MemoryLayout<Int16>.stride))
         }.map { Float($0) / (Float(Int16.max) + 1) }
 
@@ -91,6 +94,7 @@ class Carv2Data:Encodable{
         attitude = Rotation3DFloat.init(simd_quatf(vector: simd_float4(intbyte[safe:1,default: 0], intbyte[safe:2,default: 0], intbyte[safe:3,default: 0], intbyte[safe:4,default: 0])))
         acceleration = SIMD3<Float>(x: intbyte[safe:5,default: 0] * 16, y: intbyte[safe:6,default: 0]  * 16, z: intbyte[safe:7,default: 0] * 16)
         angularVelocity = SIMD3<Float>(x: intbyte3[safe:0,default: 0], y: intbyte3[safe:1,default: 0] , z: intbyte3[safe:2,default: 0])
+        forDebug = []
     }
 }
 

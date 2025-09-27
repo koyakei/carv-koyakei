@@ -37,6 +37,7 @@ class Carv1AnalyzedDataPair: Encodable{
         self.percentageOfTurnsByTime = percentageOfTurnsByTime
     }
     
+    
     var yawingSide: TurnYawingSide {
         get{
             switch unitedYawingAngle {

@@ -39,6 +39,28 @@ struct Carv2AnalyzedDataPair:Encodable {
             }
         }
     }
+    // z がヨーイング角速度の同調　左足前テレマークでの　parallel ski
+    var angulerVelocityDiffrencialForTelemarkLeftSideFont: Vector3DFloat {
+        return 左側基準の右足の角速度 - Vector3DFloat.init(x: left.angularVelocity.x, y: left.angularVelocity.z, z: -left.angularVelocity.y)
+    }
+    
+    var 左側基準の右足の角速度 : Vector3DFloat {
+        return Vector3DFloat.init(x: right.angularVelocity.x, y: -right.angularVelocity.z, z: -right.angularVelocity.y).rotated(by: unifiedDiffrentialAttitudeFromLeftToRight)
+    }
+    
+    // z yaw x roll y pitch
+    var angulerVelocityDiffrencialForTelemarkRightSideFont: Vector3DFloat {
+        return 右側基準の左足の角速度 - Vector3DFloat.init(x: right.angularVelocity.x, y: right.angularVelocity.z, z: right.angularVelocity.y)
+    }
+    
+    var unifiedDiffrentialAttitudeFromRightToLeft: Rotation3DFloat {
+        right.rightRealityKitRotation.inverse * left.leftRealityKitRotation
+    }
+    var 右側基準の左足の角速度 : Vector3DFloat {
+        return Vector3DFloat.init(x: -left.angularVelocity.x, y: -left.angularVelocity.z, z: left.angularVelocity.y).rotated(by: unifiedDiffrentialAttitudeFromRightToLeft)
+    }
+    
+    
     var outsideSkiRollAngle: Float {
         return outsideSki.rollAngle + Float(Angle2D(degrees: 90).radians)
     }

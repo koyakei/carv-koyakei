@@ -6,6 +6,7 @@ import Spatial
 final class DataManager :ObservableObject {
     let bluethoothCentralManager: BluethoothCentralManager
     private var cancellables = Set<AnyCancellable>()
+    @Published var carv2RawDataPair: Carv2DataPair = .init()
     @Published var carv2DataPair: Carv2AnalyzedDataPair = .init()
     @Published var latestNotCompletedTurnCarv2AnalyzedDataPairs: [Carv2AnalyzedDataPair]  = []
     @Published var finishedTurnDataArray: [SingleFinishedTurnData] = []
@@ -46,6 +47,7 @@ final class DataManager :ObservableObject {
                     .combineLatest(right.$data.compactMap { $0 })
                     .map { leftData, rightData in
                         let carvDataPair = Carv2DataPair(left: Carv2Data(leftData), right: Carv2Data(rightData))
+                        self.carv2RawDataPair = carvDataPair
                         return Carv2AnalyzedDataPair(left: carvDataPair.left, right: carvDataPair.right, recordetTime: carvDataPair.recordedTime, isTurnSwitching: self.isTurnSwitchInNomal(carvDataPair: carvDataPair), percentageOfTurnsByAngle: abs((carvDataPair.unitedAttitude * self.lastFinishedTrunData.lastPhaseOfTune.unitedAttitude.inverse).angle.radians) / abs(self.lastFinishedTrunData.diffrencialAngleFromStartToEnd.radians), percentageOfTurnsByTime: abs((carvDataPair.recordedTime.timeIntervalSince1970 - self.lastFinishedTrunData.turnEndedTime.timeIntervalSince1970) / self.lastFinishedTrunData.turnDuration))
                     }
                     .eraseToAnyPublisher()
