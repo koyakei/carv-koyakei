@@ -28,7 +28,7 @@ class Carv1AnalyzedDataPair: Encodable{
     let percentageOfTurnsByTime: TimeInterval
     
     
-    init(left: Carv1RawData = .init(), right: Carv1RawData = .init(), recordetTime: Date = Date.now, isTurnSwitching: Bool = false, percentageOfTurnsByAngle: Float = 0, percentageOfTurnsByTime: TimeInterval = 0, leftPressureOffset: [Float] =  [Float](repeating: 0, count: 32), rightPressureOffset: [Float] = [Float](repeating: 0, count: 32)) {
+    init(left: Carv1RawData = .init(), right: Carv1RawData = .init(), recordetTime: Date = Date.now, isTurnSwitching: Bool = false, percentageOfTurnsByAngle: Float = 0, percentageOfTurnsByTime: TimeInterval = 0, leftPressureOffset: [Float] =  [Float](repeating: 0, count: 14), rightPressureOffset: [Float] = [Float](repeating: 0, count: 14)) {
         self.left = Carv1Data(rawData: left, pressureOffset: leftPressureOffset)
         self.right = Carv1Data(rawData: right, pressureOffset: rightPressureOffset)
         self.recordetTime = recordetTime
