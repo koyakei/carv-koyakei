@@ -94,7 +94,7 @@ final class Carv2Data:Encodable{
             Array(UnsafeBufferPointer<Int16>(start: $0.baseAddress?.assumingMemoryBound(to: Int16.self), count: data.count / MemoryLayout<Int16>.stride))
         }.map { Float($0) / (Float(Int16.max) + 1) }
 
-        let intbyte3 : [Float] = Carv2Data.floatArray(data.dropFirst(16))
+        let intbyte3 : [Float] = Carv2Data.floatArray(data.dropFirst(17))
 //            .withUnsafeBytes {
 //            let buffer = $0.bindMemory(to: Float.self)
 //            return Array(buffer.prefix(data.count / MemoryLayout<Float>.size))
@@ -105,5 +105,15 @@ final class Carv2Data:Encodable{
         angularVelocity = SIMD3<Float>(x: intbyte3[safe:0,default: 0], y: intbyte3[safe:1,default: 0] , z: intbyte3[safe:2,default: 0])
         forDebug = []
     }
+    static private func int16ToFloat(data: Data) -> MotionSensorData {
+        let intbyte3 : [Float] = floatArray( data.dropFirst(16))
+        let intbyte :[Float] = data.withUnsafeBytes {
+            Array(UnsafeBufferPointer<Int16>(start: $0.baseAddress?.assumingMemoryBound(to: Int16.self), count: data.count / MemoryLayout<Int16>.stride))
+        }.map { Float($0) / (Float(Int16.max) + 1) }
+
+//        intbyte[safe:５,default: 0] これがTimeinterval ぽいぞ　なんとか
+        return MotionSensorData(attitude: Rotation3DFloat.init(simd_quatf(vector: simd_float4(intbyte[safe:1,default: 0], intbyte[safe:2,default: 0], intbyte[safe:3,default: 0], intbyte[safe:4,default: 0]))), acceleration:  SIMD3<Float>(x: intbyte[safe:5,default: 0] * 16, y: intbyte[safe:6,default: 0]  * 16, z: intbyte[safe:7,default: 0] * 16),angularVelocity: SIMD3<Float>(x: intbyte3[safe:0,default: 0], y: intbyte3[safe:1,default: 0] , z: intbyte3[safe:2,default: 0]))
+    }
+
 }
 
