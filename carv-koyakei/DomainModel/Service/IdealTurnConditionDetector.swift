@@ -11,7 +11,7 @@ import CoreMotion
 struct IdealTurnConditionDetector {
 
     func ターン前半のすべての角速度とAttitudeが理想状態に一致しているか？(turnPhase:
-            MovingPhaseProtocol) -> Bool {
+                                              any MovingPhaseProtocol) -> Bool {
         let 横回転: Double = turnPhase.absoluteRotationRate.z
         let roll: Double = turnPhase.absoluteRotationRate.y
         let pitch: Double = turnPhase.absoluteRotationRate.x

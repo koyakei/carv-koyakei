@@ -6,15 +6,16 @@
 //
 import simd
 import Foundation
-
+import SceneKit
+import Spatial
 struct OneTurnDiffrentialFinder {
-    var lastTurnSwitchAngle: simd_quatf = simd_quatf.init()
-    var oneTurnDiffrentialEuller: Float = Float(Measurement(value: 45.0, unit: UnitAngle.degrees)
-        .converted(to: .radians).value)
+    var lastTurnSwitchAngle: Rotation3DFloat = .init()
+    var oneTurnDiffrentialEuller : Float = Angle2DFloat(degrees: 45.0).radians
     
-    mutating func handle(isTurnSwitched: Bool ,currentTurnSwitchAngle: simd_quatf) -> Float{
+    mutating func handle(isTurnSwitched: Bool ,currentTurnSwitchAngle: Rotation3DFloat) -> Float{
+        
         if (isTurnSwitched){
-            oneTurnDiffrentialEuller = abs(QuaternionToEullerAngleDifferential.handle(base: lastTurnSwitchAngle, target: currentTurnSwitchAngle).z)
+            oneTurnDiffrentialEuller = QuaternionToEullerAngleDifferential.handle(base: lastTurnSwitchAngle, target: currentTurnSwitchAngle).eulerAngles(order: .xyz).angles.z
             lastTurnSwitchAngle = currentTurnSwitchAngle
         }
         return oneTurnDiffrentialEuller

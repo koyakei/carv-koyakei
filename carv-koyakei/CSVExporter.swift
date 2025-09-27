@@ -72,7 +72,6 @@ class CSVExporter {
             header += "unitedYawingAngle,"
             header += "yawingSide,"
             header += "percentageOfTurn,"
-            header += "numberOfTurns,"
             header += "\n"
             file.write(header.data(using: .utf8)!)
             self.file = file
@@ -102,7 +101,7 @@ class CSVExporter {
         let format = DateFormatter()
             format.dateFormat = "HH:mm:ss.SSS"
         format.timeZone = .current
-        text += "\(format.string(from: Date(timeIntervalSince1970: motion.recordetTime))),"
+        text += "\(format.string(from: Date(timeIntervalSince1970: motion.recordetTime.timeIntervalSince1970))),"
         text += "\(motion.acceleration.x),"
         text += "\(motion.acceleration.y),"
         text += "\(motion.acceleration.z),"
@@ -128,7 +127,7 @@ class CSVExporter {
         let format = DateFormatter()
             format.dateFormat = "HH:mm:ss.SSS"
         format.timeZone = .current
-        text += "\(format.string(from: Date(timeIntervalSince1970: motion.recordetTime))),"
+        text += "\(format.string(from: Date(timeIntervalSince1970: motion.recordetTime.timeIntervalSince1970))),"
         text += "\(motion.left.acceleration.x),"
         text += "\(motion.left.acceleration.y),"
         text += "\(motion.left.acceleration.z),"
@@ -162,7 +161,6 @@ class CSVExporter {
         text += "\(motion.unitedYawingAngle),"
         text += "\(motion.yawingSide),"
         text += "\(motion.percentageOfTurnsByAngle),"
-        text += "\(motion.numberOfTurns),"
         text += "\n"
         print(text)
         file.write(text.data(using: .utf8)!)

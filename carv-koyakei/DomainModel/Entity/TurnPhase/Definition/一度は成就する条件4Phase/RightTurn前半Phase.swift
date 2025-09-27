@@ -6,7 +6,7 @@ import Foundation
 
 struct RightTurn前半Phase {
     static func handle(absoluteFallLineAttitude: Attitude,
-                currentMovingPhase: MovingPhaseProtocol)
+                       currentMovingPhase: any MovingPhaseProtocol)
                     -> Bool{
         // これらを一度でも満たして、 なおかつangle がターンマックスを過ぎたら
         RightTurn内にスキーが傾いている.handle(absoluteFallLineAttitude:

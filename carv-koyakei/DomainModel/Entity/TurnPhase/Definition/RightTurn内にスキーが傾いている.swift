@@ -6,7 +6,7 @@ import Foundation
 
 struct RightTurn内にスキーが傾いている {
     static func handle(absoluteFallLineAttitude: Attitude,
-                currentMovingPhase: MovingPhaseProtocol)
+                currentMovingPhase: any MovingPhaseProtocol)
                     -> Bool{
         currentMovingPhase.attitude.roll > .zero // 内に倒れている
     }

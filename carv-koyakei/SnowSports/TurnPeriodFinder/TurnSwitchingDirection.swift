@@ -6,7 +6,7 @@ import Foundation
 
 struct TimeStampAndTurnSideDirectionSide {
     // 右ターン  true left false
-    let turnPhase: TurnPhaseProtocol.Protocol
+    let turnPhase: (any TurnPhaseProtocol).Protocol
     let timeStampSince1970: Double
 }
 

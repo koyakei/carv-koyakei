@@ -6,8 +6,9 @@
 //
 
 import Foundation
-import CoreBluetooth
+@preconcurrency import CoreBluetooth
 import SwiftUI
+import Combine
 
 enum ConnectionStatus: String {
     case connected = "Connected"
@@ -50,9 +51,8 @@ class DroggerBluetoothModel: NSObject, ObservableObject {
         if !enableToUpdateOutputText {
             return
         }
-        DispatchQueue.main.async {
             self.output = self.outputs.joined(separator: "")
-        }
+        
     }
 }
 
@@ -81,9 +81,8 @@ extension DroggerBluetoothModel: CBCentralManagerDelegate {
         p.delegate = self
         p.discoverServices([droggerService])
         centralManager.stopScan()
-        DispatchQueue.main.async {
             self.deviceDetail = String(format: "\(p.name!): \(p.identifier)")
-        }
+        
     }
     
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: (any Error)?) {

@@ -1,24 +1,30 @@
 import SwiftUI
 
 struct ContentView: View {
-    @EnvironmentObject var carv2DataPair: Carv2DataPair
-    @EnvironmentObject var ble :BluethoothCentralManager
-    @EnvironmentObject var yawingBeep: YawingBeep
-    @StateObject var cameraViewModel = CameraViewModel()
-    
+    var ble :BluethoothCentralManager
+    var yawingBeep: YawingBeep
+    var rollingBeep: RollingBeep
+    var cameraViewModel = CameraViewModel()
+    var dataManager: DataManager
+    var carv1DataManager: Carv1DataManager
+    var carv1Ble:Carv1BluethoothCentralManager
     var body: some View {
         TabView {
-            HomeView()
+            HomeView(ble: ble, yawingBeep: yawingBeep,rollingBeep: rollingBeep,dataManager: dataManager)
                 .tabItem {
                     Image(systemName: "house.fill")
                     Text("ホーム")
-                }.environmentObject(ble).environmentObject(yawingBeep)
-            ARBootsView()
+                }
+            ARBootsView(dataManager: dataManager)
                 .tabItem {
                     Image(systemName: "person.fill")
                     Text("AR")
                 }
-            FootPressureView()
+            Carv1View(dataManager: carv1DataManager,ble: carv1Ble)
+                .tabItem {
+                    Text("carv1")
+                }
+            FootPressureView(carv1DataManager: carv1DataManager)
                 .tabItem {
                     Image(systemName: "person.fill")
                     Text("pressure")
@@ -26,7 +32,6 @@ struct ContentView: View {
             switch cameraViewModel.status {
                     case .configured:
                         YawingAnglerVelocityChartOverlay(cameraViewModel: cameraViewModel).tabItem {
-                            Image(systemName: "person.fill")
                             Text("anguler")
                         }
                     case .unauthorized:
@@ -37,10 +42,6 @@ struct ContentView: View {
             
         }
     }
-}
-
-#Preview {
-    ContentView().environmentObject(BluethoothCentralManager())
 }
 
 

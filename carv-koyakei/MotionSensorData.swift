@@ -8,10 +8,10 @@
 import Foundation
 import Spatial
 import simd
-import SwiftUICore
+import SwiftUI
 
 struct MotionSensorData{
-    public let attitude: Rotation3D
+    public let attitude: Rotation3DFloat
     public let acceleration: SIMD3<Float>
     public let angularVelocity: SIMD3<Float>
 }

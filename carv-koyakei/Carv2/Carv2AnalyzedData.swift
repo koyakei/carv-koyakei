@@ -7,20 +7,26 @@
 import Spatial
 import Foundation
 
-struct Carv2AnalyzedData {
-    var attitude: Rotation3D
-    var acceleration: SIMD3<Float>
-    var angularVelocity : SIMD3<Float>
-    let recordetTime: TimeInterval = Date.now.timeIntervalSince1970
-    var rollAngle: Double {attitude.eulerAngles(order: .xyz).angles.z}
-    var yawAngle: Double {attitude.eulerAngles(order: .xyz).angles.y}
-    var pitchAngle: Double {attitude.eulerAngles(order: .xyz).angles.z}
-}
 
-struct Carv2AnalyzedDataPair :Identifiable, OutsideSkiRollAngle{
-    let id = UUID()
-    var left: Carv2AnalyzedData
-    var right: Carv2AnalyzedData
+struct Carv2AnalyzedDataPair:Encodable {
+    var left: Carv2Data
+    var right: Carv2Data
+    
+    var recordetTime: Date
+    var isTurnSwitching: Bool
+    
+    var percentageOfTurnsByAngle: Float
+    var percentageOfTurnsByTime: TimeInterval
+    
+    init(left: Carv2Data = .init(), right: Carv2Data = .init(), recordetTime: Date = Date.now, isTurnSwitching: Bool = false, percentageOfTurnsByAngle: Float = 0, percentageOfTurnsByTime: TimeInterval = 0) {
+        self.left = left
+        self.right = right
+        self.recordetTime = recordetTime
+        self.isTurnSwitching = isTurnSwitching
+        self.percentageOfTurnsByAngle = percentageOfTurnsByAngle
+        self.percentageOfTurnsByTime = percentageOfTurnsByTime
+    }
+    
     var yawingSide: TurnYawingSide {
         get{
             switch unitedYawingAngle {
@@ -33,11 +39,33 @@ struct Carv2AnalyzedDataPair :Identifiable, OutsideSkiRollAngle{
             }
         }
     }
-    var outsideSkiRollAngle: Double {
-        return outsideSki.rollAngle + Angle2D(degrees: 90).radians
+    // z がヨーイング角速度の同調　左足前テレマークでの　parallel ski
+    var angulerVelocityDiffrencialForTelemarkLeftSideFont: Vector3DFloat {
+        return 左側基準の右足の角速度 - Vector3DFloat.init(x: left.angularVelocity.x, y: left.angularVelocity.z, z: -left.angularVelocity.y)
     }
     
-    var outsideSki: Carv2AnalyzedData {
+    var 左側基準の右足の角速度 : Vector3DFloat {
+        return Vector3DFloat.init(x: right.angularVelocity.x, y: -right.angularVelocity.z, z: -right.angularVelocity.y).rotated(by: unifiedDiffrentialAttitudeFromLeftToRight)
+    }
+    
+    // z yaw x roll y pitch
+    var angulerVelocityDiffrencialForTelemarkRightSideFont: Vector3DFloat {
+        return 右側基準の左足の角速度 - Vector3DFloat.init(x: right.angularVelocity.x, y: right.angularVelocity.z, z: right.angularVelocity.y)
+    }
+    
+    var unifiedDiffrentialAttitudeFromRightToLeft: Rotation3DFloat {
+        right.rightRealityKitRotation.inverse * left.leftRealityKitRotation
+    }
+    var 右側基準の左足の角速度 : Vector3DFloat {
+        return Vector3DFloat.init(x: -left.angularVelocity.x, y: -left.angularVelocity.z, z: left.angularVelocity.y).rotated(by: unifiedDiffrentialAttitudeFromRightToLeft)
+    }
+    
+    
+    var outsideSkiRollAngle: Float {
+        return outsideSki.rollAngle + Float(Angle2D(degrees: 90).radians)
+    }
+    
+    var outsideSki: Carv2Data {
         if yawingSide == .LeftYawing {
             return left
         } else {
@@ -45,7 +73,7 @@ struct Carv2AnalyzedDataPair :Identifiable, OutsideSkiRollAngle{
         }
     }
     
-    var insideSki: Carv2AnalyzedData {
+    var insideSki: Carv2Data {
         if yawingSide == .RightYawing {
             return right
         } else {
@@ -53,19 +81,17 @@ struct Carv2AnalyzedDataPair :Identifiable, OutsideSkiRollAngle{
         }
     }
     
-    var isTurnSwitching: Bool
-    var unitedAttitude : Rotation3D {
-        Rotation3D.slerp(from: left.attitude, to: right.attitude, t: 0.5)
+    var unitedAttitude : Rotation3DFloat {
+        Rotation3DFloat.slerp(from: left.attitude, to: right.attitude, t: 0.5)
     }
-    var percentageOfTurnsByAngle: Float
-    var percentageOfTurnsByTime: Double
     var unitedYawingAngle : Float {
         left.angularVelocity.y + right.angularVelocity.y
     }
     var yawingAngulerRateDiffrential: Float { Float(right.angularVelocity.y - left.angularVelocity.y)}
-    var numberOfTurns: Int
-    var recordetTime: TimeInterval
-    var unifiedDiffrentialAttitudeFromLeftToRight: Rotation3D {
+    var unifiedDiffrentialAttitudeFromLeftToRight: Rotation3DFloat {
         left.attitude.inverse * right.attitude
     }
+    // ローリングの方向を　realitykit 用の変換コードを一つの行列変換で表現したやつを掛けて揃えなきゃいけないんだけど、やってない。
+    // ここでサボると加速度の変換がおかしなことになる。
+    var rollingAngulerRateDiffrential: Float { Float(right.angularVelocity.x + left.angularVelocity.x)}
 }

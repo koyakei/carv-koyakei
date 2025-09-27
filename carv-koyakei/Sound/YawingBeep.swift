@@ -5,32 +5,40 @@
 //  Created by keisuke koyanagi on 2025/03/17.
 //
 
-
 import AudioKit
 import Foundation
 import Combine
-import SwiftUICore
-
-class YawingBeep: ObservableObject{
+import SwiftUI
+import AVFAudio
+@MainActor
+class YawingBeep{
     
-    var isBeeping: Bool = false
-    public static var shared: YawingBeep = .init()
-    private var cancellables = Set<AnyCancellable>()
-    
-    @Published var diffYawingTargetAngle: Double = 2.0
-    @ObservedObject var conductor : DynamicOscillatorConductor = DynamicOscillatorConductor()
-    private init() {
-        
-        conductor.start()
-        carv2DataPair.$right
-            .sink { [weak self] newValue in
-                self?.handleRightChange(newValue)
+    var isBeeping: Bool = false {
+        didSet{
+            if isBeeping {
+                conductor.start()
+            } else {
+                conductor.stop()
             }
-            .store(in: &cancellables)
+        }
     }
-    var carv2DataPair :Carv2DataPair = Carv2DataPair.shared
-        
-    private func handleRightChange(_ newValue: Carv2Data) {
+    
+    var diffYawingTargetAngle: Double = 2.0
+    var conductor: DynamicOscillatorConductor = DynamicOscillatorConductor()
+    var dataManager: DataManager
+    private var cancellables = Set<AnyCancellable>()
+    init(dataManager: DataManager){
+        self.dataManager = dataManager
+        dataManager.$carv2DataPair
+            .sink { [weak self] newValue in
+                self?.handleDataPairChange(newValue)
+            }
+            .store(in: &cancellables)  //handleDataPairChangeを実行したい
+    }
+    
+    private var cancellable: AnyCancellable? = nil
+    
+    private func handleDataPairChange(_ carv2DataPair: Carv2AnalyzedDataPair) {
         if isBeeping == false { return }
         if (-diffYawingTargetAngle...diffYawingTargetAngle).contains(Double(carv2DataPair.yawingAngulerRateDiffrential) ) {
             conductor.data.isPlaying = false
@@ -58,3 +66,4 @@ class YawingBeep: ObservableObject{
             return base * pow(pow(2, num + min), 1/12)
         }
 }
+

@@ -62,12 +62,6 @@ struct OrientationTrackingView: UIViewRepresentable {
     }
 }
 
-// クォータニオン変換拡張
-extension simd_quatf {
-    init(_ matrix: float4x4) {
-        self.init(matrix)
-    }
-}
 
 extension Float {
     var degreesToRadians: Self { self * .pi / 180 }

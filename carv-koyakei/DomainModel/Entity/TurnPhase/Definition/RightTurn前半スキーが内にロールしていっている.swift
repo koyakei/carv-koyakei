@@ -3,10 +3,10 @@
 //
 
 import Foundation
-
+import CoreMotion
 struct RightTurn前半スキーが内にロールしていっている {
     static func handle(absoluteFallLineAttitude: Attitude,
-                currentMovingPhase: MovingPhaseProtocol)
+                currentMovingPhase: any MovingPhaseProtocol)
                     -> Bool{
         currentMovingPhase.absoluteRotationRate.y > .zero // rpll
 //        右に倒れていく

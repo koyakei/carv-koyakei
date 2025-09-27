@@ -14,18 +14,7 @@ import SoundpipeAudioKit
 import Combine
 
 
-
-struct DynamicOscillatorData {
-    var isPlaying: Bool = false
-    var frequency: AUValue = 440
-    var amplitude: AUValue = 1.0
-    var rampDuration: AUValue = 0
-    var detuningOffset: AUValue = 440
-    var balance: AUValue = 1.0
-}
-
 class DynamicOscillatorConductor: ObservableObject {
-
     let engine = AudioEngine()
     var osc = DynamicOscillator()
     var panner : Panner
@@ -76,12 +65,10 @@ class DynamicOscillatorConductor: ObservableObject {
     func start() {
             osc.amplitude = 1
             do {
-                try AVAudioSession.sharedInstance().setCategory(
-                    .playAndRecord,
-                    mode: .default,
-                    options: [  .allowBluetoothA2DP ,.duckOthers ]
-                        )
                 try engine.start()
+                let session = AVAudioSession.sharedInstance()
+                try session.setCategory(.playback, mode: .voiceChat,options: [.mixWithOthers])
+                try session.setActive(true)
             } catch let err {
                 Log(err)
             }
@@ -91,122 +78,11 @@ class DynamicOscillatorConductor: ObservableObject {
         data.isPlaying = false
         osc.stop()
         engine.stop()
-    }
-}
-
-class SineWave {
-
-    
-    var oscillator = Oscillator()
-    
-    private enum Fade {
-        case none
-        case `in`
-        case out
-    }
-
-    private let audioEngine = AVAudioEngine()
-    private let player = AVAudioPlayerNode()
-    private var buffer: AVAudioPCMBuffer!
-    private var fadeInBuffer: AVAudioPCMBuffer!
-    private var fadeOutBuffer: AVAudioPCMBuffer!
-    private let semaphore = DispatchSemaphore(value: 0)
-
-    var volume: Float = 0.1 {
-        didSet { updateBuffers() }
-    }
-
-    var hz: Float = 600 {
-        didSet { updateBuffers() }
-    }
-    static public var shared = SineWave.init()
-    
-    init(volume: Float = 0.1, hz: Float = 600) {
-        self.volume = volume
-        self.hz = hz
-        let audioFormat = player.outputFormat(forBus: 0)
-        updateBuffers()
-        audioEngine.attach(player)
-        audioEngine.connect(player, to: audioEngine.mainMixerNode, format: audioFormat)
-        audioEngine.prepare()
         do {
-            try self.audioEngine.start()
-        } catch {
-            print(error.localizedDescription)
+            let session = AVAudioSession.sharedInstance()
+            try session.setActive(false)
+        } catch let err {
+            Log(err)
         }
     }
-
-    deinit {
-        stopEngine()
-    }
-
-    func updateBuffers() {
-        buffer = makeBuffer()
-        fadeInBuffer = makeBuffer(fade: .in)
-        fadeOutBuffer = makeBuffer(fade: .out)
-    }
-
-    private func makeBuffer(fade: Fade = .none) -> AVAudioPCMBuffer {
-        let audioFormat = player.outputFormat(forBus: 0)
-        let sampleRate = Float(audioFormat.sampleRate) // 44100.0
-        let length = AVAudioFrameCount(sampleRate / hz)
-        let capacity = fade == .none ? length : 15 * length
-        guard let buf = AVAudioPCMBuffer(pcmFormat: audioFormat, frameCapacity: capacity) else {
-            fatalError("Error initializing AVAudioPCMBuffer")
-        }
-        buf.frameLength = capacity
-//        let u = Float.pi / Float(capacity)
-        for n in (0 ..< Int(capacity)) {
-            let power: Float
-//            switch fade {
-//            case .none: power = 1.0
-//            case .in:   power = 0.5 * (1.0 - cosf(Float(n) * u))
-//            case .out:  power = 0.5 * (1.0 + cosf(Float(n) * u))
-//            }
-            power = 1.0
-            let value = power * volume * sinf(Float(n) * 2.0 * Float.pi / Float(length))
-            buf.floatChannelData?.advanced(by: 0).pointee[n] = value
-            buf.floatChannelData?.advanced(by: 1).pointee[n] = value
-        }
-        return buf
-    }
-
-    func play() {
-        
-        oscillator.play()
-        if audioEngine.isRunning {
-            player.play()
-            player.scheduleBuffer(fadeInBuffer) { [weak self] in
-                self?.semaphore.signal()
-            }
-            player.scheduleBuffer(buffer, at: nil, options: .loops)
-        }
-    }
-
-    func pause() {
-        if player.isPlaying {
-            switch semaphore.wait(timeout: .now()) {
-            case .success:
-//                self.pause()
-//                break
-                player.scheduleBuffer(fadeOutBuffer, at: nil,
-                                      options: .interruptsAtLoop,
-                                      completionHandler: { [weak self] in
-                                          self?.player.pause()
-                                      })
-            case .timedOut:
-                break
-            }
-        }
-    }
-
-    func stopEngine() {
-        pause()
-        if audioEngine.isRunning {
-            audioEngine.disconnectNodeOutput(player)
-            audioEngine.detach(player)
-            audioEngine.stop()
-        }
-    }
-
 }

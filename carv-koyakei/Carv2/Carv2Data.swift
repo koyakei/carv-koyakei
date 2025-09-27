@@ -7,129 +7,110 @@
 import Foundation
 import Spatial
 import simd
-import SwiftUICore
+import SwiftUI
 import Combine
-class Carv2Data{
-    let attitude: Rotation3D
+
+final class Carv2Data:Encodable{
+    let attitude: Rotation3DFloat
     let acceleration: SIMD3<Float>
     let angularVelocity : SIMD3<Float>
-    let recordetTime: TimeInterval = Date.now.timeIntervalSince1970
+    let recordetTime: Date = Date.now
+    var rollAngle: Float {attitude.eulerAngles(order: .xyz).angles.z}
+    var yawAngle: Float {attitude.eulerAngles(order: .xyz).angles.y}
+    var pitchAngle: Float {attitude.eulerAngles(order: .xyz).angles.z}
+    let forDebug: [Float]
     init(){
         attitude = .identity
         acceleration = .zero
         angularVelocity = .zero
+        forDebug = []
     }
 
     // 右側　x 前上　+ 　後上ー 　左は逆
     // y  上々　＋　下下　ー
     // 右側　z 内上＋　外上ー　多分左は逆
     //
-    var gravityAccel : Vector3D {
+    var gravityAccel : Vector3DFloat {
         // Rの筐体上の方向を　Yマイナス１として姿勢を正しく認識　Yが縦だからこれが正しいはず
         //前方向を植えにすると　Z　マイナス１ roll がZなのでこれも正しいはず
         // 外を植えにするとXマイナス１
-        let v = Vector3D(x: 1, y: 0, z: 0).rotated(by: attitude)
-        return Vector3D(x: -v.z, y: v.y, z: v.x)
+        let v = Vector3DFloat(x: 1, y: 0, z: 0).rotated(by: attitude)
+        return Vector3DFloat(x: -v.z, y: v.y, z: v.x)
     }
     
     // without gravity 左右共有
-    var userAcceleration : Vector3D {
-        Vector3D(gravityAccel.vector - Vector3D(acceleration).vector)
+    var userAcceleration : Vector3DFloat {
+        Vector3DFloat(gravityAccel.vector - Vector3DFloat(acceleration).vector)
     }
     
-    var leftRealityKitAngularVelocity : Vector3D {
-        Vector3D(angularVelocity)
+    var leftRealityKitAngularVelocity : Vector3DFloat {
+        Vector3DFloat(angularVelocity)
     }
     
-    var 初期姿勢に対しての角速度Right : Vector3D {
-        let p = ProjectiveTransform3D(scale: Size3D(vector: [-1,-1,-1]),rotation: Rotation3D(simd_quatd(real: 1, imag: [1.0,1.0,1.0]).normalized))
-        return Vector3D.init(x: angularVelocity.x, y: angularVelocity.z, z: -angularVelocity.y).rotated(by: Rotation3D.init(simd_quatd(vector:p.matrix * attitude.vector)).rotated(by: Rotation3D(angle: Angle2D(radians: -.pi), axis: RotationAxis3D(vector: [0,1,0]))))
+    var 初期姿勢に対しての角速度Right : Vector3DFloat {
+        let p = ProjectiveTransform3DFloat(scale: Size3DFloat(vector: [-1,-1,-1]),rotation: Rotation3DFloat(simd_quatf(real: 1, imag: [1.0,1.0,1.0]).normalized))
+        return Vector3DFloat.init(x: angularVelocity.x, y: angularVelocity.z, z: -angularVelocity.y).rotated(by: Rotation3DFloat.init(simd_quatf(vector:p.matrix * attitude.vector)).rotated(by: Rotation3DFloat(angle: Angle2DFloat(radians: -.pi), axis: RotationAxis3DFloat(vector: [0,1,0]))))
        
     }
     
-    var 初期姿勢に対しての角速度2 : Vector3D {
-        let p = ProjectiveTransform3D(scale: Size3D(vector: [-1,-1,-1]),rotation: Rotation3D(simd_quatd(real: 1, imag: [1.0,1.0,1.0]).normalized))
-        return Vector3D.init(x: 0, y: 1, z: 0).rotated(by: Rotation3D.init(simd_quatd(vector:p.matrix * attitude.vector)).rotated(by: Rotation3D(angle: Angle2D(radians: -.pi), axis: RotationAxis3D(vector: [0,1,0]))))
-    }
-    
-    var 初期姿勢に対しての角速度3 : Vector3D {
-        let p = ProjectiveTransform3D(scale: Size3D(vector: [-1,-1,-1]),rotation: Rotation3D(simd_quatd(real: 1, imag: [1.0,1.0,1.0]).normalized))
-        return Vector3D.init(x: 0, y: 0, z: 1).rotated(by: Rotation3D.init(simd_quatd(vector:p.matrix * attitude.vector)).rotated(by: Rotation3D(angle: Angle2D(radians: -.pi), axis: RotationAxis3D(vector: [0,1,0]))))
-    }
-    
-    var 初期姿勢に対しての角速度4 : Vector3D {
-        let p = ProjectiveTransform3D(scale: Size3D(vector: [-1,-1,-1]),rotation: Rotation3D(simd_quatd(real: 1, imag: [1.0,1.0,1.0]).normalized))
-        return Vector3D.init(x: 1, y: 0, z: 0).rotated(by: Rotation3D.init(simd_quatd(vector:p.matrix * attitude.vector)).rotated(by: Rotation3D(angle: Angle2D(radians: -.pi), axis: RotationAxis3D(vector: [0,1,0]))))
-    }
-    
-    var 初期姿勢に対しての角速度5 : Vector3D {
-        return Vector3D.init(x: 1, y: 0, z: 0).rotated(by: attitude.inverse)
-    }
-    
-    var 初期姿勢に対しての角速度6 : Vector3D {
-        return Vector3D.init(x: 0, y: 1, z: 0).rotated(by: attitude.inverse)
-    }
-    
-    var 初期姿勢に対しての角速度7 : Vector3D {
-        return Vector3D.init(x: 0, y: 0, z: 1).rotated(by: attitude.inverse)
-    }
-    
-    
-    
-    var worldAcceleration0 : Vector3D {
-        let v = Vector3D(acceleration).rotated(by: attitude)
-        return Vector3D(x: -v.z, y: v.y, z: v.x)
+    var worldAcceleration0 : Vector3DFloat {
+        let v = Vector3DFloat(acceleration).rotated(by: attitude)
+        return Vector3DFloat(x: -v.z, y: v.y, z: v.x)
     }
     // 東西南北を固定したワールド座標系に対する加速度
-    var worldAcceleration : Vector3D {
+    var worldAcceleration : Vector3DFloat {
         worldAcceleration0.projected(.init(x: 1, y: 1, z: 1).rotated(by: attitude)).rotated(by: attitude)
     }
     
-    var rightRealityKitRotation: Rotation3D {
-        let p = ProjectiveTransform3D(scale: Size3D(vector: [-1,-1,-1]),rotation: Rotation3D(simd_quatd(real: 1, imag: [1.0,1.0,1.0]).normalized))
-        return Rotation3D.init(simd_quatd(vector:p.matrix * attitude.vector))
-//            .rotated(by: Rotation3D(angle: Angle2D(radians: .pi), axis: RotationAxis3D(vector: [0,1,0])))
+    var rightRealityKitRotation: Rotation3DFloat {
+        return Rotation3DFloat(quaternion: simd_quatf(ix: -attitude.quaternion.vector.x, iy:   attitude.quaternion.vector.y, iz: attitude.quaternion.vector.z, r: attitude.quaternion.vector.w))
     }
     
-    var leftRealityKitRotation: Rotation3D {
-        let p = ProjectiveTransform3D(scale: Size3D(vector: [-1,-1,-1]),rotation: Rotation3D(simd_quatd(real: 1, imag: [-1.0,1.0,1.0]).normalized))
-        return Rotation3D.init(simd_quatd(vector: attitude.vector * p.matrix ))
-            .rotated(by: Rotation3D(angle: Angle2D(radians: .pi), axis: RotationAxis3D(vector: [1,0,0])))
-            .rotated(by: Rotation3D(angle: Angle2D(radians: -.pi), axis: RotationAxis3D(vector: [0,1,0])))
-    }
-    var rightRealityKitRotation2: Rotation3D {
-        return attitude.rotated(by: Rotation3D(eulerAngles: EulerAngles(x: Angle2D(radians: .pi / 2), y: Angle2D(radians: .pi / 2), z: Angle2D(radians: .pi), order: .xyz)))
-    }
-    var leftRealityKitRotation2: Rotation3D {
-        return attitude.rotated(by: Rotation3D(eulerAngles: EulerAngles(x: Angle2D(radians: 0), y: Angle2D(radians: 0), z: Angle2D(radians: .pi), order: .xyz)))
-    }
-    var leftRealityKitRotation3: Rotation3D {
+    var leftRealityKitRotation: Rotation3DFloat {
         
-        return attitude.rotated(by: Rotation3D(eulerAngles: EulerAngles(x: Angle2D(radians: .pi), y: Angle2D(radians: 0), z: Angle2D(radians: .pi), order: .xyz)))
+        return Rotation3DFloat(quaternion: simd_quatf(ix: attitude.quaternion.vector.x, iy:   attitude.quaternion.vector.y, iz: attitude.quaternion.vector.z, r: -attitude.quaternion.vector.w))
     }
-  
     
-    static private func int16ToFloat(data: Data) -> MotionSensorData {
-
-        let intbyte :[Float] = data.withUnsafeBytes {
-            Array(UnsafeBufferPointer<Int16>(start: $0.baseAddress?.assumingMemoryBound(to: Int16.self), count: data.count / MemoryLayout<Int16>.stride))
-        }.map { Float($0)/32768.0 }
-        let intbyte3 : [Float] = data.dropFirst(14).withUnsafeBytes { buffer in
-            guard let baseAddress = buffer.baseAddress else { return [] }
-            let count = buffer.count / MemoryLayout<Float32>.stride
-            return [Float32](UnsafeBufferPointer(
-                start: baseAddress.bindMemory(to: Float32.self, capacity: count),
-                count: count
-            )).map { Float32($0) }
-        }
-        return MotionSensorData(attitude: Rotation3D.init(simd_quatf(vector: simd_float4(intbyte[0], intbyte[1], intbyte[2], intbyte[3]))), acceleration:  SIMD3<Float>(x: intbyte[4] * 16, y: intbyte[5]  * 16, z: intbyte[6] * 16),angularVelocity: SIMD3<Float>(x: intbyte3[safe:0, default: 0], y: intbyte3[safe: 1, default: 0] , z: intbyte3[safe: 2,default: 0 ]))
+    var leftRealityKitRotation3: Rotation3DFloat {
+        
+        return attitude.rotated(by: Rotation3DFloat(eulerAngles: EulerAnglesFloat(x: Angle2DFloat(radians: .pi), y: Angle2DFloat(radians: 0), z: Angle2DFloat(radians: .pi), order: .xyz)))
     }
+    static func floatArray(_ data: Data) -> [Float] {
+        let count = data.count / MemoryLayout<Float>.size
+        return data.withUnsafeBytes {
+            let buffer = $0.bindMemory(to: Float.self)
+            return Array(buffer.prefix(count))
+        }.map { $0 }
+    }
+
     
     public init(_ data: Data) {
-        let motionSensorData = Carv2Data.int16ToFloat(data: data.dropFirst(1))
-        attitude = motionSensorData.attitude
-        acceleration = motionSensorData.acceleration
-        angularVelocity = motionSensorData.angularVelocity
+        let intbyte :[Float] = data
+            .dropFirst(1)
+            .withUnsafeBytes {
+            Array(UnsafeBufferPointer<Int16>(start: $0.baseAddress?.assumingMemoryBound(to: Int16.self), count: data.count / MemoryLayout<Int16>.stride))
+        }.map { Float($0) / (Float(Int16.max) + 1) }
+
+        let intbyte3 : [Float] = Carv2Data.floatArray(data.dropFirst(17))
+//            .withUnsafeBytes {
+//            let buffer = $0.bindMemory(to: Float.self)
+//            return Array(buffer.prefix(data.count / MemoryLayout<Float>.size))
+//        }.map { $0 }
+    
+        attitude = Rotation3DFloat.init(simd_quatf(vector: simd_float4(intbyte[safe:1,default: 0], intbyte[safe:2,default: 0], intbyte[safe:3,default: 0], intbyte[safe:4,default: 0])))
+        acceleration = SIMD3<Float>(x: intbyte[safe:5,default: 0] * 16, y: intbyte[safe:6,default: 0]  * 16, z: intbyte[safe:7,default: 0] * 16)
+        angularVelocity = SIMD3<Float>(x: intbyte3[safe:0,default: 0], y: intbyte3[safe:1,default: 0] , z: intbyte3[safe:2,default: 0])
+        forDebug = []
     }
+    static private func int16ToFloat(data: Data) -> MotionSensorData {
+        let intbyte3 : [Float] = floatArray( data.dropFirst(16))
+        let intbyte :[Float] = data.withUnsafeBytes {
+            Array(UnsafeBufferPointer<Int16>(start: $0.baseAddress?.assumingMemoryBound(to: Int16.self), count: data.count / MemoryLayout<Int16>.stride))
+        }.map { Float($0) / (Float(Int16.max) + 1) }
+
+//        intbyte[safe:５,default: 0] これがTimeinterval ぽいぞ　なんとか
+        return MotionSensorData(attitude: Rotation3DFloat.init(simd_quatf(vector: simd_float4(intbyte[safe:1,default: 0], intbyte[safe:2,default: 0], intbyte[safe:3,default: 0], intbyte[safe:4,default: 0]))), acceleration:  SIMD3<Float>(x: intbyte[safe:5,default: 0] * 16, y: intbyte[safe:6,default: 0]  * 16, z: intbyte[safe:7,default: 0] * 16),angularVelocity: SIMD3<Float>(x: intbyte3[safe:0,default: 0], y: intbyte3[safe:1,default: 0] , z: intbyte3[safe:2,default: 0]))
+    }
+
 }
 

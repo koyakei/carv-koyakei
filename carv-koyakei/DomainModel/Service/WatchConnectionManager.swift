@@ -8,7 +8,7 @@
 import Foundation
 import WatchConnectivity
 
-class WatchConnectionManager: NSObject, ObservableObject {
+class WatchConnectionManager: NSObject {
     
     var isConnected: Bool = false
     override init() {
@@ -20,7 +20,7 @@ class WatchConnectionManager: NSObject, ObservableObject {
 }
 
 extension WatchConnectionManager :WCSessionDelegate{
-    func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
+    func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: (any Error)?) {
         guard error == nil else {
             print("WCSession failed to activate: \(error!.localizedDescription)")
             return

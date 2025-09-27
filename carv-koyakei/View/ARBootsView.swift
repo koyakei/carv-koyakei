@@ -11,9 +11,8 @@ import Charts
 import Spatial
 
 struct ARBootsView: View {
-    @ObservedObject var carv2DataPair : Carv2DataPair = Carv2DataPair.shared
-    @StateObject private var cameraManager = CameraManager()
-    var carv2AnalyzedDataPairManager = Carv2AnalyzedDataPairManager.shared
+    @StateObject var dataManager: DataManager
+    @Bindable var cameraManager = CameraManager()
     @State private var currentScale: CGFloat = 3.0
     @State private var initialScale: CGFloat = 3.0
     let leftAnchorName = "leftAnchor"
@@ -121,18 +120,15 @@ struct ARBootsView: View {
                 guard let arrowLeft = content.entities.first(where: {$0.name == "worldAnchor"})?.children.first(where: { $0.name == leftAnchorName }) else {
                     return }
                 arrowLeft.setOrientation(
-                    simd_quatf(carv2DataPair.left.leftRealityKitRotation
-                              ), relativeTo: nil)
+                    dataManager.carv2DataPair.left.leftRealityKitRotation.quaternion
+                , relativeTo: nil)
                 guard let arrowRight = content.entities.first(where: {$0.name == "worldAnchor"})?.children.first(where: { $0.name == rightAnchorName })else  { return }
-                arrowRight.setOrientation(
-                    simd_quatf(carv2DataPair.right.rightRealityKitRotation
-                              ) , relativeTo: nil)
                 
+                arrowRight.setOrientation(dataManager.carv2DataPair.right.rightRealityKitRotation.quaternion
+                              , relativeTo: nil)
                 guard let arrowUnified = content.entities.first(where: {$0.name == "worldAnchor"})?.children.first(where: { $0.name == unifiedAnchorName })else  { return }
-                arrowUnified.setOrientation(
-                    simd_quatf(Carv2DataPair.shared.unifiedDiffrentialAttitudeFromRightToLeft
-                              ) , relativeTo: nil)
-                
+                arrowUnified.setOrientation(dataManager.carv2DataPair.unifiedDiffrentialAttitudeFromRightToLeft.quaternion
+                               , relativeTo: nil)
             }
             .gesture(magnificationGesture)
             .overlay(alignment: .bottom){
@@ -146,41 +142,32 @@ struct ARBootsView: View {
 //                                .padding(.bottom, 10)
                 HStack{
                     VStack{
-                        Text( carv2DataPair.angulerVelocityDiffrencialForTelemarkLeftSideFont.x.formatted(.number.precision(.fractionLength(1))))
-                        Text( carv2DataPair.angulerVelocityDiffrencialForTelemarkLeftSideFont.y.formatted(.number.precision(.fractionLength(1))))
-                        Text( carv2DataPair.angulerVelocityDiffrencialForTelemarkLeftSideFont.z.formatted(.number.precision(.fractionLength(1))))
+                        Text( dataManager.carv2DataPair.angulerVelocityDiffrencialForTelemarkLeftSideFont.x.formatted(.number.precision(.fractionLength(1))))
+                        Text( dataManager.carv2DataPair.angulerVelocityDiffrencialForTelemarkLeftSideFont.y.formatted(.number.precision(.fractionLength(1))))
+                        Text( dataManager.carv2DataPair.angulerVelocityDiffrencialForTelemarkLeftSideFont.z.formatted(.number.precision(.fractionLength(1))))
                     }
                     VStack{
-                        Text( carv2DataPair.左側基準の右足の角速度.x.formatted(.number.precision(.fractionLength(1))))
-                        Text( carv2DataPair.左側基準の右足の角速度.y.formatted(.number.precision(.fractionLength(1))))
-                        Text( carv2DataPair.左側基準の右足の角速度.z.formatted(.number.precision(.fractionLength(1))))
-                    }
-                    
-                    VStack{
-                        Text( carv2DataPair.angulerVelocityDiffrencialForTelemarkRightSideFont.x.formatted(.number.precision(.fractionLength(1))))
-                        Text( carv2DataPair.angulerVelocityDiffrencialForTelemarkRightSideFont.y.formatted(.number.precision(.fractionLength(1))))
-                        Text( carv2DataPair.angulerVelocityDiffrencialForTelemarkRightSideFont.z.formatted(.number.precision(.fractionLength(1))))
-                    }
-                    VStack{
-                        Text( carv2DataPair.右側基準の左足の角速度.x.formatted(.number.precision(.fractionLength(1))))
-                        Text( carv2DataPair.右側基準の左足の角速度.y.formatted(.number.precision(.fractionLength(1))))
-                        Text( carv2DataPair.右側基準の左足の角速度.z.formatted(.number.precision(.fractionLength(1))))
-                    }
-                    VStack{
-                        Text( carv2DataPair.初期姿勢に対しての角速度8.x.formatted(.number.precision(.fractionLength(1))))
-                        Text( carv2DataPair.初期姿勢に対しての角速度8.y.formatted(.number.precision(.fractionLength(1))))
-                        Text( carv2DataPair.初期姿勢に対しての角速度8.z.formatted(.number.precision(.fractionLength(1))))
+                        Text( dataManager.carv2DataPair.左側基準の右足の角速度.x.formatted(.number.precision(.fractionLength(1))))
+                        Text( dataManager.carv2DataPair.左側基準の右足の角速度.y.formatted(.number.precision(.fractionLength(1))))
+                        Text( dataManager.carv2DataPair.左側基準の右足の角速度.z.formatted(.number.precision(.fractionLength(1))))
                     }
                     
                     VStack{
-                        Text( carv2DataPair.left.angularVelocity.x.formatted(.number.precision(.fractionLength(1))))
-                        Text( carv2DataPair.left.angularVelocity.y.formatted(.number.precision(.fractionLength(1))))
-                        Text( carv2DataPair.left.angularVelocity.z.formatted(.number.precision(.fractionLength(1))))
+                        Text( dataManager.carv2DataPair.angulerVelocityDiffrencialForTelemarkRightSideFont.x.formatted(.number.precision(.fractionLength(1))))
+                        Text( dataManager.carv2DataPair.angulerVelocityDiffrencialForTelemarkRightSideFont.y.formatted(.number.precision(.fractionLength(1))))
+                        Text( dataManager.carv2DataPair.angulerVelocityDiffrencialForTelemarkRightSideFont.z.formatted(.number.precision(.fractionLength(1))))
+                    }
+                   
+                    
+                    VStack{
+                        Text( dataManager.carv2DataPair.left.angularVelocity.x.formatted(.number.precision(.fractionLength(1))))
+                        Text( dataManager.carv2DataPair.left.angularVelocity.y.formatted(.number.precision(.fractionLength(1))))
+                        Text( dataManager.carv2DataPair.left.angularVelocity.z.formatted(.number.precision(.fractionLength(1))))
                     }
                     VStack{
-                        Text( carv2DataPair.right.angularVelocity.x.formatted(.number.precision(.fractionLength(1))))
-                        Text( carv2DataPair.right.angularVelocity.y.formatted(.number.precision(.fractionLength(1))))
-                        Text( carv2DataPair.right.angularVelocity.z.formatted(.number.precision(.fractionLength(1))))
+                        Text( dataManager.carv2DataPair.right.angularVelocity.x.formatted(.number.precision(.fractionLength(1))))
+                        Text( dataManager.carv2DataPair.right.angularVelocity.y.formatted(.number.precision(.fractionLength(1))))
+                        Text( dataManager.carv2DataPair.right.angularVelocity.z.formatted(.number.precision(.fractionLength(1))))
                     }
                 }
             }
@@ -201,62 +188,62 @@ struct ARBootsView: View {
     // 外足のロール角度を重ねて表示
     private var chartOverlay: some View {
         VStack(alignment: .leading) {
-            Text("ロール角比較")
-                        .font(.caption.bold())
-                        .foregroundStyle(.secondary)
-                    
-                    Chart {
-                        // 前回ターン（青い折れ線）
-                        ForEach(carv2DataPair.beforeTurn) { data in
-                            PointMark(
-                                x: .value("フェーズ", abs(data.percentageOfTurnsByTime)),
-                                y: .value("角度", abs(data.outsideSkiRollAngle))
-                            )
-                            .interpolationMethod(.catmullRom)
-                            .foregroundStyle(.blue)
-                        }
-                        
-                        // 現在ターン（赤いポイント）
-                        ForEach(carv2DataPair.currentTurn) { data in
-                            PointMark(
-                                x: .value("フェーズ", data.percentageOfTurnsByTime),
-                                y: .value("角度", abs(data.outsideSkiRollAngle))
-                            )
-                            .interpolationMethod(.catmullRom)
-                            .foregroundStyle(.red)
-                        }
-                    }
-                    .chartXScale(domain: 0...1)
-                    .chartXAxis {
-                        AxisMarks(values: [0, 0.2, 0.4, 0.6, 0.8, 1.0]) { value in
-                            AxisGridLine()
-                            AxisTick()
-                            AxisValueLabel {
-                                if let doubleValue = value.as(Double.self) {
-                                    Text("\(doubleValue, format: .number.precision(.fractionLength(2)))")
-                                }
-                            }
-                        }
-                    }
-                    .chartYAxis {
-                        AxisMarks(values: [0, Double.pi/6, Double.pi/3, Double.pi/2]) { value in
-                                AxisValueLabel {
-                                    if let doubleValue = value.as(Double.self) {
-                                        if doubleValue == 0 {
-                                            Text("0°")
-                                        } else if doubleValue == Double.pi/6 {
-                                            Text("30°")
-                                        } else if doubleValue == Double.pi/3 {
-                                            Text("60°")
-                                        } else if doubleValue == Double.pi/2 {
-                                            Text("90°")
-                                        }
-                                    }
-                                }
-                            }
-                    }
-                    .chartYScale(domain: 0...(Double.pi/2))
-                    .frame(width: 300, height: 150)
+//            Text("ロール角比較")
+//                        .font(.caption.bold())
+//                        .foregroundStyle(.secondary)
+//                    
+//                    Chart {
+//                        // 前回ターン（青い折れ線）
+//                        ForEach(carv2DataPair.beforeTurn) { data in
+//                            PointMark(
+//                                x: .value("フェーズ", abs(data.percentageOfTurnsByTime)),
+//                                y: .value("角度", abs(data.outsideSkiRollAngle))
+//                            )
+//                            .interpolationMethod(.catmullRom)
+//                            .foregroundStyle(.blue)
+//                        }
+//                        
+//                        // 現在ターン（赤いポイント）
+//                        ForEach(carv2DataPair.currentTurn) { data in
+//                            PointMark(
+//                                x: .value("フェーズ", data.percentageOfTurnsByTime),
+//                                y: .value("角度", abs(data.outsideSkiRollAngle))
+//                            )
+//                            .interpolationMethod(.catmullRom)
+//                            .foregroundStyle(.red)
+//                        }
+//                    }
+//                    .chartXScale(domain: 0...1)
+//                    .chartXAxis {
+//                        AxisMarks(values: [0, 0.2, 0.4, 0.6, 0.8, 1.0]) { value in
+//                            AxisGridLine()
+//                            AxisTick()
+//                            AxisValueLabel {
+//                                if let doubleValue = value.as(Double.self) {
+//                                    Text("\(doubleValue, format: .number.precision(.fractionLength(2)))")
+//                                }
+//                            }
+//                        }
+//                    }
+//                    .chartYAxis {
+//                        AxisMarks(values: [0, Double.pi/6, Double.pi/3, Double.pi/2]) { value in
+//                                AxisValueLabel {
+//                                    if let doubleValue = value.as(Double.self) {
+//                                        if doubleValue == 0 {
+//                                            Text("0°")
+//                                        } else if doubleValue == Double.pi/6 {
+//                                            Text("30°")
+//                                        } else if doubleValue == Double.pi/3 {
+//                                            Text("60°")
+//                                        } else if doubleValue == Double.pi/2 {
+//                                            Text("90°")
+//                                        }
+//                                    }
+//                                }
+//                            }
+//                    }
+//                    .chartYScale(domain: 0...(Double.pi/2))
+//                    .frame(width: 300, height: 150)
         }
     }
 }
@@ -273,6 +260,3 @@ struct VisualEffectBlur: UIViewRepresentable {
     }
 }
 
-#Preview {
-    ARBootsView()
-}

@@ -1,10 +1,10 @@
 import SwiftUI
 import Charts
 import AVFoundation
+import Spatial
 
 struct YawingAnglerVelocityChartOverlay: View {
-    @ObservedObject var cameraViewModel: CameraViewModel
-    @ObservedObject var carv2DataPair: Carv2DataPair = Carv2DataPair.shared
+    var cameraViewModel: CameraViewModel
     
     
     var body: some View {
@@ -12,7 +12,7 @@ struct YawingAnglerVelocityChartOverlay: View {
             // カメラプレビュー
             CameraPreview(session: cameraViewModel.session)
                 .edgesIgnoringSafeArea(.all)
-            Text(carv2DataPair.currentTurn.count.description).foregroundStyle(.green)
+//            Text(carv2DataPair.currentTurn.count.description).foregroundStyle(.green)
             // チャートオーバーレイ
             VStack {
                 
@@ -20,23 +20,23 @@ struct YawingAnglerVelocityChartOverlay: View {
                     // 前回ターン（青い折れ線）
                     
                     // 現在ターン（赤いポイント）
-                    ForEach(carv2DataPair.currentTurn) { data in
-                        PointMark(
-                            x: .value("フェーズ", data.percentageOfTurnsByTime),
-                            y: .value("角度", data.yawingAngulerRateDiffrential)
-                        )
-                        .interpolationMethod(.catmullRom)
-                        .foregroundStyle(.red)
-                    }
-                    
-                    ForEach(carv2DataPair.currentTurn) { data in
-                        PointMark(
-                            x: .value("フェーズ", data.percentageOfTurnsByTime),
-                            y: .value("角度",  data.unifiedDiffrentialAttitudeFromLeftToRight.eulerAngles(order: .xyz).angles.z / .pi * 4)
-                        )
-                        .interpolationMethod(.catmullRom)
-                        .foregroundStyle(.blue)
-                    }
+//                    ForEach(carv2DataPair.currentTurn) { data in
+//                        PointMark(
+//                            x: .value("フェーズ", data.percentageOfTurnsByTime),
+//                            y: .value("角度", data.yawingAngulerRateDiffrential)
+//                        )
+//                        .interpolationMethod(.catmullRom)
+//                        .foregroundStyle(.red)
+//                    }
+//                    
+//                    ForEach(carv2DataPair.currentTurn) { data in
+//                        PointMark(
+//                            x: .value("フェーズ", data.percentageOfTurnsByTime),
+//                            y: .value("角度",  data.unifiedDiffrentialAttitudeFromLeftToRight.eulerAngles(order: .xyz).angles.z / .pi * 4)
+//                        )
+//                        .interpolationMethod(.catmullRom)
+//                        .foregroundStyle(.blue)
+//                    }
                 }
                 .chartXScale(domain: 0...1)
                 .chartXAxis {
