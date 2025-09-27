@@ -78,6 +78,14 @@ final class Carv2Data:Encodable{
         
         return attitude.rotated(by: Rotation3DFloat(eulerAngles: EulerAnglesFloat(x: Angle2DFloat(radians: .pi), y: Angle2DFloat(radians: 0), z: Angle2DFloat(radians: .pi), order: .xyz)))
     }
+    static func floatArray(_ data: Data) -> [Float] {
+        let count = data.count / MemoryLayout<Float>.size
+        return data.withUnsafeBytes {
+            let buffer = $0.bindMemory(to: Float.self)
+            return Array(buffer.prefix(count))
+        }.map { $0 }
+    }
+
     
     public init(_ data: Data) {
         let intbyte :[Float] = data
@@ -86,10 +94,11 @@ final class Carv2Data:Encodable{
             Array(UnsafeBufferPointer<Int16>(start: $0.baseAddress?.assumingMemoryBound(to: Int16.self), count: data.count / MemoryLayout<Int16>.stride))
         }.map { Float($0) / (Float(Int16.max) + 1) }
 
-        let intbyte3 : [Float] = data.dropFirst(16).withUnsafeBytes {
-            let buffer = $0.bindMemory(to: Float.self)
-            return Array(buffer.prefix(data.count / MemoryLayout<Float>.size))
-        }.map { $0 }
+        let intbyte3 : [Float] = Carv2Data.floatArray(data.dropFirst(16))
+//            .withUnsafeBytes {
+//            let buffer = $0.bindMemory(to: Float.self)
+//            return Array(buffer.prefix(data.count / MemoryLayout<Float>.size))
+//        }.map { $0 }
     
         attitude = Rotation3DFloat.init(simd_quatf(vector: simd_float4(intbyte[safe:1,default: 0], intbyte[safe:2,default: 0], intbyte[safe:3,default: 0], intbyte[safe:4,default: 0])))
         acceleration = SIMD3<Float>(x: intbyte[safe:5,default: 0] * 16, y: intbyte[safe:6,default: 0]  * 16, z: intbyte[safe:7,default: 0] * 16)
