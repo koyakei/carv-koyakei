@@ -20,11 +20,12 @@ import Combine
 
 final class Carv1RawData:Encodable{
     let attitude: Rotation3DFloat
+    //重力の影響を除いた加速度
     let acceleration: SIMD3<Float>
     let rawPressure: [Float]
     let angularVelocity: SIMD3<Float>
     let recordedTime: Date = Date.now
-    let fordebug: [Float]
+    let fordebug: [Double]
     let recordedAtFromBootDevice: TimeInterval
     
     init(){
@@ -52,13 +53,13 @@ final class Carv1RawData:Encodable{
         }.map { Float($0) / (Float(Int16.max) + 1) }
         
         
-        let test = data.dropFirst(3)
+        let test = data
+            .subdata(in: 31..<36)
             .withUnsafeBytes {
             Array(UnsafeBufferPointer<Int32>(start: $0.baseAddress?.assumingMemoryBound(to: Int32.self), count: data.count / MemoryLayout<Int32>.stride))
-        }[7]
+        }[0]
         
-        fordebug = [Float(test),Float(test >> 5),Float(test) / (Float(UInt16.max) + 1) * 12,Float(test >> 3) / 256, Float(test) / (Float(UInt8.max) + 1) / 8
-                    ,Float(test) / 128,Float(test) / 1000, Float(test) / (Float(UInt16.max) + 1),Float(test) / (Float(UInt16.max) + 1) * 4,Float(test >> 4)
+        fordebug = [Double(test),Double(test) / 1000
         ]
         recordedAtFromBootDevice = Double(Float(test) / 1000)
         attitude =
