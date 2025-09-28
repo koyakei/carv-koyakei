@@ -7,6 +7,7 @@ struct ContentView: View {
     var cameraViewModel = CameraViewModel()
     var dataManager: DataManager
     var carv1DataManager: Carv1DataManager
+    var outsidePressureBeep: OutsidePressureBeep
     var carv1Ble:Carv1BluethoothCentralManager
     var body: some View {
         TabView {
@@ -20,7 +21,7 @@ struct ContentView: View {
                     Image(systemName: "person.fill")
                     Text("AR")
                 }
-            Carv1View(dataManager: carv1DataManager,ble: carv1Ble)
+            Carv1View(dataManager: carv1DataManager,ble: carv1Ble,outsidePressureBeep: outsidePressureBeep)
                 .tabItem {
                     Text("carv1")
                 }

@@ -7,7 +7,7 @@
 
 import Foundation
 import AVFoundation
-import UIKit
+import AVFAudio
 import AudioKit
 import AudioToolbox
 import SoundpipeAudioKit

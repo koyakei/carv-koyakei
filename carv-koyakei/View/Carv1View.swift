@@ -11,6 +11,7 @@ import Foundation
 struct Carv1View: View {
     @StateObject var dataManager: Carv1DataManager
     @StateObject var ble: Carv1BluethoothCentralManager
+    @State var outsidePressureBeep: OutsidePressureBeep
     var body: some View {
         ScrollView {
             let gridItems = Array(repeating: GridItem(.flexible()), count: 5)
@@ -100,6 +101,13 @@ struct Carv1View: View {
                         )
                     )
                 }
+            }
+            HStack{
+                Text(outsidePressureBeep.conductor.data.isPlaying.description)
+                Button(action: {
+                    outsidePressureBeep.isBeeping.toggle()}){
+                        Text("yawing beep \(outsidePressureBeep.isBeeping ? "on" : "off")")
+                    }
             }
             HStack{
                 Button(action: { dataManager.bluethoothCentralManager.scan() }) {

@@ -9,6 +9,5 @@ The helper class that handles the transfer of discovery tokens between peers
 import NearbyInteraction
 import Combine
 import MultipeerConnectivity
-import WatchConnectivity
 
 

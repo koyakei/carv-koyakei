@@ -78,6 +78,14 @@ class Carv1AnalyzedDataPair: Encodable{
         left.attitude.inverse * right.attitude
     }
     var rollingAngulerRateDiffrential: Float { Float(right.angularVelocity.x + left.angularVelocity.x)}
+    var 外足荷重されているか: Bool {
+        switch yawingSide {
+        case .LeftYawing, .RightYawing:
+            return outsideSki.amountOfPressure > insideSki.amountOfPressure
+        case .Straight:
+            return true
+        }
+    }
 }
 
 
