@@ -26,7 +26,7 @@ struct Carv1Data:Encodable{
             pressure.reduce(0, +)
         }
     }
-    init( rawData: Carv1RawData = Carv1RawData(), pressureOffset: [Float] = [Float](repeating: 0, count: 14)){
+    init( rawData: Carv1RawData = Carv1RawData(), pressureOffset: [Float] = [Float](repeating: 0, count: 18)){
         attitude = rawData.attitude
         acceleration = rawData.acceleration
         pressure = zip(rawData.rawPressure, pressureOffset).map { p, cp in

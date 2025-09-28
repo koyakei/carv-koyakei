@@ -8,12 +8,12 @@ final class Carv1DataManager :ObservableObject {
     let bluethoothCentralManager: Carv1BluethoothCentralManager
     private var cancellables = Set<AnyCancellable>()
     @Published var carvRawDataPair:Carv1RawDataPair = .init()
-    @Published var carvDataPair: Carv1AnalyzedDataPair = .init(leftPressureOffset: [Float](repeating: 0, count: 14), rightPressureOffset: [Float](repeating: 0, count: 14))
+    @Published var carvDataPair: Carv1AnalyzedDataPair = .init(leftPressureOffset: [Float](repeating: 0, count: 18), rightPressureOffset: [Float](repeating: 0, count: 18))
     @Published var latestNotCompletedTurnCarvAnalyzedDataPairs: [Carv1AnalyzedDataPair]  = []
     @Published var finishedTurnDataArray: [Carv1SingleFinishedTurnData] = []
     @Published var skytechMode: Bool = false
-    @Published var calibration基準値Right :[Float] = [Float](repeating: 0, count: 14)
-    @Published var calibration基準値Left :[Float] = [Float](repeating: 0, count: 14)
+    @Published var calibration基準値Right :[Float] = [Float](repeating: 0, count: 18)
+    @Published var calibration基準値Left :[Float] = [Float](repeating: 0, count: 18)
     private var lastFinishedTrunData: Carv1SingleFinishedTurnData {
         get {
             finishedTurnDataArray.last ?? .init(numberOfTrun: 0, turnPhases: [])
