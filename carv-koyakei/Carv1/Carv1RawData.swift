@@ -42,7 +42,7 @@ final class Carv1RawData:Encodable{
             fatalError("データ長が不足しています")
         }
         self.rawPressure = data.subdata(in: 35..<50).withUnsafeBytes { rawBuffer in
-            rawBuffer.bindMemory(to: UInt8.self).map { Float($0)}
+            rawBuffer.bindMemory(to: UInt8.self).map { Float(~$0)}
         }
         let intbyte :[Float] = data.dropFirst(1)
 //            .subdata(in: 2..<13)
