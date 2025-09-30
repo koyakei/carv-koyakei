@@ -7,6 +7,7 @@ import SwiftUI
 final class Carv1DataManager :ObservableObject {
     let bluethoothCentralManager: Carv1BluethoothCentralManager
     private var cancellables = Set<AnyCancellable>()
+    
     @Published var carvRawDataPair:Carv1RawDataPair = .init()
     @Published var carvDataPair: Carv1AnalyzedDataPair = .init(leftPressureOffset: [Float](repeating: 0, count: 18), rightPressureOffset: [Float](repeating: 0, count: 18))
     @Published var latestNotCompletedTurnCarvAnalyzedDataPairs: [Carv1AnalyzedDataPair]  = []
@@ -44,6 +45,29 @@ final class Carv1DataManager :ObservableObject {
             }.first()
             .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] avg in
                 self?.calibration基準値Left = avg
+            })
+            .store(in: &cancellables)
+    }
+    
+    func calibratePressureRight(){
+        // Collect 15 left rawPressure arrays, average them element-wise, then store as calibration baseline
+        $carvRawDataPair
+            .map { $0.right.rawPressure }
+            .collect(25)
+            .map {
+                arrays -> [Float] in
+                guard let first = arrays.first else { return [] }
+                var sum = [Float](repeating: 0, count: first.count)
+                for arr in arrays {
+                    for i in 0..<first.count {
+                        sum[i] += arr[i]
+                    }
+                }
+                let count = Float(arrays.count)
+                return sum.map { $0 / count }
+            }.first()
+            .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] avg in
+                self?.calibration基準値Right = avg
             })
             .store(in: &cancellables)
     }
@@ -90,26 +114,27 @@ final class Carv1DataManager :ObservableObject {
         
         $carvRawDataPair.map {
             let recordedDate: Date = $0.left.recordedTime.timeIntervalSince1970 > $0.right.recordedTime.timeIntervalSince1970 ? $0.left.recordedTime : $0.right.recordedTime
-                                    return Carv1AnalyzedDataPair(
-                                        left: $0.left,
-                                        right: $0.right,
-                                        recordetTime: recordedDate,
-                                        isTurnSwitching: self.isTurnSwitchInNomal(recordedTime: recordedDate),
-                                        percentageOfTurnsByAngle: self.percentageOfTurnsByAngle($0),
-                                        percentageOfTurnsByTime: self.percentageOfTurnsByTime($0)
-                                    )
+            return Carv1AnalyzedDataPair(
+                left: $0.left,
+                right: $0.right,
+                recordetTime: recordedDate,
+                isTurnSwitching: self.isTurnSwitchInNomal(recordedTime: recordedDate),
+                percentageOfTurnsByAngle: self.percentageOfTurnsByAngle($0),
+                percentageOfTurnsByTime: self.percentageOfTurnsByTime($0),
+                leftPressureOffset: self.calibration基準値Left, rightPressureOffset: self.calibration基準値Right
+            )
         }
-            .sink { [weak self] (dataPair: Carv1AnalyzedDataPair) in
-                guard let self = self else { return }
-                self.carvDataPair = dataPair
-                self.latestNotCompletedTurnCarvAnalyzedDataPairs.append(dataPair)
-                if dataPair.isTurnSwitching {
-                    self.finishedTurnDataArray.append(.init(numberOfTrun: self.numberOfTurn, turnPhases: self.latestNotCompletedTurnCarvAnalyzedDataPairs))
-                    self.latestNotCompletedTurnCarvAnalyzedDataPairs.removeAll()
-                    self.numberOfTurn += 1
-                }
+        .sink { [weak self] (dataPair: Carv1AnalyzedDataPair) in
+            guard let self = self else { return }
+            self.carvDataPair = dataPair
+            self.latestNotCompletedTurnCarvAnalyzedDataPairs.append(dataPair)
+            if dataPair.isTurnSwitching {
+                self.finishedTurnDataArray.append(.init(numberOfTrun: self.numberOfTurn, turnPhases: self.latestNotCompletedTurnCarvAnalyzedDataPairs))
+                self.latestNotCompletedTurnCarvAnalyzedDataPairs.removeAll()
+                self.numberOfTurn += 1
             }
-            .store(in: &cancellables)
+        }
+        .store(in: &cancellables)
     }
     
     // To convert:
@@ -132,12 +157,12 @@ final class Carv1DataManager :ObservableObject {
                 let dateString = iso8601Formatter.string(from: date)
                 try container.encode(dateString)
             }
-              
+            
             // データをJSONにエンコード
             let jsonData = try encoder.encode(finishedTurnDataArray.map{flatten(turnData: $0)}.flatMap(\.self))
             let df = DateFormatter()
-                df.dateFormat = "yyyy年MM月dd日HH:mm:ss"
-        
+            df.dateFormat = "yyyy年MM月dd日HH:mm:ss"
+            
             // 保存先URL (例: Documentsディレクトリ下のperson.json)
             let fileManager = FileManager.default
             let urls = fileManager.urls(for: .documentDirectory, in: .userDomainMask)
@@ -182,7 +207,7 @@ final class Carv1DataManager :ObservableObject {
             self.right = right
         }
     }
-
+    
 }
 
 
@@ -196,7 +221,7 @@ struct Carv1EncodableTurnPhase: Encodable {
     let percentageOfTurnsByTime: TimeInterval
     // Fallback numeric snapshots for attitudes/angles if available; optional to avoid failures
     let unitedAttitudeAngleRadians: Float?
-
+    
     init(from phase: Carv1AnalyzedDataPair) {
         self.timestamp = phase.recordetTime
         self.isTurnSwitching = phase.isTurnSwitching
@@ -219,7 +244,7 @@ struct Carv1TurnPhase : Encodable{
 struct Carv1SingleFinishedTurnData: Encodable {
     let numberOfTrun: Int
     let turnPhases: [Carv1AnalyzedDataPair]
-
+    
     var turnStartedTime: Date {
         firstPhaseOfTune.recordetTime
     }
@@ -239,7 +264,7 @@ struct Carv1SingleFinishedTurnData: Encodable {
     var lastPhaseOfTune: Carv1AnalyzedDataPair {
         turnPhases[safe: turnPhases.endIndex - 1, default: Carv1AnalyzedDataPair(left: .init(), right: .init(), recordetTime: Date(timeIntervalSince1970: 1), isTurnSwitching: true, percentageOfTurnsByAngle: 0, percentageOfTurnsByTime: 0)]
     }
-
+    
     enum CodingKeys: String, CodingKey {
         case numberOfTrun
         case turnStartedTime
@@ -248,7 +273,7 @@ struct Carv1SingleFinishedTurnData: Encodable {
         case diffrencialAngleFromStartToEndRadians
         case phases
     }
-
+    
     func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(numberOfTrun, forKey: .numberOfTrun)

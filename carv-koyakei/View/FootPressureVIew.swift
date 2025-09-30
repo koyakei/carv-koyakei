@@ -33,7 +33,7 @@ struct FootPressureView: View {
                     Text("Left Calibrate")
                 }
                 Text(carv1DataManager.carvDataPair.left.amountOfPressure.formatted(.number.precision(.fractionLength(1))))
-                Button(action: { carv1DataManager.calibratePressureLeft()
+                Button(action: { carv1DataManager.calibratePressureRight()
                 }){
                     Text("Right Calibrate")
                 }
@@ -48,7 +48,7 @@ struct FootPressureView: View {
                             let size = min(geometry.size.width, geometry.size.height)
                             let x = point.x * size
                             let y = point.y * size
-                            Text(carv1DataManager.carvDataPair.left.pressure[index].description).position(x: x, y: y)
+                            Text(carv1DataManager.carvDataPair.left.relavantPressureMap[index].formatted(.number.precision(.fractionLength(1)))).position(x: x, y: y)
 //                            Circle()
 //                                .fill(
 //                                    Color(white: (Double(carv1DataManager.carvDataPair.right.pressure[index]) / 60.0) )
@@ -67,7 +67,7 @@ struct FootPressureView: View {
                             let size = min(geometry.size.width, geometry.size.height)
                             let x = point.x * size
                             let y = point.y * size
-                            Text(carv1DataManager.carvDataPair.right.pressure[index].description).position(x: x, y: y)
+                            Text(carv1DataManager.carvDataPair.right.relavantPressureMap[index].formatted(.number.precision(.fractionLength(1)))).position(x: x, y: y)
                             //                            Circle()
                             //                                .fill(
                             //                                    Color(white: (Double(carv1DataManager.carvDataPair.right.pressure[index]) / 60.0) )

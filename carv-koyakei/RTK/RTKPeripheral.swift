@@ -7,15 +7,93 @@
 
 import Foundation
 import CoreLocation
+import CoreBluetooth
+import Combine
 
-struct RTKDevise {
-    public static let shared: RTKDevise = .init()
+@MainActor
+final class RTKPeripheral : NSObject, Identifiable,@MainActor CBPeripheralDelegate , ObservableObject{
     var currentData: CLLocation = CLLocation.init()
     
-    mutating func update(_ nmea: String) {
-        if let location = self.locationFromNMEA(nmea) {
-            self.currentData = location
+    @Published var peripheral: CBPeripheral
+    @Published var clLocation: CLLocation?
+    
+    init(peripheral: CBPeripheral) {
+        self.peripheral = peripheral
+        super.init()
+        self.peripheral.delegate = self
+    }
+    
+    public func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: (any Error)?) {
+        if let error = error {
+            print("特性発見エラー: \(error.localizedDescription)")
+            return
         }
+        
+        guard let characteristics = service.characteristics else { return }
+        for characteristic in characteristics {
+            print("発見された特性: \(characteristic.uuid)")
+        }
+    }
+    
+    func subscribeAttitude() {
+        guard let characteristic = findCharacteristic(periferalName: peripheral.name!) else {
+            print("Characteristic not found")
+            return
+        }
+        
+        // 通知サポートチェックを追加
+        guard characteristic.properties.contains(.notify) else {
+            print("Characteristic does not support notifications")
+            return
+        }
+        
+        self.peripheral.setNotifyValue(true, for: characteristic)
+        
+        print("Subscribe initiated")
+    }
+    
+    func unsubscribeAttitude() {
+        guard let characteristic = findCharacteristic(periferalName: peripheral.name!) else { return }
+        peripheral.setNotifyValue(false, for: characteristic)
+    }
+    
+    private func findCharacteristic(periferalName : String) -> CBCharacteristic? {
+        guard let service = peripheral.services?.first(where: { $0.peripheral?.name == periferalName }) else {
+            print("no service")
+            return nil }
+        return service.characteristics?.first
+    }
+    
+    // MARK: - CBPeripheralDelegate
+    
+    func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: (any Error)?) {
+        if let error = error {
+            print("Error discovering services: \(error.localizedDescription)")
+            return
+        }
+        
+        
+        for service in peripheral.services ?? [] {
+            peripheral.discoverCharacteristics(nil, for: service)
+        }
+    }
+    
+    func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: (any Error)?) {
+        if let error = error {
+            print("Error updating value: \(error.localizedDescription)")
+            return
+        }
+        if let data = characteristic.value {
+            clLocation = locationFromNMEA(String(decoding: data, as: UTF8.self))
+        }
+    }
+    
+    public func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: (any Error)?) {
+        print("peripheral:didUpdateNotificationStateFor: \(characteristic)")
+        if let error = error {
+            print("error: \(error)")
+        }
+        print("通知状態更新: \(characteristic.isNotifying ? "有効" : "無効")")
     }
     
     // NMEA文字列からCLLocationを生成する簡易関数（GGAまたはRMCパース例）

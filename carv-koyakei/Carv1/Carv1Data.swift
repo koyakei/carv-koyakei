@@ -21,12 +21,17 @@ struct Carv1Data:Encodable{
     let pressure: [Float]
     let angularVelocity: SIMD3<Float>
     let recordedTime: Date
+    
     var amountOfPressure: Float {
-        get {
-            pressure.reduce(0, +)
-        }
+        pressure.reduce(0, +)
     }
-    init( rawData: Carv1RawData = Carv1RawData(), pressureOffset: [Float] = [Float](repeating: 0, count: 18)){
+    
+    var relavantPressureMap: [Float] {
+        pressure.map { $0 - (pressure.min() ?? 0) }
+    }
+
+    
+    init( rawData: Carv1RawData = Carv1RawData(), pressureOffset: [Float] ){
         attitude = rawData.attitude
         acceleration = rawData.acceleration
         pressure = zip(rawData.rawPressure, pressureOffset).map { p, cp in

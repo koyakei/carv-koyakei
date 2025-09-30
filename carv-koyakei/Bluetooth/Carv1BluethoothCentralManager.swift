@@ -11,8 +11,8 @@ class Carv1BluethoothCentralManager: NSObject, @MainActor CBCentralManagerDelega
 //    static let rightCharactaristicUUID = UUID(uuidString: "85A29A4C-09C3-C632-858A-3387339C67CF")
 //    static let leftCharactaristicUUID = UUID(uuidString:  "850D8BCF-3B03-1322-F51C-DD38E961FC1A")
     // iphone
-    let rightCharactaristicUUID = UUID(uuidString:"5A5433BD-A1AA-84B1-1F54-B05E46B9D94B")
-    let leftCharactaristicUUID = UUID(uuidString: "DEF38F61-34D1-8014-1A70-50B5A63B377D")
+    var rightCharactaristicUUID = UUID(uuidString:"5A5433BD-A1AA-84B1-1F54-B05E46B9D94B")
+    var leftCharactaristicUUID = UUID(uuidString: "DEF38F61-34D1-8014-1A70-50B5A63B377D")
 //    5A5433BD-A1AA-84B1-1F54-B05E46B9D94B
 //    DEF38F61-34D1-8014-1A70-50B5A63B377D
     
