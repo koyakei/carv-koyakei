@@ -17,10 +17,84 @@ final class RTKPeripheral : NSObject, Identifiable,@MainActor CBPeripheralDelega
     @Published var peripheral: CBPeripheral
     @Published var clLocation: CLLocation?
     
+    @Published var age: Float? = nil
+    var latestRes : String = ""
+    private var writeCharacteristic: CBCharacteristic?
+    
     init(peripheral: CBPeripheral) {
         self.peripheral = peripheral
         super.init()
         self.peripheral.delegate = self
+    }
+    
+    func makeNMEACommand(fields: [String]) -> String {
+        // 先頭 $
+        var base = "$" + fields.joined(separator: ",")
+        
+        // XORチェックサム計算（$は除いて, *の前まで）
+        let chars = Array(base)
+        var checksum: UInt8 = 0
+        for i in 1..<chars.count {
+            if let ascii = chars[i].asciiValue {
+                checksum ^= ascii
+            }
+        }
+        
+        // *XX と CRLF を追加
+        base += String(format: "*%02X\r\n", checksum)
+        return base
+    }
+    
+    func buildNtripCommand(
+        port: Int = 2101,
+        username: String = "",
+        password: String = "",
+        ggaInterval: Int = 1
+    ) -> String {
+        return makeNMEACommand(fields: [
+            "PBIZ",
+            "ntripcl",
+            "1",
+            "ntrip1.bizstation.jp",
+            String(port),
+            "NEAR-FIXED",
+            username,
+            password,
+            String(ggaInterval)
+        ])
+    }
+    
+    
+    func buildNetworkCommand(
+        type: Int,
+        ssid: String,
+        password: String,
+        fixedAddress: String = "",
+        gateway: String = "",
+        netmask: String = ""
+    ) -> String {
+        return makeNMEACommand(fields: [
+            "PBIZ",
+            "wifi",
+            "\(type)",
+            ssid,
+            password,
+            fixedAddress,
+            gateway,
+            netmask
+        ])
+    }
+    
+    func startNtrip(){
+        if let characteristic = writeCharacteristic {
+            peripheral.writeValue(Data(buildNtripCommand().utf8), for: characteristic, type: .withResponse)
+        }
+    }
+    
+    func setWifiSetting(ssid: String, password: String){
+        if let characteristic = writeCharacteristic {
+            peripheral.writeValue(Data(buildNetworkCommand(type: 1, ssid: ssid, password: password).utf8), for: characteristic, type: .withResponse)
+        }
     }
     
     public func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: (any Error)?) {
@@ -95,92 +169,37 @@ final class RTKPeripheral : NSObject, Identifiable,@MainActor CBPeripheralDelega
         }
         print("通知状態更新: \(characteristic.isNotifying ? "有効" : "無効")")
     }
-    
     // NMEA文字列からCLLocationを生成する簡易関数（GGAまたはRMCパース例）
-    private func locationFromNMEA(_ nmea: String) -> CLLocation? {
-        // NMEAトークンをカンマ区切りで分割
-        let tokens = nmea.components(separatedBy: ",")
-        guard tokens.count > 6 else {
+    private func locationFromNMEA(_ nmeaSentence: String) -> CLLocation? {
+        let parts = nmeaSentence.components(separatedBy: ",")
+        if parts[0].hasSuffix("PBIZR") {
+            latestRes = nmeaSentence
             return nil
         }
-        // GGA例: $GPGGA,hhmmss.ss,ddmm.mmmm,a,dddmm.mmmm,a,x,xx,x.x,x.x,M,x.x,M,x.x,xxxx
-        // RMC例: $GPRMC,hhmmss.ss,A,ddmm.mmmm,a,dddmm.mmmm,a,x.x,x.x,ddmmyy,x.x,a
-        let type = tokens[0]
-        var latitude: CLLocationDegrees = 0.0
-        var longitude: CLLocationDegrees = 0.0
-        var altitude: CLLocationDistance = 0.0
-        var speed: CLLocationSpeed = 0.0
-        var course: CLLocationDirection = 0.0
-        var timestamp = Date()
-        var valid = false
-
-        if type.contains("GGA") {
-            // 緯度
-            if let lat = nmeaCoordinateToDegrees(tokens[2]), tokens[3] == "N" || tokens[3] == "S" {
-                latitude = (tokens[3] == "N") ? lat : -lat
-            } else {
-                return nil
-            }
-            // 経度
-            if let lon = nmeaCoordinateToDegrees(tokens[4]), tokens[5] == "E" || tokens[5] == "W" {
-                longitude = (tokens[5] == "E") ? lon : -lon
-            } else {
-                return nil
-            }
-            // 標高(m)
-            if let alt = Double(tokens[9]) {
-                altitude = alt
-            }
-            valid = tokens[6] != "0" // 6th フィールドは位置固定状態（0=no fix）
-        } else if type.contains("RMC") {
-            // 有効フラグ
-            valid = tokens[2] == "A"
-            if !valid {
-                return nil
-            }
-            // 緯度
-            if let lat = nmeaCoordinateToDegrees(tokens[3]), tokens[4] == "N" || tokens[4] == "S" {
-                latitude = (tokens[4] == "N") ? lat : -lat
-            } else {
-                return nil
-            }
-            // 経度
-            if let lon = nmeaCoordinateToDegrees(tokens[5]), tokens[6] == "E" || tokens[6] == "W" {
-                longitude = (tokens[6] == "E") ? lon : -lon
-            } else {
-                return nil
-            }
-            // 速度節→m/sに変換（1 knot = 0.514444 m/s）
-            if let spd = Double(tokens[7]) {
-                speed = spd * 0.514444
-            }
-            // 進行方向
-            if let crs = Double(tokens[8]) {
-                course = crs
-            }
-            // UTC日時をパース（例: hhmmss, ddmmyy）
-            let timeStr = tokens[1]
-            let dateStr = tokens[9]
-            if let dateTime = nmeaDateTimeFromStrings(timeStr: timeStr, dateStr: dateStr) {
-                timestamp = dateTime
-            }
-        } else {
-            // 他のタイプは未対応
+        guard parts.count > 6, parts[0].hasSuffix("GGA") else {
             return nil
         }
-
-        guard valid else {
-            return nil
+        let latRaw = parts[2]
+        let latDirection = parts[3]
+        let lonRaw = parts[4]
+        let lonDirection = parts[5]
+        self.age = Float(parts[13]) ?? self.age
+        // 緯度 (DDMM.MMMM) -> (度 + 分/60)
+        if let latDegrees = Double(latRaw.prefix(2)), let latMinutes = Double(latRaw.suffix(latRaw.count - 2)),
+           let lonDegrees = Double(lonRaw.prefix(3)), let lonMinutes = Double(lonRaw.suffix(lonRaw.count - 3)) {
+            var latitude = latDegrees + latMinutes / 60.0
+            var longitude = lonDegrees + lonMinutes / 60.0
+            
+            if latDirection == "S" {
+                latitude = -latitude
+            }
+            if lonDirection == "W" {
+                longitude = -longitude
+            }
+            
+            return CLLocation(latitude: latitude, longitude: longitude)
         }
-        let coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-        let location = CLLocation(coordinate: coordinate,
-                                  altitude: altitude,
-                                  horizontalAccuracy: 5.0,
-                                  verticalAccuracy: 5.0,
-                                  course: course,
-                                  speed: speed,
-                                  timestamp: timestamp)
-        return location
+        return nil
     }
 
     /// NMEA形式の緯度経度「ddmm.mmmm」を度に変換

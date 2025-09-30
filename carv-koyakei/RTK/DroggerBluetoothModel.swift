@@ -53,6 +53,7 @@ class DroggerBluetoothModel: NSObject, ObservableObject {
             self.output = self.outputs.joined(separator: "")
         
     }
+    
 }
 
 @MainActor

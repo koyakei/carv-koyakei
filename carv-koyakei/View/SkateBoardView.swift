@@ -12,8 +12,40 @@ import Foundation
 import CoreLocation
 
 struct SkateBoardView: View {
+    @StateObject var bluetoothModel: DroggerBluetoothModel
+    @AppStorage("ssid") var ssid: String = ""
+    @AppStorage("password") var password: String = ""
     var body: some View {
-        Text("Hello, World!")
+        HStack () {
+            Label("Device", systemImage: "info.circle")
+                .labelStyle(.automatic)
+                .padding(.bottom, 12)
+            Spacer()
+            Text(bluetoothModel.peripheralStatus.rawValue)
+        }
+        Text(bluetoothModel.deviceDetail)
+            .font(.system(size: 10, design: .monospaced))
+            .textSelection(.enabled)
+        VStack{
+            Text("wifi setting 接続先")
+            TextField("SSID", text: $ssid)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+            TextField("password", text: $password)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+            if let rtkDevice = bluetoothModel.rtkDevice {
+                Button("接続"){
+                    rtkDevice.setWifiSetting(ssid: ssid, password: password)
+                }
+                Button("start ntrip"){
+                    rtkDevice.startNtrip()
+                }
+                Text(rtkDevice.latestRes)
+                Text("接続遅延秒数 \(String(describing: rtkDevice.age))")
+            }
+            
+        }.tabItem {
+            Label("setting", systemImage: "gear")
+        }
     }
     
     // モーションレコード
