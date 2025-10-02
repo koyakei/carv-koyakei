@@ -4,11 +4,13 @@ struct ContentView: View {
     var ble :BluethoothCentralManager
     var yawingBeep: YawingBeep
     var rollingBeep: RollingBeep
-    var cameraViewModel = CameraViewModel()
+//    var cameraViewModel = CameraViewModel()
     var dataManager: DataManager
     var carv1DataManager: Carv1DataManager
     var outsidePressureBeep: OutsidePressureBeep
     var carv1Ble:Carv1BluethoothCentralManager
+    var skateBoardDataManager: SkateBoardDataManager
+    var droggerBlueTooth: DroggerBluetoothModel
     var body: some View {
         TabView {
             HomeView(ble: ble, yawingBeep: yawingBeep,rollingBeep: rollingBeep,dataManager: dataManager)
@@ -31,21 +33,21 @@ struct ContentView: View {
                     Text("pressure")
                 }
             
-            SkateBoardView(skateboard: SkateBoardDataManager(analysedData: SkateBoardAnalysedData()))
+            SkateBoardView(skateboard: skateBoardDataManager,droggerBluetooth: droggerBlueTooth)
                 .tabItem {
                     Image(systemName: "skateboard.fill")
                     Text("skateboard")
                 }
-            switch cameraViewModel.status {
-                    case .configured:
-                        YawingAnglerVelocityChartOverlay(cameraViewModel: cameraViewModel).tabItem {
-                            Text("anguler")
-                        }
-                    case .unauthorized:
-                        Text("カメラへのアクセスが許可されていません")
-                    case .unconfigured:
-                        ProgressView()
-                    }
+//            switch cameraViewModel.status {
+//                    case .configured:
+//                        YawingAnglerVelocityChartOverlay(cameraViewModel: cameraViewModel).tabItem {
+//                            Text("anguler")
+//                        }
+//                    case .unauthorized:
+//                        Text("カメラへのアクセスが許可されていません")
+//                    case .unconfigured:
+//                        ProgressView()
+//                    }
             
         }
     }

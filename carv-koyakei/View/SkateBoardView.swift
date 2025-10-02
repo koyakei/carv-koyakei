@@ -15,16 +15,17 @@ struct SkateBoardView: View {
     @StateObject var skateboard: SkateBoardDataManager
     @AppStorage("ssid") var ssid: String = ""
     @AppStorage("password") var password: String = ""
+    @StateObject var droggerBluetooth: DroggerBluetoothModel // Owns its own DroggerBluetoothModel instance.
     var body: some View {
         VStack{
             HStack () {
                 Label("Device", systemImage: "info.circle")
                     .labelStyle(.automatic)
                     .padding(.bottom, 12)
-                Spacer()
-                Text(skateboard.droggerBluetooth.peripheralStatus.rawValue)
+                Spacer() 
+                Text(droggerBluetooth.peripheralStatus.rawValue)
             }
-            Text(skateboard.droggerBluetooth.deviceDetail)
+            Text(droggerBluetooth.deviceDetail)
                 .font(.system(size: 10, design: .monospaced))
                 .textSelection(.enabled)
             VStack{
@@ -33,7 +34,7 @@ struct SkateBoardView: View {
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                 TextField("password", text: $password)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
-                if let rtkDevice = skateboard.droggerBluetooth.rtkDevice {
+                if let rtkDevice = droggerBluetooth.rtkDevice {
                     Button("接続"){
                         rtkDevice.setWifiSetting(ssid: ssid, password: password)
                     }
@@ -63,12 +64,12 @@ final class SkateBoardDataManager: ObservableObject{
     @Published var finishedTurnDataArray: [SingleFinishedTurnData] = []
     @Published var cmDeviceMotion: CMDeviceMotion? = nil
     let coreMotionManager: CMMotionManager = .init()
-    @StateObject var droggerBluetooth: DroggerBluetoothModel = .init()
+    let droggerBluetooth: DroggerBluetoothModel
     
     private var cancellables = Set<AnyCancellable>()
     @Published var numberOfTurn: Int = 0
-    init( analysedData: SkateBoardAnalysedData) {
-        
+    init( analysedData: SkateBoardAnalysedData, droggerBluetooth: DroggerBluetoothModel) {
+        self.droggerBluetooth = droggerBluetooth
         self.analysedData = analysedData
     }
     private var lastFinishedTrunData: SingleFinishedTurnData {
@@ -207,5 +208,4 @@ struct SkateBoardAnalysedData{
         isTurnSwitching = false
     }
 }
-
 

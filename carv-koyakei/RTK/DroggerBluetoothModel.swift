@@ -21,16 +21,17 @@ enum ConnectionStatus: String {
 let droggerService = CBUUID(string: "0baba001-0000-1000-8000-00805f9b34fb")
 let droggerSerialDataCharactaristic = CBUUID(string: "0baba002-0000-1000-8000-00805f9b34fb")
 let droggerSerialWriteCharactaristic = CBUUID(string: "0baba003-0000-1000-8000-00805f9b34fb")
+
 @MainActor
-class DroggerBluetoothModel: NSObject, ObservableObject {
+class DroggerBluetoothModel: NSObject, ObservableObject, CBCentralManagerDelegate  {
     
     @Published var rtkDevice: RTKPeripheral? = nil
     private var centralManager: CBCentralManager!
     private var outputs: [String] = []
     var enableToUpdateOutputText = true
-    @Published var peripheralStatus: ConnectionStatus = .disconncected
-    @Published var deviceDetail: String = ""
-    @Published var output: String = ""
+    var peripheralStatus: ConnectionStatus = .disconncected
+    var deviceDetail: String = ""
+    var output: String = ""
     
     override init() {
         super.init()
@@ -54,10 +55,6 @@ class DroggerBluetoothModel: NSObject, ObservableObject {
         
     }
     
-}
-
-@MainActor
-extension DroggerBluetoothModel: CBCentralManagerDelegate {
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
         if central.state == .poweredOn {
             print("Bluetooth powered on")
