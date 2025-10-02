@@ -30,6 +30,12 @@ struct ContentView: View {
                     Image(systemName: "person.fill")
                     Text("pressure")
                 }
+            
+            SkateBoardView(skateboard: SkateBoardDataManager(analysedData: SkateBoardAnalysedData()))
+                .tabItem {
+                    Image(systemName: "skateboard.fill")
+                    Text("skateboard")
+                }
             switch cameraViewModel.status {
                     case .configured:
                         YawingAnglerVelocityChartOverlay(cameraViewModel: cameraViewModel).tabItem {
@@ -44,6 +50,3 @@ struct ContentView: View {
         }
     }
 }
-
-
-

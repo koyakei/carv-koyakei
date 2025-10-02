@@ -12,45 +12,46 @@ import Foundation
 import CoreLocation
 
 struct SkateBoardView: View {
-    @StateObject var bluetoothModel: DroggerBluetoothModel
+    @StateObject var skateboard: SkateBoardDataManager
     @AppStorage("ssid") var ssid: String = ""
     @AppStorage("password") var password: String = ""
     var body: some View {
-        HStack () {
-            Label("Device", systemImage: "info.circle")
-                .labelStyle(.automatic)
-                .padding(.bottom, 12)
-            Spacer()
-            Text(bluetoothModel.peripheralStatus.rawValue)
-        }
-        Text(bluetoothModel.deviceDetail)
-            .font(.system(size: 10, design: .monospaced))
-            .textSelection(.enabled)
         VStack{
-            Text("wifi setting 接続先")
-            TextField("SSID", text: $ssid)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-            TextField("password", text: $password)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-            if let rtkDevice = bluetoothModel.rtkDevice {
-                Button("接続"){
-                    rtkDevice.setWifiSetting(ssid: ssid, password: password)
-                }
-                Button("start ntrip"){
-                    rtkDevice.startNtrip()
-                }
-                Text(rtkDevice.latestRes)
-                Text("接続遅延秒数 \(String(describing: rtkDevice.age))")
+            HStack () {
+                Label("Device", systemImage: "info.circle")
+                    .labelStyle(.automatic)
+                    .padding(.bottom, 12)
+                Spacer()
+                Text(skateboard.droggerBluetooth.peripheralStatus.rawValue)
             }
-            
-        }.tabItem {
-            Label("setting", systemImage: "gear")
+            Text(skateboard.droggerBluetooth.deviceDetail)
+                .font(.system(size: 10, design: .monospaced))
+                .textSelection(.enabled)
+            VStack{
+                Text("wifi setting 接続先")
+                TextField("SSID", text: $ssid)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                TextField("password", text: $password)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                if let rtkDevice = skateboard.droggerBluetooth.rtkDevice {
+                    Button("接続"){
+                        rtkDevice.setWifiSetting(ssid: ssid, password: password)
+                    }
+                    Button("start ntrip"){
+                        rtkDevice.startNtrip()
+                    }
+                    Text(rtkDevice.latestRes)
+                    Text("接続遅延秒数 \(String(describing: rtkDevice.age))")
+                }
+                Button("start motion"){
+                    skateboard.startRecording()
+                }
+                Button("stop motion"){
+                    skateboard.stopRecording()
+                }
+            }
         }
     }
-    
-    // モーションレコード
-    // フォールライン方向の
-    //
 }
 
 @MainActor
@@ -62,7 +63,7 @@ final class SkateBoardDataManager: ObservableObject{
     @Published var finishedTurnDataArray: [SingleFinishedTurnData] = []
     @Published var cmDeviceMotion: CMDeviceMotion? = nil
     let coreMotionManager: CMMotionManager = .init()
-    var droggerBluetooth: DroggerBluetoothModel = .init()
+    @StateObject var droggerBluetooth: DroggerBluetoothModel = .init()
     
     private var cancellables = Set<AnyCancellable>()
     @Published var numberOfTurn: Int = 0
@@ -83,7 +84,7 @@ final class SkateBoardDataManager: ObservableObject{
             .assign(to: \.rawData, on: self)
             .store(in: &cancellables)
         droggerBluetooth.$rtkDevice.compactMap{ $0 }.compactMap{$0.clLocation}.compactMap{$0}.combineLatest($rawData) { clLocation, rawData in
-            SkateBoardAnalysedData(rawData, with: clLocation, isTurnSwitching: self.isTurnSwithching(rotationAngle: rawData.angulerVelocity))
+            SkateBoardAnalysedData(rawData, with: clLocation, isTurnSwitching: self.isTurnSwithching(rotationAngle: rawData.angulerVelocity), fallLineDirection: self.finishedTurnDataArray.lastTurn.fallLineDirection)
         }.sink{ [weak self] (data: SkateBoardAnalysedData) in
             guard let self = self else { return }
             self.analysedData = data
@@ -107,6 +108,10 @@ final class SkateBoardDataManager: ObservableObject{
         }
     }
     
+    func stopRecording(){
+        coreMotionManager.stopDeviceMotionUpdates()
+    }
+    
     struct SingleFinishedTurnData {
         let numberOfTrun: Int
         var turnPhases: [SkateBoardAnalysedData]
@@ -123,6 +128,11 @@ final class SkateBoardDataManager: ObservableObject{
             turnEndedTime.timeIntervalSince(turnStartedTime)
         }
         
+        var fallLineDirection: Rotation3DFloat{
+            Rotation3DFloat(quaternion: turnPhases.map{ $0.attitude.quaternion}.reduce(simd_quatf(), +))
+        }
+        
+        
         var diffrencialAngleFromStartToEnd: Angle2DFloat {
             (lastPhaseOfTune.attitude * firstPhaseOfTune.attitude.inverse).angle
         }
@@ -133,6 +143,12 @@ final class SkateBoardDataManager: ObservableObject{
         var lastPhaseOfTune: SkateBoardAnalysedData {
             turnPhases[safe: turnPhases.endIndex - 1, default: .init()]
         }
+    }
+}
+
+extension Array where Element == SkateBoardDataManager.SingleFinishedTurnData{
+    var lastTurn : SkateBoardDataManager.SingleFinishedTurnData{
+        self[safe: self.count - 1, default: .init(numberOfTrun: 0, turnPhases: [])]
     }
 }
 
@@ -170,8 +186,8 @@ struct SkateBoardAnalysedData{
     let attitude: Rotation3DFloat
     let angulerVelocity: Vector3DFloat
     let isTurnSwitching: Bool
-    init(_ rawData: SkateBoardRawData, with location: CLLocation, isTurnSwitching: Bool ) {
-        self.fallLineAcceleration = 0
+    init(_ rawData: SkateBoardRawData, with location: CLLocation, isTurnSwitching: Bool , fallLineDirection : Rotation3DFloat = .identity) {
+        self.fallLineAcceleration = Vector3DFloat(x: 0, y: 1, z: 0).rotated(by: fallLineDirection).dot(rawData.acceleration)
         self.location = location
         self.timestamp = rawData.timestamp
         self.othogonalAcceleration = 0
