@@ -142,18 +142,15 @@ final class Carv1DataManager :ObservableObject {
         return turnData.turnPhases.map { Carv1TurnPhase(numberOfTurn: turnData.numberOfTrun, turnPhase: $0) }
     }
     
-    func expoert(){
+    func export(){
         do {
-            let iso8601Formatter: ISO8601DateFormatter = {
-                let formatter = ISO8601DateFormatter()
-                formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-                return formatter
-            }()
             let encoder = JSONEncoder()
             encoder.dateEncodingStrategy = .iso8601
             encoder.nonConformingFloatEncodingStrategy = .convertToString(positiveInfinity: "Infinity", negativeInfinity: "-Infinity", nan: "NaN")
             encoder.dateEncodingStrategy = .custom { date, encoder in
                 var container = encoder.singleValueContainer()
+                let iso8601Formatter = ISO8601DateFormatter()
+                iso8601Formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
                 let dateString = iso8601Formatter.string(from: date)
                 try container.encode(dateString)
             }

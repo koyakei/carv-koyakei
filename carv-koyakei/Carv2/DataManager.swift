@@ -73,17 +73,14 @@ final class DataManager :ObservableObject {
     
     func expoert(){
         do {
-            let iso8601Formatter: ISO8601DateFormatter = {
-                let formatter = ISO8601DateFormatter()
-                formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-                return formatter
-            }()
             let encoder = JSONEncoder()
             encoder.dateEncodingStrategy = .iso8601
             encoder.nonConformingFloatEncodingStrategy = .convertToString(positiveInfinity: "Infinity", negativeInfinity: "-Infinity", nan: "NaN")
             encoder.dateEncodingStrategy = .custom { date, encoder in
                 var container = encoder.singleValueContainer()
-                let dateString = iso8601Formatter.string(from: date)
+                let formatter = ISO8601DateFormatter()
+                formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+                let dateString = formatter.string(from: date)
                 try container.encode(dateString)
             }
               

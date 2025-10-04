@@ -27,6 +27,12 @@ enum Endianness {
     case big
 }
 
+extension simd_quatf{
+    init(_ val: simd_quatd){
+        self.init(ix: Float(val.vector.x), iy: Float(val.vector.y), iz: Float(val.vector.z), r: Float(val.vector.w))
+    }
+}
+
 import simd
 extension simd_quatd {
     var formatQuaternion: String {
