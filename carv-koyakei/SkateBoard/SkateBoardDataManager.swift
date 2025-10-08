@@ -55,7 +55,7 @@ final class SkateBoardDataManager: ObservableObject{
 //        }.store(in: &cancellables)
     }
     
-    @Published var switchingAngluerRateDegree: Float = 15
+    @Published var switchingAngluerRateDegree: Float = 0
     
     func isTurnSwithching(turnPhase: SkateBoardRawData,rotationAngle: Vector3DFloat) -> Bool{
         (Angle2DFloat(degrees: -switchingAngluerRateDegree).radians..<Angle2DFloat(degrees: switchingAngluerRateDegree).radians ~= turnPhase.angulerVelocity.z && turnPhase.timestamp.timeIntervalSince1970 - self.lastFinishedTrunData.turnEndedTime.timeIntervalSince1970 > 0.4)
