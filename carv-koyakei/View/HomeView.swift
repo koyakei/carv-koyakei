@@ -20,8 +20,10 @@ struct HomeView: View {
     @State var rollingBeep: RollingBeep
     @StateObject var dataManager: DataManager
     
-    @State private var savedTime: String = ""
-    @State private var leftid: String = ""
+    
+    @AppStorage("carv2Right") var right: String = ""
+     var Left: String = ""
+    
     var body: some View {
 //        ScrollView {
 //            let gridItems = Array(repeating: GridItem(.flexible()), count: 5)
@@ -35,6 +37,10 @@ struct HomeView: View {
 //            }
 //        }
         VStack {
+            TextField("Left", text: dataManager.bluethoothCentralManager.$leftCharactaristicUUIDString)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+            TextField("Right", text: dataManager.bluethoothCentralManager.$rightCharactaristicUUIDString)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
 
 //                                    HStack{
 //                                        Text(Angle2D(radians: dataManager.carv2DataPair.beforeTurn.fallLineAttitude.eulerAngles(order: .xyz).angles.x).degrees.description)
@@ -283,8 +289,6 @@ struct HomeView: View {
             if let right = ble.carv2DeviceRight{
                 DeviceRow(device: right, ble: ble)
             }
-        }.onAppear {
-            //            conductor.start()
         }
     }
 }

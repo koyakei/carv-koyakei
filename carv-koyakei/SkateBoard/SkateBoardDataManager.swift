@@ -54,6 +54,7 @@ final class SkateBoardDataManager: ObservableObject{
 //            }
 //        }.store(in: &cancellables)
     }
+    
     @Published var switchingAngluerRateDegree: Float = 15
     
     func isTurnSwithching(turnPhase: SkateBoardRawData,rotationAngle: Vector3DFloat) -> Bool{

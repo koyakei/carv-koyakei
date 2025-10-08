@@ -30,6 +30,9 @@ struct SkateBoardView: View {
                 .textSelection(.enabled)
             Text("number of turn \(skateboard.numberOfTurn.description)")
             VStack{
+                Button("clear"){
+                    skateboard.finishedTurnDataArray.removeAll()
+                }
                 Text(skateboard.analysedData.timestamp.description)
                 Text(skateboard.lastFinishedTrunData.turnEndedTime.description)
                 Text("wifi setting 接続先")
