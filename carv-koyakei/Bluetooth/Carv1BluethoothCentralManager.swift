@@ -11,10 +11,18 @@ class Carv1BluethoothCentralManager: NSObject, @MainActor CBCentralManagerDelega
 //    static let rightCharactaristicUUID = UUID(uuidString: "85A29A4C-09C3-C632-858A-3387339C67CF")
 //    static let leftCharactaristicUUID = UUID(uuidString:  "850D8BCF-3B03-1322-F51C-DD38E961FC1A")
     // iphone
-    var rightCharactaristicUUID = UUID(uuidString:"5A5433BD-A1AA-84B1-1F54-B05E46B9D94B")
-    var leftCharactaristicUUID = UUID(uuidString: "DEF38F61-34D1-8014-1A70-50B5A63B377D")
 //    5A5433BD-A1AA-84B1-1F54-B05E46B9D94B
 //    DEF38F61-34D1-8014-1A70-50B5A63B377D
+    
+    @AppStorage("carv1Right") var rightCharactaristicUUIDString =  "5A5433BD-A1AA-84B1-1F54-B05E46B9D94B"//  UUID(uuidString: "85E2946B-0D18-FA01-E1C9-0393EDD9013A")
+    @AppStorage("carv1Left") var leftCharactaristicUUIDString = "DEF38F61-34D1-8014-1A70-50B5A63B377D" // UUID(uuidString:  "57089C67-2275-E220-B6D3-B16E2639EFD6")
+    var rightCharactaristicUUID :UUID{
+        UUID(uuidString: rightCharactaristicUUIDString) ?? UUID()
+    }
+    
+    var leftCharactaristicUUID :UUID{
+        UUID(uuidString: leftCharactaristicUUIDString) ?? UUID()
+    }
     
     static let periferalName = "⛷CARV"
     @Published var carv1DeviceLeft: Carv1DevicePeripheral? = nil
