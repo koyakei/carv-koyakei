@@ -27,48 +27,22 @@ final class Carv1DataManager :ObservableObject {
     }
     
     func calibratePressureLeft(){
-        // Collect 15 left rawPressure arrays, average them element-wise, then store as calibration baseline
         $carvRawDataPair
+            .prefix(25)
             .map { $0.left.rawPressure }
-            .collect(25)
-            .map {
-                arrays -> [Float] in
-                guard let first = arrays.first else { return [] }
-                var sum = [Float](repeating: 0, count: first.count)
-                for arr in arrays {
-                    for i in 0..<first.count {
-                        sum[i] += arr[i]
-                    }
-                }
-                let count = Float(arrays.count)
-                return sum.map { $0 / count }
-            }.first()
-            .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] avg in
-                self?.calibration基準値Left = avg
-            })
+            .reduce([Float](repeating: 0, count: 18),+)
+            .map { $0 / Float(25)}
+            .assign(to: \.calibration基準値Left, on: self)
             .store(in: &cancellables)
     }
     
     func calibratePressureRight(){
-        // Collect 15 left rawPressure arrays, average them element-wise, then store as calibration baseline
         $carvRawDataPair
+            .prefix(25)
             .map { $0.right.rawPressure }
-            .collect(25)
-            .map {
-                arrays -> [Float] in
-                guard let first = arrays.first else { return [] }
-                var sum = [Float](repeating: 0, count: first.count)
-                for arr in arrays {
-                    for i in 0..<first.count {
-                        sum[i] += arr[i]
-                    }
-                }
-                let count = Float(arrays.count)
-                return sum.map { $0 / count }
-            }.first()
-            .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] avg in
-                self?.calibration基準値Right = avg
-            })
+            .reduce([Float](repeating: 0, count: 18),+)
+            .map { $0 / Float(25)}
+            .assign(to: \.calibration基準値Right, on: self)
             .store(in: &cancellables)
     }
     
@@ -106,7 +80,7 @@ final class Carv1DataManager :ObservableObject {
                     ).filter{ leftData, rightData in
                         leftData.first == 0x0A && rightData.first == 0x0A}
                     .map { (leftData: Data, rightData: Data)  in
-                        return Carv1RawDataPair(left: Carv1RawData(leftData), right: Carv1RawData(rightData))
+                        Carv1RawDataPair(left: Carv1RawData(leftData), right: Carv1RawData(rightData))
                     }
             }
             .assign(to: \.carvRawDataPair, on: self)

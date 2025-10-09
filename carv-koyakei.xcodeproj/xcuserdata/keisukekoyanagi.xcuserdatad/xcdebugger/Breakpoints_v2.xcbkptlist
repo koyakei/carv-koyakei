@@ -428,8 +428,8 @@
             filePath = "carv-koyakei/Carv1/Carv1DataManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "99"
-            endingLineNumber = "99"
+            startingLineNumber = "73"
+            endingLineNumber = "73"
             landmarkName = "subscribe()"
             landmarkType = "7">
          </BreakpointContent>
@@ -437,7 +437,7 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "6DBB5A5A-CA48-4A7B-888D-A8E96E1CB677"
+            uuid = "98B39E7B-F033-4712-B735-18273C4851B2"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -453,22 +453,6 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "98B39E7B-F033-4712-B735-18273C4851B2"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "carv-koyakei/Carv1/Carv1DataManager.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "31"
-            endingLineNumber = "31"
-            landmarkName = "calibratePressureLeft()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             uuid = "A9D468F5-4314-48B3-A25D-BC62D27FCC7F"
             shouldBeEnabled = "No"
             ignoreCount = "0"
@@ -476,26 +460,10 @@
             filePath = "carv-koyakei/Carv1/Carv1DataManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "75"
-            endingLineNumber = "75"
+            startingLineNumber = "49"
+            endingLineNumber = "49"
             landmarkName = "Carv1DataManager"
             landmarkType = "3">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "E4C84295-1382-4C51-848E-D23A78AC57F1"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "carv-koyakei/Carv1/Carv1DataManager.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "47"
-            endingLineNumber = "47"
-            landmarkName = "calibratePressureLeft()"
-            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -508,8 +476,8 @@
             filePath = "carv-koyakei/Carv1/Carv1DataManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "32"
-            endingLineNumber = "32"
+            startingLineNumber = "31"
+            endingLineNumber = "31"
             landmarkName = "calibratePressureLeft()"
             landmarkType = "7">
          </BreakpointContent>
@@ -527,38 +495,6 @@
             startingLineNumber = "63"
             endingLineNumber = "63"
             landmarkName = "init(_:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "5BC8AF9E-C2A8-42B2-A328-2348930D92DC"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "carv-koyakei/Carv1/Carv1DataManager.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "109"
-            endingLineNumber = "109"
-            landmarkName = "subscribe()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "40F10F98-AAB0-4109-87A0-6D66426291AE"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "carv-koyakei/Carv1/Carv1DataManager.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "36"
-            endingLineNumber = "36"
-            landmarkName = "calibratePressureLeft()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -604,8 +540,8 @@
             filePath = "carv-koyakei/SkateBoard/SkateBoardDataManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "44"
-            endingLineNumber = "44"
+            startingLineNumber = "55"
+            endingLineNumber = "55"
             landmarkName = "subscribe()"
             landmarkType = "7">
          </BreakpointContent>
@@ -620,8 +556,8 @@
             filePath = "carv-koyakei/SkateBoard/SkateBoardDataManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "68"
-            endingLineNumber = "68"
+            startingLineNumber = "79"
+            endingLineNumber = "79"
             landmarkName = "startRecording()"
             landmarkType = "7">
          </BreakpointContent>
@@ -636,8 +572,8 @@
             filePath = "carv-koyakei/SkateBoard/SkateBoardDataManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "73"
-            endingLineNumber = "73"
+            startingLineNumber = "84"
+            endingLineNumber = "84"
             landmarkName = "startRecording()"
             landmarkType = "7">
          </BreakpointContent>
@@ -652,8 +588,8 @@
             filePath = "carv-koyakei/SkateBoard/SkateBoardDataManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "70"
-            endingLineNumber = "70"
+            startingLineNumber = "81"
+            endingLineNumber = "81"
             landmarkName = "startRecording()"
             landmarkType = "7">
          </BreakpointContent>
@@ -668,8 +604,8 @@
             filePath = "carv-koyakei/SkateBoard/SkateBoardDataManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "69"
-            endingLineNumber = "69"
+            startingLineNumber = "80"
+            endingLineNumber = "80"
             landmarkName = "startRecording()"
             landmarkType = "7">
          </BreakpointContent>
@@ -684,8 +620,8 @@
             filePath = "carv-koyakei/SkateBoard/SkateBoardDataManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "71"
-            endingLineNumber = "71"
+            startingLineNumber = "82"
+            endingLineNumber = "82"
             landmarkName = "startRecording()"
             landmarkType = "7">
          </BreakpointContent>
@@ -700,8 +636,8 @@
             filePath = "carv-koyakei/SkateBoard/SkateBoardDataManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "72"
-            endingLineNumber = "72"
+            startingLineNumber = "83"
+            endingLineNumber = "83"
             landmarkName = "startRecording()"
             landmarkType = "7">
          </BreakpointContent>
@@ -716,8 +652,8 @@
             filePath = "carv-koyakei/SkateBoard/SkateBoardDataManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "61"
-            endingLineNumber = "61"
+            startingLineNumber = "72"
+            endingLineNumber = "72"
             landmarkName = "isTurnSwithching(turnPhase:rotationAngle:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -732,8 +668,8 @@
             filePath = "carv-koyakei/SkateBoard/SkateBoardDataManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "34"
-            endingLineNumber = "34"
+            startingLineNumber = "45"
+            endingLineNumber = "45"
             landmarkName = "lastFinishedTrunData"
             landmarkType = "24">
          </BreakpointContent>

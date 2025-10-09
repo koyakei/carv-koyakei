@@ -15,7 +15,7 @@ class Carv1BluethoothCentralManager: NSObject, @MainActor CBCentralManagerDelega
 //    DEF38F61-34D1-8014-1A70-50B5A63B377D
     
     @AppStorage("carv1Right") var rightCharactaristicUUIDString =  "5A5433BD-A1AA-84B1-1F54-B05E46B9D94B"//  UUID(uuidString: "85E2946B-0D18-FA01-E1C9-0393EDD9013A")
-    @AppStorage("carv1Left") var leftCharactaristicUUIDString = "DEF38F61-34D1-8014-1A70-50B5A63B377D" // UUID(uuidString:  "57089C67-2275-E220-B6D3-B16E2639EFD6")
+    @AppStorage("carv1Left") var leftCharactaristicUUIDString = "8CF04FD1-A857-931D-5D25-CA41383F5E18" // UUID(uuidString:  "57089C67-2275-E220-B6D3-B16E2639EFD6")
     var rightCharactaristicUUID :UUID{
         UUID(uuidString: rightCharactaristicUUIDString) ?? UUID()
     }
