@@ -456,6 +456,8 @@
 				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = da;
 				INFOPLIST_KEY_NSLocationUsageDescription = location;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = da;
+				INFOPLIST_KEY_NSMotionUsageDescription = hjjhhjhj;
+				INFOPLIST_KEY_NSWorldSensingUsageDescription = "位置を知りたい";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -518,6 +520,8 @@
 				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = da;
 				INFOPLIST_KEY_NSLocationUsageDescription = location;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = da;
+				INFOPLIST_KEY_NSMotionUsageDescription = hjjhhjhj;
+				INFOPLIST_KEY_NSWorldSensingUsageDescription = "位置を知りたい";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;

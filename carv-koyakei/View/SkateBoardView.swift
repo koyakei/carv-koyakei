@@ -29,6 +29,7 @@ struct SkateBoardView: View {
                 .font(.system(size: 10, design: .monospaced))
                 .textSelection(.enabled)
             Text("number of turn \(skateboard.numberOfTurn.description)")
+            Text("heas \(skateboard.headMotion?.acceleration.vector.x.description)")
             VStack{
                 Button("clear"){
                     skateboard.finishedTurnDataArray.removeAll()
@@ -40,6 +41,7 @@ struct SkateBoardView: View {
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                 TextField("password", text: $password)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
+                Text( "head avalable \(skateboard.headMotionManager.isDeviceMotionActive.description)")
                 if let rtkDevice = droggerBluetooth.rtkDevice {
                     Button("接続"){
                         rtkDevice.setWifiSetting(ssid: ssid, password: password)
@@ -50,8 +52,16 @@ struct SkateBoardView: View {
                     Text(rtkDevice.latestRes)
                     Text("接続遅延秒数 \(String(describing: rtkDevice.age))")
                 }
-                Button("start motion"){
-                    skateboard.startRecording()
+                HStack{
+                    Button("start motion"){
+                        skateboard.startRecording()
+                    }
+                    Button("start head and board recoarding"){
+                        skateboard.startHeadAndBoardMotionRecording()
+                    }
+                }
+                Button("head orientation calibration"){
+                    skateboard.calibrateHeadBoardDifference()
                 }
                 Button("stop motion"){
                     skateboard.stopRecording()
