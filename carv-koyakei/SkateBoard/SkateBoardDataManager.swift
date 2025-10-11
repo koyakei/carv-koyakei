@@ -77,17 +77,18 @@ final class SkateBoardDataManager: ObservableObject{
             }
         }
         .store(in: &cancellables)
-            coreMotionManager.startDeviceMotionUpdates(using: .xTrueNorthZVertical, to: .main) { [weak self] data, _ in
-                guard let value = data else { return }
-                guard let self = self else { return }
-                self.rawData = SkateBoardRawData(value)
+       
+        coreMotionManager.startDeviceMotionUpdates(using: .xTrueNorthZVertical, to: .main) { [weak self] data, _ in
+            guard let value = data else { return }
+            guard let self = self else { return }
+            self.rawData = SkateBoardRawData(value)
+        }
+        headMotionManager.startDeviceMotionUpdates(to: .main) { [weak self] data, _ in
+            guard let self = self else { return }
+            if let data = data {
+                self.headMotion = HeadMotionRawData(data,headBoardDiffrencial: self.headBoardDiffrencial)
             }
-            headMotionManager.startDeviceMotionUpdates(to: .main) { [weak self] data, _ in
-                guard let self = self else { return }
-                if let data = data {
-                    self.headMotion = HeadMotionRawData(data,headBoardDiffrencial: self.headBoardDiffrencial)
-                }
-            }
+        }
         
     }
     
@@ -105,7 +106,6 @@ final class SkateBoardDataManager: ObservableObject{
                 self.numberOfTurn += 1
             }
         }
-        
     }
     
     func stopRecording(){
@@ -117,7 +117,8 @@ final class SkateBoardDataManager: ObservableObject{
     // To convert:
     func flatten(turnData:
                  SingleFinishedTurnData) -> [TurnPhase] {
-        return turnData.turnPhases.map { TurnPhase(numberOfTurn: turnData.numberOfTrun, turnPhase: .init($0, ywingSide: turnData.yawingSide, fallLineDirection: turnData.fallLineDirection,diffrencialAnleFromStartoEnd: turnData.diffrencialAngleFromStartToEnd.radians, lastTurnFinishedTurnPhaseAttitude: turnData.firstPhaseOfTune.attitude)) }
+        
+        return turnData.turnPhases.map { TurnPhase(numberOfTurn: turnData.numberOfTrun, turnPhase: .init($0, ywingSide: turnData.yawingSide, fallLineDirection: turnData.fallLineDirection,diffrencialAnleFromStartoEnd: turnData.diffrencialAngleFromStartToEnd.radians, lastTurnFinishedTurnPhaseAttitude: turnData.firstPhaseOfTune.attitude,headAttitude: $0.headAttitude, headAngulerVelocity: $0.headAngulerVelocity, headAcceleration: $0.acceleration)) }
     }
     
     func export(){
@@ -206,7 +207,6 @@ final class SkateBoardDataManager: ObservableObject{
             Rotation3DFloat(quaternion: turnPhases.map{ $0.attitude.quaternion}.reduce(simd_quatf(), +))
         }
         
-        
         var diffrencialAngleFromStartToEnd: Angle2DFloat {
             (lastPhaseOfTune.attitude * firstPhaseOfTune.attitude.inverse).angle
         }
@@ -275,7 +275,7 @@ struct SkateBoardAnalysedData: Encodable {
     let isTurnSwitching: Bool
     let fallLineDirection: Rotation3DFloat
     let percentageOfTurnsByAngle: Float
-
+    
     let headAttitude: Rotation3DFloat
     let headAngulerVelocity: Vector3DFloat
     let headAcceleration: Vector3DFloat
@@ -311,9 +311,9 @@ struct SkateBoardAnalysedData: Encodable {
         self.angulerVelocity = rawData.angulerVelocity
         self.isTurnSwitching = isTurnSwitching
         self.headAttitude = headAttitude
-
+        
         self.headAcceleration = headAcceleration
-
+        
         self.headAngulerVelocity = headAngulerVelocity
         
         self.yawingSide = {
@@ -341,9 +341,9 @@ struct SkateBoardAnalysedData: Encodable {
         self.yawingSide = ywingSide
         self.percentageOfTurnsByAngle = abs((rawData.attitude * lastTurnFinishedTurnPhaseAttitude.inverse).angle.radians) / abs(diffrencialAnleFromStartoEnd)
         self.headAttitude = headAttitude
-
+        
         self.headAcceleration = headAcceleration
-
+        
         self.headAngulerVelocity = headAngulerVelocity
     }
     
@@ -359,13 +359,13 @@ struct SkateBoardAnalysedData: Encodable {
         percentageOfTurnsByAngle = 0
         
         self.headAttitude = headAttitude
-
+        
         self.headAcceleration = headAcceleration
-
+        
         self.headAngulerVelocity = headAngulerVelocity
     }
-
-
+    
+    
     enum CodingKeys: String, CodingKey {
         case fallLineAcceleration
         case location
@@ -380,18 +380,17 @@ struct SkateBoardAnalysedData: Encodable {
         case yawingAngle
         case pitchingAngle
         case rollingAngle
-        
         case headyawingAngle
         case headpitchingAngle
         case headrollingAngle
         case headAcceleration
         case headAngulerVelocity
     }
-
+    
     enum LocationKeys: String, CodingKey {
         case latitude, longitude, altitude
     }
-
+    
     func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(fallLineAcceleration, forKey: .fallLineAcceleration)

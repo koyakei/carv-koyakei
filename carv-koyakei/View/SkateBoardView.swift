@@ -29,12 +29,12 @@ struct SkateBoardView: View {
                 .font(.system(size: 10, design: .monospaced))
                 .textSelection(.enabled)
             Text("number of turn \(skateboard.numberOfTurn.description)")
-            Text("heas \(skateboard.headMotion?.acceleration.vector.x.description)")
+            Text("heas \(skateboard.finishedTurnDataArray.last?.lastPhaseOfTune.headAttitude.vector.x.description)")
             VStack{
                 Button("clear"){
                     skateboard.finishedTurnDataArray.removeAll()
                 }
-                Text(skateboard.analysedData.timestamp.description)
+                Text(skateboard.rawData.timestamp.description)
                 Text(skateboard.lastFinishedTrunData.turnEndedTime.description)
                 Text("wifi setting 接続先")
                 TextField("SSID", text: $ssid)
