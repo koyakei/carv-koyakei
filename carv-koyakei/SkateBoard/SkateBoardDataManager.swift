@@ -237,7 +237,7 @@ final class HeadMotionRawData: ObservableObject{
     let angulerVelocity: Vector3DFloat
     let timestamp: Date
     init(_ deviceMotion: CMDeviceMotion) {
-        self.acceleration = Vector3DFloat(x: Float(0),y: Float(5), z: Float(0))
+        self.acceleration = Vector3DFloat(x: Float(deviceMotion.userAcceleration.x),y: Float(deviceMotion.userAcceleration.y), z: Float(deviceMotion.userAcceleration.z))
         self.attitude = Rotation3DFloat(quaternion: simd_quatf( deviceMotion.attitude.quaternion.simdQuat))
         self.angulerVelocity = Vector3DFloat(x: Float(deviceMotion.rotationRate.x), y: Float(deviceMotion.rotationRate.y), z: Float(deviceMotion.rotationRate.z))
         self.timestamp = Date(timeIntervalSince1970: deviceMotion.timestamp)
