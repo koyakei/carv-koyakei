@@ -61,13 +61,13 @@ final class SkateBoardDataManager: ObservableObject{
     
     func calibrateHeadBoardDifference(){
         if let head = self.headMotion{
-            self.headBoardDiffrencial = rawData.attitude.rotated(by:head.attitude.inverse)
+            self.headBoardDiffrencial = head.attitude.rotated(by:rawData.attitude.inverse)
         }
     }
     
     func startHeadAndBoardMotionRecording(){
         $rawData.compactMap{$0}.combineLatest($headMotion.compactMap{$0}).sink { (rawData, headMotion) in
-            let skatebordData = SkateBoardAnalysedData(rawData, with: CLLocation(), isTurnSwitching: self.isTurnSwithching(turnPhase: rawData,rotationAngle: rawData.angulerVelocity), fallLineDirection: self.finishedTurnDataArray.lastTurn.fallLineDirection, diffrencialAnleFromStartoEnd: self.lastFinishedTrunData.diffrencialAngleFromStartToEnd.radians, lastTurnFinishedTurnPhaseAttitude: self.lastFinishedTrunData.lastPhaseOfTune.attitude,headAttitude: headMotion.attitude,headAngulerVelocity: headMotion.angulerVelocity, headAcceleration: headMotion.acceleration)
+            let skatebordData = SkateBoardAnalysedData(rawData, with: CLLocation(), isTurnSwitching: self.isTurnSwithching(turnPhase: rawData,rotationAngle: rawData.angulerVelocity), fallLineDirection: self.finishedTurnDataArray.lastTurn.fallLineDirection, diffrencialAnleFromStartoEnd: self.lastFinishedTrunData.diffrencialAngleFromStartToEnd.radians, lastTurnFinishedTurnPhaseAttitude: self.lastFinishedTrunData.lastPhaseOfTune.attitude,headAttitude: headMotion.attitude * self.headBoardDiffrencial.inverse,headAngulerVelocity: headMotion.angulerVelocity, headAcceleration: headMotion.acceleration)
             self.analysedData = skatebordData
             self.latestNotCompletedTurn.append(skatebordData)
             if skatebordData.isTurnSwitching {
@@ -86,7 +86,7 @@ final class SkateBoardDataManager: ObservableObject{
         headMotionManager.startDeviceMotionUpdates(to: .main) { [weak self] data, _ in
             guard let self = self else { return }
             if let data = data {
-                self.headMotion = HeadMotionRawData(data,headBoardDiffrencial: self.headBoardDiffrencial)
+                self.headMotion = HeadMotionRawData(data)
             }
         }
         
@@ -204,7 +204,7 @@ final class SkateBoardDataManager: ObservableObject{
         }
         
         var fallLineDirection: Rotation3DFloat{
-            Rotation3DFloat(quaternion: turnPhases.map{ $0.attitude.quaternion}.reduce(simd_quatf(), +))
+            Rotation3DFloat(quaternion: turnPhases.map{ $0.attitude.quaternion}.reduce(simd_quatf(ix: 0, iy: 0, iz: 0, r: 0), +).normalized)
         }
         
         var diffrencialAngleFromStartToEnd: Angle2DFloat {
@@ -236,9 +236,9 @@ final class HeadMotionRawData: ObservableObject{
     let attitude: Rotation3DFloat
     let angulerVelocity: Vector3DFloat
     let timestamp: Date
-    init(_ deviceMotion: CMDeviceMotion, headBoardDiffrencial: Rotation3DFloat = .identity) {
-        self.acceleration = Vector3DFloat(x: Float(deviceMotion.userAcceleration.x),y: Float(deviceMotion.userAcceleration.y), z: Float(deviceMotion.userAcceleration.z))
-        self.attitude = Rotation3DFloat(quaternion: simd_quatf( deviceMotion.attitude.quaternion.simdQuat)) * headBoardDiffrencial
+    init(_ deviceMotion: CMDeviceMotion) {
+        self.acceleration = Vector3DFloat(x: Float(0),y: Float(5), z: Float(0))
+        self.attitude = Rotation3DFloat(quaternion: simd_quatf( deviceMotion.attitude.quaternion.simdQuat))
         self.angulerVelocity = Vector3DFloat(x: Float(deviceMotion.rotationRate.x), y: Float(deviceMotion.rotationRate.y), z: Float(deviceMotion.rotationRate.z))
         self.timestamp = Date(timeIntervalSince1970: deviceMotion.timestamp)
     }
@@ -264,9 +264,10 @@ final class SkateBoardRawData: ObservableObject{
 }
 
 struct SkateBoardAnalysedData: Encodable {
-    var fallLineAcceleration: Float {
-        Vector3DFloat(x: 0, y: 1, z: 0).rotated(by: relativeFallLineDirection).dot(acceleration)
+    var fallLineAcceleration: Vector3DFloat {
+        Vector3DFloat(x: Vector3DFloat(x: 1, y: 0, z: 0).rotated(by: relativeFallLineDirection).dot(acceleration), y: Vector3DFloat(x: 0, y: 1, z: 0).rotated(by: relativeFallLineDirection).dot(acceleration), z: Vector3DFloat(x: 0, y: 0, z: 1).rotated(by: relativeFallLineDirection).dot(acceleration))
     }
+    
     let location: CLLocation
     let timestamp: Date
     let acceleration: Vector3DFloat
@@ -284,6 +285,37 @@ struct SkateBoardAnalysedData: Encodable {
     
     var relativeFallLineDirection:Rotation3DFloat{
         fallLineDirection.rotated(by: attitude.inverse)
+    }
+    
+    var headRelativeAttitudeAgainstBoard: Rotation3DFloat{
+        headAttitude.rotated(by: attitude.inverse) //  attitude で回すのもやったけど　.inverse が固定できる。
+    }
+    
+    var headRelativeAttitudeAgainstFallLine: Rotation3DFloat{
+        headAttitude.rotated(by: fallLineDirection.inverse)
+    }
+
+    
+    var headRelativeAcceleration: Vector3DFloat{
+        Vector3DFloat(x: Vector3DFloat(x: 1, y: 0, z: 0).rotated(by: headAttitude.inverse).dot(headAcceleration), y: Vector3DFloat(x: 0, y: 1, z: 0).rotated(by: headAttitude.inverse).dot(headAcceleration), z: Vector3DFloat(x: 0, y: 0, z: 1).rotated(by: headAttitude.inverse).dot(headAcceleration))
+        
+    }
+    
+    var headRelativeFallLineAcceleration: Vector3DFloat{
+        Vector3DFloat(x: Vector3DFloat(x: 1, y: 0, z: 0).rotated(by: relativeFallLineDirection).dot(headRelativeAcceleration), y: Vector3DFloat(x: 0, y: 1, z: 0).rotated(by: relativeFallLineDirection).dot(headRelativeAcceleration), z: Vector3DFloat(x: 0, y: 0, z: 1).rotated(by: relativeFallLineDirection).dot(headRelativeAcceleration))
+    }
+    
+    var headRelativeFallLineAccelerationAgainstBoard: Vector3DFloat{
+        headRelativeFallLineAcceleration - fallLineAcceleration
+    }
+    
+    
+    var headRelativeAccelerationAgainstBoard: Vector3DFloat{
+        headRelativeAcceleration - acceleration
+    }
+    
+    var headFallineAcceleration: Float{
+        Vector3DFloat(x: 0, y: 1, z: 0).rotated(by: relativeFallLineDirection).dot(headAcceleration)
     }
     
     var orthogonalDirection:Vector3DFloat{
@@ -385,6 +417,11 @@ struct SkateBoardAnalysedData: Encodable {
         case headrollingAngle
         case headAcceleration
         case headAngulerVelocity
+        case headRelativeAcceleration
+        case headRelativeFallLineAcceleration
+        case headRelativeFallLineAccelerationAgainstBoard
+        case headRelativeAccelerationAgainstBoard
+        case headFallineAcceleration
     }
     
     enum LocationKeys: String, CodingKey {
@@ -418,5 +455,10 @@ struct SkateBoardAnalysedData: Encodable {
         try container.encode(Angle2DFloat(radians: headAttitude.eulerAngles(order: .xyz).angles.x).degrees, forKey: .headpitchingAngle)
         try container.encode(Angle2DFloat(radians: headAttitude.eulerAngles(order: .xyz).angles.y).degrees, forKey: .headrollingAngle)
         try container.encode(Angle2DFloat(radians: headAttitude.eulerAngles(order: .xyz).angles.z).degrees, forKey: .headyawingAngle)
+        try container.encode(headRelativeAcceleration, forKey: .headRelativeAcceleration)
+        try container.encode(headRelativeFallLineAcceleration, forKey: .headRelativeFallLineAcceleration)
+        try container.encode(headRelativeFallLineAccelerationAgainstBoard, forKey: .headRelativeFallLineAccelerationAgainstBoard)
+        try container.encode(headRelativeAccelerationAgainstBoard, forKey: .headRelativeAccelerationAgainstBoard)
+        try container.encode(headFallineAcceleration, forKey: .headFallineAcceleration)
     }
 }

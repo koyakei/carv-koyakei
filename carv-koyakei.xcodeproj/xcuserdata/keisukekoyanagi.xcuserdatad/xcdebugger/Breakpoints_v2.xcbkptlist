@@ -812,8 +812,8 @@
             filePath = "carv-koyakei/SkateBoard/SkateBoardDataManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "410"
-            endingLineNumber = "410"
+            startingLineNumber = "447"
+            endingLineNumber = "447"
             landmarkName = "encode(to:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -829,8 +829,8 @@
             filePath = "carv-koyakei/SkateBoard/SkateBoardDataManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "418"
-            endingLineNumber = "418"
+            startingLineNumber = "455"
+            endingLineNumber = "455"
             landmarkName = "encode(to:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -845,8 +845,8 @@
             filePath = "carv-koyakei/SkateBoard/SkateBoardDataManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "419"
-            endingLineNumber = "419"
+            startingLineNumber = "456"
+            endingLineNumber = "456"
             landmarkName = "encode(to:)"
             landmarkType = "7">
          </BreakpointContent>

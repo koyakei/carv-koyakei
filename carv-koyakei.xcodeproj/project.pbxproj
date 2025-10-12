@@ -8,6 +8,23 @@
 
 /* Begin PBXBuildFile section */
 		221E10B32D571635003B5AAF /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 221E10B22D57162D003B5AAF /* README.md */; };
+		2226956A2E9B1F8F00528D42 /* carv-koyakei-watch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 222695602E9B1F8E00528D42 /* carv-koyakei-watch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		222695912E9B275200528D42 /* WidgetSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2226958F2E9B275200528D42 /* WidgetSupport.swift */; };
+		222695922E9B275200528D42 /* SessionDelegator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2226958C2E9B275200528D42 /* SessionDelegator.swift */; };
+		222695932E9B275200528D42 /* SessionTransfer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2226958D2E9B275200528D42 /* SessionTransfer.swift */; };
+		222695942E9B275200528D42 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2226958A2E9B275200528D42 /* Logger.swift */; };
+		222695952E9B275200528D42 /* CommandStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 222695882E9B275200528D42 /* CommandStatus.swift */; };
+		222695962E9B275200528D42 /* TestDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2226958E2E9B275200528D42 /* TestDataProvider.swift */; };
+		222695972E9B275200528D42 /* SessionCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2226958B2E9B275200528D42 /* SessionCommands.swift */; };
+		222695982E9B275200528D42 /* FileTransferObservers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 222695892E9B275200528D42 /* FileTransferObservers.swift */; };
+		222695992E9B275200528D42 /* WidgetSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2226958F2E9B275200528D42 /* WidgetSupport.swift */; };
+		2226959A2E9B275200528D42 /* SessionDelegator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2226958C2E9B275200528D42 /* SessionDelegator.swift */; };
+		2226959B2E9B275200528D42 /* SessionTransfer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2226958D2E9B275200528D42 /* SessionTransfer.swift */; };
+		2226959C2E9B275200528D42 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2226958A2E9B275200528D42 /* Logger.swift */; };
+		2226959D2E9B275200528D42 /* CommandStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 222695882E9B275200528D42 /* CommandStatus.swift */; };
+		2226959E2E9B275200528D42 /* TestDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2226958E2E9B275200528D42 /* TestDataProvider.swift */; };
+		2226959F2E9B275200528D42 /* SessionCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2226958B2E9B275200528D42 /* SessionCommands.swift */; };
+		222695A02E9B275200528D42 /* FileTransferObservers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 222695892E9B275200528D42 /* FileTransferObservers.swift */; };
 		2259D29A2D5DDCDE007658AB /* SoundpipeAudioKit in Frameworks */ = {isa = PBXBuildFile; productRef = 2259D2992D5DDCDE007658AB /* SoundpipeAudioKit */; };
 		2259D29D2D5DDCE8007658AB /* AudioKitUI in Frameworks */ = {isa = PBXBuildFile; productRef = 2259D29C2D5DDCE8007658AB /* AudioKitUI */; };
 		22FA7E2E2D826DCB00D9E8F9 /* carv-koyakei.xcconfig.template in Resources */ = {isa = PBXBuildFile; fileRef = 22FA7E2D2D826DCB00D9E8F9 /* carv-koyakei.xcconfig.template */; };
@@ -15,6 +32,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		222695682E9B1F8F00528D42 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 22A73C6B2D4241AB00C1BF1C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 2226955F2E9B1F8E00528D42;
+			remoteInfo = "carv-koyakei-watch Watch App";
+		};
 		22A73C852D4241AD00C1BF1C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 22A73C6B2D4241AB00C1BF1C /* Project object */;
@@ -31,8 +55,31 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		2226956B2E9B1F8F00528D42 /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				2226956A2E9B1F8F00528D42 /* carv-koyakei-watch Watch App.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		221E10B22D57162D003B5AAF /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		222695602E9B1F8E00528D42 /* carv-koyakei-watch Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "carv-koyakei-watch Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		222695882E9B275200528D42 /* CommandStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandStatus.swift; sourceTree = "<group>"; };
+		222695892E9B275200528D42 /* FileTransferObservers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileTransferObservers.swift; sourceTree = "<group>"; };
+		2226958A2E9B275200528D42 /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
+		2226958B2E9B275200528D42 /* SessionCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionCommands.swift; sourceTree = "<group>"; };
+		2226958C2E9B275200528D42 /* SessionDelegator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionDelegator.swift; sourceTree = "<group>"; };
+		2226958D2E9B275200528D42 /* SessionTransfer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionTransfer.swift; sourceTree = "<group>"; };
+		2226958E2E9B275200528D42 /* TestDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestDataProvider.swift; sourceTree = "<group>"; };
+		2226958F2E9B275200528D42 /* WidgetSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetSupport.swift; sourceTree = "<group>"; };
 		22A73C732D4241AB00C1BF1C /* carv-koyakei.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "carv-koyakei.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		22A73C842D4241AD00C1BF1C /* carv-koyakeiTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "carv-koyakeiTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		22A73C8E2D4241AD00C1BF1C /* carv-koyakeiUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "carv-koyakeiUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -52,6 +99,11 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		222695612E9B1F8E00528D42 /* carv-koyakei-watch Watch App */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "carv-koyakei-watch Watch App";
+			sourceTree = "<group>";
+		};
 		22A73C752D4241AB00C1BF1C /* carv-koyakei */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -73,6 +125,13 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		2226955D2E9B1F8E00528D42 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		22A73C702D4241AB00C1BF1C /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -99,15 +158,32 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		222695902E9B275200528D42 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				222695882E9B275200528D42 /* CommandStatus.swift */,
+				222695892E9B275200528D42 /* FileTransferObservers.swift */,
+				2226958A2E9B275200528D42 /* Logger.swift */,
+				2226958B2E9B275200528D42 /* SessionCommands.swift */,
+				2226958C2E9B275200528D42 /* SessionDelegator.swift */,
+				2226958D2E9B275200528D42 /* SessionTransfer.swift */,
+				2226958E2E9B275200528D42 /* TestDataProvider.swift */,
+				2226958F2E9B275200528D42 /* WidgetSupport.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
 		22A73C6A2D4241AB00C1BF1C = {
 			isa = PBXGroup;
 			children = (
+				222695902E9B275200528D42 /* Shared */,
 				22FA7E2F2D8271BC00D9E8F9 /* .gitignore */,
 				22FA7E2D2D826DCB00D9E8F9 /* carv-koyakei.xcconfig.template */,
 				22FA7D522D8268B100D9E8F9 /* carv-koyakei.xcconfig */,
 				221E10B22D57162D003B5AAF /* README.md */,
 				22A73C872D4241AD00C1BF1C /* carv-koyakeiTests */,
 				22A73C912D4241AD00C1BF1C /* carv-koyakeiUITests */,
+				222695612E9B1F8E00528D42 /* carv-koyakei-watch Watch App */,
 				22A73C742D4241AB00C1BF1C /* Products */,
 				22A73C752D4241AB00C1BF1C /* carv-koyakei */,
 			);
@@ -119,6 +195,7 @@
 				22A73C732D4241AB00C1BF1C /* carv-koyakei.app */,
 				22A73C842D4241AD00C1BF1C /* carv-koyakeiTests.xctest */,
 				22A73C8E2D4241AD00C1BF1C /* carv-koyakeiUITests.xctest */,
+				222695602E9B1F8E00528D42 /* carv-koyakei-watch Watch App.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -126,6 +203,28 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		2226955F2E9B1F8E00528D42 /* carv-koyakei-watch Watch App */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2226956E2E9B1F8F00528D42 /* Build configuration list for PBXNativeTarget "carv-koyakei-watch Watch App" */;
+			buildPhases = (
+				2226955C2E9B1F8E00528D42 /* Sources */,
+				2226955D2E9B1F8E00528D42 /* Frameworks */,
+				2226955E2E9B1F8E00528D42 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				222695612E9B1F8E00528D42 /* carv-koyakei-watch Watch App */,
+			);
+			name = "carv-koyakei-watch Watch App";
+			packageProductDependencies = (
+			);
+			productName = "carv-koyakei-watch Watch App";
+			productReference = 222695602E9B1F8E00528D42 /* carv-koyakei-watch Watch App.app */;
+			productType = "com.apple.product-type.application";
+		};
 		22A73C722D4241AB00C1BF1C /* carv-koyakei */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 22A73C982D4241AD00C1BF1C /* Build configuration list for PBXNativeTarget "carv-koyakei" */;
@@ -133,10 +232,12 @@
 				22A73C6F2D4241AB00C1BF1C /* Sources */,
 				22A73C702D4241AB00C1BF1C /* Frameworks */,
 				22A73C712D4241AB00C1BF1C /* Resources */,
+				2226956B2E9B1F8F00528D42 /* Embed Watch Content */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				222695692E9B1F8F00528D42 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				22A73C752D4241AB00C1BF1C /* carv-koyakei */,
@@ -203,9 +304,12 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1620;
+				LastSwiftUpdateCheck = 2600;
 				LastUpgradeCheck = 2600;
 				TargetAttributes = {
+					2226955F2E9B1F8E00528D42 = {
+						CreatedOnToolsVersion = 26.0.1;
+					};
 					22A73C722D4241AB00C1BF1C = {
 						CreatedOnToolsVersion = 16.2;
 					};
@@ -240,11 +344,19 @@
 				22A73C722D4241AB00C1BF1C /* carv-koyakei */,
 				22A73C832D4241AD00C1BF1C /* carv-koyakeiTests */,
 				22A73C8D2D4241AD00C1BF1C /* carv-koyakeiUITests */,
+				2226955F2E9B1F8E00528D42 /* carv-koyakei-watch Watch App */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		2226955E2E9B1F8E00528D42 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		22A73C712D4241AB00C1BF1C /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -272,10 +384,33 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		2226955C2E9B1F8E00528D42 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				222695912E9B275200528D42 /* WidgetSupport.swift in Sources */,
+				222695922E9B275200528D42 /* SessionDelegator.swift in Sources */,
+				222695932E9B275200528D42 /* SessionTransfer.swift in Sources */,
+				222695942E9B275200528D42 /* Logger.swift in Sources */,
+				222695952E9B275200528D42 /* CommandStatus.swift in Sources */,
+				222695962E9B275200528D42 /* TestDataProvider.swift in Sources */,
+				222695972E9B275200528D42 /* SessionCommands.swift in Sources */,
+				222695982E9B275200528D42 /* FileTransferObservers.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		22A73C6F2D4241AB00C1BF1C /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				222695992E9B275200528D42 /* WidgetSupport.swift in Sources */,
+				2226959A2E9B275200528D42 /* SessionDelegator.swift in Sources */,
+				2226959B2E9B275200528D42 /* SessionTransfer.swift in Sources */,
+				2226959C2E9B275200528D42 /* Logger.swift in Sources */,
+				2226959D2E9B275200528D42 /* CommandStatus.swift in Sources */,
+				2226959E2E9B275200528D42 /* TestDataProvider.swift in Sources */,
+				2226959F2E9B275200528D42 /* SessionCommands.swift in Sources */,
+				222695A02E9B275200528D42 /* FileTransferObservers.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -296,6 +431,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		222695692E9B1F8F00528D42 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 2226955F2E9B1F8E00528D42 /* carv-koyakei-watch Watch App */;
+			targetProxy = 222695682E9B1F8F00528D42 /* PBXContainerItemProxy */;
+		};
 		22A73C862D4241AD00C1BF1C /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 22A73C722D4241AB00C1BF1C /* carv-koyakei */;
@@ -309,6 +449,73 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		2226956C2E9B1F8F00528D42 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = X4RPB4Q33M;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "carv-koyakei-watch";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "com.koyakei.carv-koyakei2";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.koyakei.carv-koyakei2.watchkitapp";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 26.0;
+			};
+			name = Debug;
+		};
+		2226956D2E9B1F8F00528D42 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = X4RPB4Q33M;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "carv-koyakei-watch";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "com.koyakei.carv-koyakei2";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.koyakei.carv-koyakei2.watchkitapp";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 26.0;
+			};
+			name = Release;
+		};
 		22A73C962D4241AD00C1BF1C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -654,6 +861,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		2226956E2E9B1F8F00528D42 /* Build configuration list for PBXNativeTarget "carv-koyakei-watch Watch App" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2226956C2E9B1F8F00528D42 /* Debug */,
+				2226956D2E9B1F8F00528D42 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		22A73C6E2D4241AB00C1BF1C /* Build configuration list for PBXProject "carv-koyakei" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
