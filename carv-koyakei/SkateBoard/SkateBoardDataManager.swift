@@ -33,16 +33,17 @@ final class SkateBoardDataManager: ObservableObject{
     let coreMotionManager: CMMotionManager = .init()
     let headMotionManager: CMHeadphoneMotionManager = .init()
     let droggerBluetooth: DroggerBluetoothModel
-    @Published var headMotion: HeadMotionRawData?
+    @Published var headMotion: HeadMotionRawData = .init()
     @Published var headBoardDiffrencial: Rotation3DFloat = .identity
     
     private var cancellables = Set<AnyCancellable>()
     @Published var numberOfTurn: Int = 0
+    
     init( analysedData: SkateBoardAnalysedData, droggerBluetooth: DroggerBluetoothModel) {
         self.droggerBluetooth = droggerBluetooth
         self.analysedData = analysedData
-        
     }
+    
     var lastFinishedTrunData: SingleFinishedTurnData {
         get {
             finishedTurnDataArray.last ?? .init(numberOfTrun: 0, turnPhases: [])
@@ -60,11 +61,11 @@ final class SkateBoardDataManager: ObservableObject{
     }
     
     func calibrateHeadBoardDifference(){
-        if let head = self.headMotion{
-            self.headBoardDiffrencial = head.attitude.rotated(by:rawData.attitude.inverse)
-        }
+            self.headBoardDiffrencial = headMotion.attitude.rotated(by:rawData.attitude.inverse)
     }
     
+    var headStartRecordingDate: Date = Date.now
+    var boardStartRecordingDate: Date = Date.now
     func startHeadAndBoardMotionRecording(){
         $rawData.compactMap{$0}.combineLatest($headMotion.compactMap{$0}).sink { (rawData, headMotion) in
             let skatebordData = SkateBoardAnalysedData(rawData, with: CLLocation(), isTurnSwitching: self.isTurnSwithching(turnPhase: rawData,rotationAngle: rawData.angulerVelocity), fallLineDirection: self.finishedTurnDataArray.lastTurn.fallLineDirection, diffrencialAnleFromStartoEnd: self.lastFinishedTrunData.diffrencialAngleFromStartToEnd.radians, lastTurnFinishedTurnPhaseAttitude: self.lastFinishedTrunData.lastPhaseOfTune.attitude,headAttitude: headMotion.attitude * self.headBoardDiffrencial.inverse,headAngulerVelocity: headMotion.angulerVelocity, headAcceleration: headMotion.acceleration)
@@ -77,18 +78,23 @@ final class SkateBoardDataManager: ObservableObject{
             }
         }
         .store(in: &cancellables)
-       
+        // head のほうが常に古い値がheadmotion から発行される　どこにボトルネックがあるのか＿
+        self.boardStartRecordingDate = Date.now
         coreMotionManager.startDeviceMotionUpdates(using: .xTrueNorthZVertical, to: .main) { [weak self] data, _ in
-            guard let value = data else { return }
             guard let self = self else { return }
-            self.rawData = SkateBoardRawData(value)
+            
+            guard let value = data else { return }
+            self.rawData = SkateBoardRawData(value, Date(timeIntervalSince1970: self.boardStartRecordingDate.timeIntervalSince1970 + value.timestamp))
         }
+        
+        self.headStartRecordingDate = Date.now
         headMotionManager.startDeviceMotionUpdates(to: .main) { [weak self] data, _ in
             guard let self = self else { return }
             if let data = data {
-                self.headMotion = HeadMotionRawData(data)
+                self.headMotion = HeadMotionRawData(data, Date(timeIntervalSince1970: self.headStartRecordingDate.timeIntervalSince1970 + data.timestamp))
             }
         }
+        
         
     }
     
@@ -96,7 +102,8 @@ final class SkateBoardDataManager: ObservableObject{
         coreMotionManager.startDeviceMotionUpdates(using: .xTrueNorthZVertical, to: .main) { [weak self] data, _ in
             guard let value = data else { return }
             guard let self = self else { return }
-            self.rawData = SkateBoardRawData(value)
+            self.boardStartRecordingDate = Date.now
+            self.rawData = SkateBoardRawData(value, Date(timeIntervalSince1970: self.boardStartRecordingDate.timeIntervalSince1970 + value.timestamp))
             let skatebordData = SkateBoardAnalysedData(rawData, with: CLLocation(), isTurnSwitching: self.isTurnSwithching(turnPhase: rawData,rotationAngle: rawData.angulerVelocity), fallLineDirection: self.finishedTurnDataArray.lastTurn.fallLineDirection, diffrencialAnleFromStartoEnd: self.lastFinishedTrunData.diffrencialAngleFromStartToEnd.radians, lastTurnFinishedTurnPhaseAttitude: self.lastFinishedTrunData.lastPhaseOfTune.attitude)
             self.analysedData = skatebordData
             self.latestNotCompletedTurn.append(skatebordData)
@@ -236,16 +243,22 @@ final class HeadMotionRawData: ObservableObject{
     let attitude: Rotation3DFloat
     let angulerVelocity: Vector3DFloat
     let timestamp: Date
-    init(_ deviceMotion: CMDeviceMotion) {
+    init(_ deviceMotion: CMDeviceMotion ,_ date: Date) {
         self.acceleration = Vector3DFloat(x: Float(deviceMotion.userAcceleration.x),y: Float(deviceMotion.userAcceleration.y), z: Float(deviceMotion.userAcceleration.z))
         self.attitude = Rotation3DFloat(quaternion: simd_quatf( deviceMotion.attitude.quaternion.simdQuat))
         self.angulerVelocity = Vector3DFloat(x: Float(deviceMotion.rotationRate.x), y: Float(deviceMotion.rotationRate.y), z: Float(deviceMotion.rotationRate.z))
         self.timestamp = Date(timeIntervalSince1970: deviceMotion.timestamp)
     }
+    init(){
+        acceleration = .zero
+        attitude = .identity
+        angulerVelocity = .zero
+        timestamp = Date()
+    }
 }
 
 final class SkateBoardRawData: ObservableObject{
-    init(_ deviceMotion: CMDeviceMotion) {
+    init(_ deviceMotion: CMDeviceMotion,_ date: Date) {
         self.acceleration = Vector3DFloat(x: Float(deviceMotion.userAcceleration.x),y: Float(deviceMotion.userAcceleration.y), z: Float(deviceMotion.userAcceleration.z))
         self.attitude = Rotation3DFloat(quaternion: simd_quatf( deviceMotion.attitude.quaternion.simdQuat))
         self.angulerVelocity = Vector3DFloat(x: Float(deviceMotion.rotationRate.x), y: Float(deviceMotion.rotationRate.y), z: Float(deviceMotion.rotationRate.z))
@@ -294,7 +307,7 @@ struct SkateBoardAnalysedData: Encodable {
     var headRelativeAttitudeAgainstFallLine: Rotation3DFloat{
         headAttitude.rotated(by: fallLineDirection.inverse)
     }
-
+    
     
     var headRelativeAcceleration: Vector3DFloat{
         Vector3DFloat(x: Vector3DFloat(x: 1, y: 0, z: 0).rotated(by: headAttitude.inverse).dot(headAcceleration), y: Vector3DFloat(x: 0, y: 1, z: 0).rotated(by: headAttitude.inverse).dot(headAcceleration), z: Vector3DFloat(x: 0, y: 0, z: 1).rotated(by: headAttitude.inverse).dot(headAcceleration))
@@ -432,26 +445,26 @@ struct SkateBoardAnalysedData: Encodable {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(fallLineAcceleration, forKey: .fallLineAcceleration)
         // Encode location as a nested object
-        var locContainer = container.nestedContainer(keyedBy: LocationKeys.self, forKey: .location)
-        try locContainer.encode(location.coordinate.latitude, forKey: .latitude)
-        try locContainer.encode(location.coordinate.longitude, forKey: .longitude)
-        try locContainer.encode(location.altitude, forKey: .altitude)
+//        var locContainer = container.nestedContainer(keyedBy: LocationKeys.self, forKey: .location)
+//        try locContainer.encode(location.coordinate.latitude, forKey: .latitude)
+//        try locContainer.encode(location.coordinate.longitude, forKey: .longitude)
+//        try locContainer.encode(location.altitude, forKey: .altitude)
         // Encode timestamp as ISO8601 string
         let isoFormatter = ISO8601DateFormatter()
         isoFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
         try container.encode(isoFormatter.string(from: timestamp), forKey: .timestamp)
-        try container.encode(othogonalAcceleration, forKey: .othogonalAcceleration)
+//        try container.encode(othogonalAcceleration, forKey: .othogonalAcceleration)
         try container.encode(acceleration, forKey: .acceleration)
-        try container.encode(attitude, forKey: .attitude)
-        try container.encode(attitude.angle.degrees, forKey: .attitudeAngle)
+//        try container.encode(attitude, forKey: .attitude)
+//        try container.encode(attitude.angle.degrees, forKey: .attitudeAngle)
         try container.encode(Angle2DFloat(radians: attitude.eulerAngles(order: .xyz).angles.x).degrees, forKey: .pitchingAngle)
         try container.encode(Angle2DFloat(radians: attitude.eulerAngles(order: .xyz).angles.y).degrees, forKey: .rollingAngle)
         try container.encode(Angle2DFloat(radians: attitude.eulerAngles(order: .xyz).angles.z).degrees, forKey: .yawingAngle)
-        try container.encode(angulerVelocity, forKey: .angulerVelocity)
+//        try container.encode(angulerVelocity, forKey: .angulerVelocity)
         try container.encode(isTurnSwitching, forKey: .isTurnSwitching)
         try container.encode(percentageOfTurnsByAngle, forKey: .percentageOfTurnsByAngle)
         try container.encode(headAcceleration, forKey: .headAcceleration)
-        try container.encode(headAngulerVelocity, forKey: .headAngulerVelocity)
+//        try container.encode(headAngulerVelocity, forKey: .headAngulerVelocity)
         try container.encode(Angle2DFloat(radians: headAttitude.eulerAngles(order: .xyz).angles.x).degrees, forKey: .headpitchingAngle)
         try container.encode(Angle2DFloat(radians: headAttitude.eulerAngles(order: .xyz).angles.y).degrees, forKey: .headrollingAngle)
         try container.encode(Angle2DFloat(radians: headAttitude.eulerAngles(order: .xyz).angles.z).degrees, forKey: .headyawingAngle)

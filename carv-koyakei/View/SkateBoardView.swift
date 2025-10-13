@@ -32,6 +32,10 @@ struct SkateBoardView: View {
             Text("number of turn \(skateboard.numberOfTurn.description)")
             Text("heas \(skateboard.analysedData.headFallineAcceleration.description)")
             
+            Rectangle()
+                            .fill(Color.blue)
+                            .frame(width: CGFloat((skateboard.rawData.timestamp.timeIntervalSince1970 - skateboard.headMotion.timestamp.timeIntervalSince1970) * 1000 + 100), height: 20)
+                            .animation(.default, value: CGFloat((skateboard.rawData.timestamp.timeIntervalSince1970 - skateboard.headMotion.timestamp.timeIntervalSince1970) * 1000 + 100))
 //            HStack{
 //                Text("↑").rotationEffect(Angle(radians: Double(skateboard.analysedData.headRelativeAttitudeAgainstBoard.eulerAngles(order: .xyz).angles.x)))
 //                Text("↑").rotationEffect(Angle(radians: Double(skateboard.analysedData.headRelativeAttitudeAgainstBoard.eulerAngles(order: .xyz).angles.y)))
@@ -94,16 +98,16 @@ struct SkateBoardView: View {
                             .animation(.default, value: CGFloat(skateboard.analysedData.headRelativeFallLineAcceleration.uniformlyScaled(by: 100).z + 100))
             Rectangle()
                             .fill(Color.blue)
-                            .frame(width: CGFloat(skateboard.headMotion?.acceleration.uniformlyScaled(by: 100).x ?? 0), height: 20)
-                            .animation(.default, value: CGFloat(skateboard.headMotion?.acceleration.uniformlyScaled(by: 100).x ?? 0))
+                            .frame(width: CGFloat(skateboard.headMotion.acceleration.uniformlyScaled(by: 100).x ?? 0), height: 20)
+                            .animation(.default, value: CGFloat(skateboard.headMotion.acceleration.uniformlyScaled(by: 100).x ?? 0))
             Rectangle()
                             .fill(Color.blue)
-                            .frame(width: CGFloat(skateboard.headMotion?.acceleration.uniformlyScaled(by: 100).y ?? 0), height: 20)
-                            .animation(.default, value: CGFloat(skateboard.headMotion?.acceleration.uniformlyScaled(by: 100).y ?? 0))
+                            .frame(width: CGFloat(skateboard.headMotion.acceleration.uniformlyScaled(by: 100).y ?? 0), height: 20)
+                            .animation(.default, value: CGFloat(skateboard.headMotion.acceleration.uniformlyScaled(by: 100).y ?? 0))
             Rectangle()
                             .fill(Color.blue)
-                            .frame(width: CGFloat(skateboard.headMotion?.acceleration.uniformlyScaled(by: 100).z ?? 0), height: 20)
-                            .animation(.default, value: CGFloat(skateboard.headMotion?.acceleration.uniformlyScaled(by: 100).z ?? 0))
+                            .frame(width: CGFloat(skateboard.headMotion.acceleration.uniformlyScaled(by: 100).z ?? 0), height: 20)
+                            .animation(.default, value: CGFloat(skateboard.headMotion.acceleration.uniformlyScaled(by: 100).z ?? 0))
             
             VStack{
                 Button("clear"){
