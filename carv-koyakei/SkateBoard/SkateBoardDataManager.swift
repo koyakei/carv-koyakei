@@ -23,6 +23,7 @@ extension Array where Element == Float {
         return lhs.map{$0 / rhs}
     }
 }
+
 @MainActor
 final class SkateBoardDataManager: ObservableObject{
     
@@ -64,11 +65,27 @@ final class SkateBoardDataManager: ObservableObject{
             self.headBoardDiffrencial = headMotion.attitude.rotated(by:rawData.attitude.inverse)
     }
     
+    
     var headStartRecordingDate: Date = Date.now
     var boardStartRecordingDate: Date = Date.now
     func startHeadAndBoardMotionRecording(){
+        self.headStartRecordingDate = Date.now
+        // head のほうが常に古い値がheadmotion から発行される　どこにボトルネックがあるのか＿
+        coreMotionManager.startDeviceMotionUpdates(using: .xTrueNorthZVertical, to: .main) { [weak self] data, _ in
+            guard let self = self else { return }
+            guard let value = data else { return }
+            self.rawData = SkateBoardRawData(value, Date(timeIntervalSince1970: self.boardStartRecordingDate.timeIntervalSince1970 + value.timestamp))
+        }
+        headMotionManager.startDeviceMotionUpdates(to: .main) { [weak self] data, _ in
+            guard let self = self else { return }
+            if let data = data {
+                self.headMotion = HeadMotionRawData(data, Date(timeIntervalSince1970: self.headStartRecordingDate.timeIntervalSince1970 + data.timestamp))
+            }
+        }
         $rawData.compactMap{$0}.combineLatest($headMotion.compactMap{$0}).sink { (rawData, headMotion) in
-            let skatebordData = SkateBoardAnalysedData(rawData, with: CLLocation(), isTurnSwitching: self.isTurnSwithching(turnPhase: rawData,rotationAngle: rawData.angulerVelocity), fallLineDirection: self.finishedTurnDataArray.lastTurn.fallLineDirection, diffrencialAnleFromStartoEnd: self.lastFinishedTrunData.diffrencialAngleFromStartToEnd.radians, lastTurnFinishedTurnPhaseAttitude: self.lastFinishedTrunData.lastPhaseOfTune.attitude,headAttitude: headMotion.attitude * self.headBoardDiffrencial.inverse,headAngulerVelocity: headMotion.angulerVelocity, headAcceleration: headMotion.acceleration)
+            let skatebordData = SkateBoardAnalysedData(rawData, with: CLLocation(), isTurnSwitching: self.isTurnSwithching(turnPhase: rawData,rotationAngle: rawData.angulerVelocity), fallLineDirection: self.finishedTurnDataArray.lastTurn.fallLineDirection, diffrencialAnleFromStartoEnd: self.lastFinishedTrunData.diffrencialAngleFromStartToEnd.radians, lastTurnFinishedTurnPhaseAttitude: self.lastFinishedTrunData.lastPhaseOfTune.attitude,
+                                                       headAttitude: headMotion.attitude * self.headBoardDiffrencial.inverse, // truenorth zvertical な値を出してほしい
+                                                       headAngulerVelocity: headMotion.angulerVelocity, headAcceleration: headMotion.acceleration)
             self.analysedData = skatebordData
             self.latestNotCompletedTurn.append(skatebordData)
             if skatebordData.isTurnSwitching {
@@ -78,23 +95,7 @@ final class SkateBoardDataManager: ObservableObject{
             }
         }
         .store(in: &cancellables)
-        // head のほうが常に古い値がheadmotion から発行される　どこにボトルネックがあるのか＿
         self.boardStartRecordingDate = Date.now
-        coreMotionManager.startDeviceMotionUpdates(using: .xTrueNorthZVertical, to: .main) { [weak self] data, _ in
-            guard let self = self else { return }
-            
-            guard let value = data else { return }
-            self.rawData = SkateBoardRawData(value, Date(timeIntervalSince1970: self.boardStartRecordingDate.timeIntervalSince1970 + value.timestamp))
-        }
-        
-        self.headStartRecordingDate = Date.now
-        headMotionManager.startDeviceMotionUpdates(to: .main) { [weak self] data, _ in
-            guard let self = self else { return }
-            if let data = data {
-                self.headMotion = HeadMotionRawData(data, Date(timeIntervalSince1970: self.headStartRecordingDate.timeIntervalSince1970 + data.timestamp))
-            }
-        }
-        
         
     }
     
@@ -247,7 +248,7 @@ final class HeadMotionRawData: ObservableObject{
         self.acceleration = Vector3DFloat(x: Float(deviceMotion.userAcceleration.x),y: Float(deviceMotion.userAcceleration.y), z: Float(deviceMotion.userAcceleration.z))
         self.attitude = Rotation3DFloat(quaternion: simd_quatf( deviceMotion.attitude.quaternion.simdQuat))
         self.angulerVelocity = Vector3DFloat(x: Float(deviceMotion.rotationRate.x), y: Float(deviceMotion.rotationRate.y), z: Float(deviceMotion.rotationRate.z))
-        self.timestamp = Date(timeIntervalSince1970: deviceMotion.timestamp)
+        self.timestamp = date
     }
     init(){
         acceleration = .zero
@@ -262,7 +263,7 @@ final class SkateBoardRawData: ObservableObject{
         self.acceleration = Vector3DFloat(x: Float(deviceMotion.userAcceleration.x),y: Float(deviceMotion.userAcceleration.y), z: Float(deviceMotion.userAcceleration.z))
         self.attitude = Rotation3DFloat(quaternion: simd_quatf( deviceMotion.attitude.quaternion.simdQuat))
         self.angulerVelocity = Vector3DFloat(x: Float(deviceMotion.rotationRate.x), y: Float(deviceMotion.rotationRate.y), z: Float(deviceMotion.rotationRate.z))
-        self.timestamp = Date(timeIntervalSince1970: deviceMotion.timestamp)
+        self.timestamp = date
     }
     init(){
         attitude = .identity
@@ -301,7 +302,7 @@ struct SkateBoardAnalysedData: Encodable {
     }
     
     var headRelativeAttitudeAgainstBoard: Rotation3DFloat{
-        headAttitude.rotated(by: attitude.inverse) //  attitude で回すのもやったけど　.inverse が固定できる。
+        headAttitude.inverse.rotated(by: attitude) //  attitude で回すのもやったけど　.inverse が固定できる。
     }
     
     var headRelativeAttitudeAgainstFallLine: Rotation3DFloat{
