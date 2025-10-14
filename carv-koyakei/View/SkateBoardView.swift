@@ -12,6 +12,15 @@ import Foundation
 import CoreLocation
 import Charts
 
+struct RotationAngleView: View {
+    var attitude: Rotation3DFloat
+    var body: some View {
+            Text("↑").rotationEffect(Angle(radians: Double(attitude.eulerAngles(order: .xyz).angles.x)))
+            Text("↑").rotationEffect(Angle(radians: Double(attitude.eulerAngles(order: .xyz).angles.y)))
+            Text("↑").rotationEffect(Angle(radians: Double(-attitude.eulerAngles(order: .xyz).angles.z)))
+    }
+}
+
 struct SkateBoardView: View {
     @StateObject var skateboard: SkateBoardDataManager
     @AppStorage("ssid") var ssid: String = ""
@@ -38,25 +47,38 @@ struct SkateBoardView: View {
             // ヘッドフォンがどっち向いているか計算したい
             // 絶対姿勢から相対姿勢を計算する　そこから
             HStack{
-                Text("↑").rotationEffect(Angle(radians: Double(skateboard.analysedData.headRelativeAttitudeAgainstBoard.eulerAngles(order: .xyz).angles.x)))
-                Text("↑").rotationEffect(Angle(radians: Double(skateboard.analysedData.headRelativeAttitudeAgainstBoard.eulerAngles(order: .xyz).angles.y)))
-                Text("↑").rotationEffect(Angle(radians: Double(skateboard.analysedData.headRelativeAttitudeAgainstBoard.eulerAngles(order: .xyz).angles.z)))
+                Text("headRelativeAttitudeAgainstBoard")
+                RotationAngleView(attitude: skateboard.analysedData.headRelativeAttitudeAgainstBoard)
             }
             HStack{
-                Text("↑").rotationEffect(Angle(radians: Double(skateboard.headBoardDiffrencial.eulerAngles(order: .xyz).angles.x)))
-                Text("↑").rotationEffect(Angle(radians: Double(skateboard.headBoardDiffrencial.eulerAngles(order: .xyz).angles.y)))
-                Text("↑").rotationEffect(Angle(radians: Double(skateboard.headBoardDiffrencial.eulerAngles(order: .xyz).angles.z)))
+                Text("headBoardDiffrencial")
+                RotationAngleView(attitude: skateboard.headBoardDiffrencial)
             }
             HStack{
-                Text("↑").rotationEffect(Angle(radians: Double(skateboard.analysedData.headAttitude.eulerAngles(order: .xyz).angles.x)))
-                Text("↑").rotationEffect(Angle(radians: Double(skateboard.analysedData.headAttitude.eulerAngles(order: .xyz).angles.y)))
-                Text("↑").rotationEffect(Angle(radians: Double(skateboard.analysedData.headAttitude.eulerAngles(order: .xyz).angles.z)))
+                Text("headBoardDiffrencialCalubratedAttitudeTrueNorthZVertical")
+                RotationAngleView(attitude: skateboard.headBoardDiffrencialCalubratedAttitudeTrueNorthZVertical)
+            }
+            HStack{
+                Text("headAttitude")
+                RotationAngleView(attitude: skateboard.analysedData.headAttitude)
             }
             
             HStack{
-                Text("↑").rotationEffect(Angle(radians: Double(skateboard.analysedData.headRelativeAttitudeAgainstFallLine.eulerAngles(order: .xyz).angles.x)))
-                Text("↑").rotationEffect(Angle(radians: Double(skateboard.analysedData.headRelativeAttitudeAgainstFallLine.eulerAngles(order: .xyz).angles.y)))
-                Text("↑").rotationEffect(Angle(radians: Double(skateboard.analysedData.headRelativeAttitudeAgainstFallLine.eulerAngles(order: .xyz).angles.z)))
+                Text("headRelativeAttitudeAgainstFallLine")
+                RotationAngleView(attitude: skateboard.analysedData.headRelativeAttitudeAgainstFallLine)
+            }
+            HStack{
+                Text("headAttitudeZverticalTrueNorth")
+                RotationAngleView(attitude: skateboard.analysedData.headAttitudeZverticalTrueNorth)
+            }
+            
+            HStack{
+                Text("boardAttitudeZverticalTrueNorth")
+                RotationAngleView(attitude: skateboard.analysedData.attitude)
+            }
+            HStack{
+                Text("fallLineDirection")
+                RotationAngleView(attitude: skateboard.analysedData.fallLineDirection)
             }
   
 //            Rectangle()
