@@ -11,6 +11,7 @@ import Spatial
 import Combine
 import Foundation
 import CoreLocation
+import WatchConnectivity
 
 extension Array where Element == Float {
     // ２つのFloat配列足し算
@@ -25,7 +26,7 @@ extension Array where Element == Float {
 }
 
 @MainActor
-final class SkateBoardDataManager: ObservableObject{
+final class SkateBoardDataManager:NSObject, ObservableObject, WCSessionDelegate {
     
     @Published var rawData: SkateBoardRawData = .init()
     @Published var analysedData: SkateBoardAnalysedData
@@ -43,6 +44,25 @@ final class SkateBoardDataManager: ObservableObject{
     init( analysedData: SkateBoardAnalysedData, droggerBluetooth: DroggerBluetoothModel) {
         self.droggerBluetooth = droggerBluetooth
         self.analysedData = analysedData
+        super.init()
+        if WCSession.isSupported() {
+            let session = WCSession.default
+            session.delegate = self
+            session.activate()
+        }
+        $finishedTurnDataArray
+            .sink { [weak self] turns in
+                self?.sendFinishedTurnCountToWatch()
+            }
+            .store(in: &cancellables)
+    }
+    
+    private func sendFinishedTurnCountToWatch() {
+        guard WCSession.isSupported(), WCSession.default.isPaired, WCSession.default.isWatchAppInstalled else { return }
+        let message = ["finishedTurnCount": self.finishedTurnDataArray.count]
+        WCSession.default.sendMessage(message, replyHandler: nil, errorHandler: { error in
+            print("Failed to send turn count to watch: \(error)")
+        })
     }
     
     var lastFinishedTrunData: SingleFinishedTurnData {
@@ -232,6 +252,19 @@ final class SkateBoardDataManager: ObservableObject{
     struct TurnPhase : Encodable{
         let numberOfTurn: Int
         let turnPhase: SkateBoardAnalysedData
+    }
+    
+    // MARK: - WCSessionDelegate 
+    func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {}
+    func sessionDidBecomeInactive(_ session: WCSession) {}
+    func sessionDidDeactivate(_ session: WCSession) {}
+    
+    func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
+        if message["command"] as? String == "export" {
+            DispatchQueue.main.async {
+                self.export()
+            }
+        }
     }
 }
 

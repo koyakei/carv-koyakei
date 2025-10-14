@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import WatchConnectivity
 
 @main
 struct carv_koyakei_watch_Watch_AppApp: App {
@@ -16,4 +17,23 @@ struct carv_koyakei_watch_Watch_AppApp: App {
             ContentView()
         }
     }
+}
+
+
+class WatchSessionManager: NSObject, WCSessionDelegate {
+    
+    override init() {
+        super.init()
+        if WCSession.isSupported() {
+            let session = WCSession.default
+            session.delegate = self
+            session.activate()
+        }
+    }
+
+    // 必須デリゲートの空実装
+    func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {}
+    func sessionReachabilityDidChange(_ session: WCSession) {}
+
+    // エラーや応答が必要な場合はここに追記
 }
