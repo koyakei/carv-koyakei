@@ -337,28 +337,45 @@ struct SkateBoardAnalysedData: Encodable {
     }
     
     var headRelativeAttitudeAgainstBoard: Rotation3DFloat{
-        headAttitude.rotated(by: headBoardDiffrencial).rotated(by: attitude.inverse)//  attitude で回すのもやったけど　.inverse が固定できる。
+        headAttitudeCalibrated.rotated(by: attitude.inverse)//  attitude で回すのもやったけど　.inverse が固定できる。
+    }
+    
+    var headAttitudeCalibrated : Rotation3DFloat{
+        headAttitude.rotated(by: headBoardDiffrencial)
+    }
+    
+    var headAttitudeZverticalTrueNorth: Rotation3DFloat{
+        headRelativeAttitudeAgainstBoard * attitude
     }
     
     var headRelativeAttitudeAgainstFallLine: Rotation3DFloat{
         headAttitudeZverticalTrueNorth.rotated(by: fallLineDirection.inverse)
     }
     
-    var headRelativeAcceleration: Vector3DFloat{
-        Vector3DFloat(x: Vector3DFloat(x: 1, y: 0, z: 0).rotated(by: headAttitude.inverse).dot(headAcceleration), y: Vector3DFloat(x: 0, y: 1, z: 0).rotated(by: headAttitude.inverse).dot(headAcceleration), z: Vector3DFloat(x: 0, y: 0, z: 1).rotated(by: headAttitude.inverse).dot(headAcceleration))
+    var headRelativeAccelerationBoardAhead: Vector3DFloat{
+        Vector3DFloat(x: Vector3DFloat(x: 1, y: 0, z: 0).rotated(by: headRelativeAttitudeAgainstBoard.inverse).dot(headAcceleration), y: Vector3DFloat(x: 0, y: 1, z: 0).rotated(by: headRelativeAttitudeAgainstBoard.inverse).dot(headAcceleration), z: Vector3DFloat(x: 0, y: 0, z: 1).rotated(by: headRelativeAttitudeAgainstBoard.inverse).dot(headAcceleration))
     }
     
-    var headRelativeFallLineAcceleration: Vector3DFloat{
-        Vector3DFloat(x: Vector3DFloat(x: 1, y: 0, z: 0).rotated(by: relativeFallLineDirection).dot(headRelativeAcceleration), y: Vector3DFloat(x: 0, y: 1, z: 0).rotated(by: relativeFallLineDirection).dot(headRelativeAcceleration), z: Vector3DFloat(x: 0, y: 0, z: 1).rotated(by: relativeFallLineDirection).dot(headRelativeAcceleration))
+    var headRelativeAccelerationBoardAhead2: Vector3DFloat{
+        headAcceleration.projected(Vector3DFloat(x: 1, y: 1, z: 1).rotated(by: headRelativeAttitudeAgainstBoard.inverse))
+    }
+    
+    var headRelativeAccelerationBoardAhead3: Vector3DFloat{
+        headAcceleration.projected(Vector3DFloat(x: 1, y: 0, z: 0).rotated(by: headRelativeAttitudeAgainstBoard.inverse))
+    }
+    
+    var headRelativeAccelerationFallLineAhead: Vector3DFloat{
+//        headAcceleration.projected(Vector3DFloat(x: 0, y: 1, z: 0).rotated(by: headAttitudeCalibrated.inverse))
+        Vector3DFloat(x: headAcceleration.rotated(by: headRelativeAttitudeAgainstBoard.inverse).dot(Vector3DFloat(x: 1, y: 0, z: 0)), y: headAcceleration.rotated(by: headRelativeAttitudeAgainstBoard.inverse).dot(Vector3DFloat(x: 0, y: 1, z: 0)), z: headAcceleration.rotated(by: headRelativeAttitudeAgainstBoard.inverse).dot(Vector3DFloat(x: 0, y: 0, z: 1)))
     }
     
     var headRelativeFallLineAccelerationAgainstBoard: Vector3DFloat{
-        headRelativeFallLineAcceleration - fallLineAcceleration
+        headRelativeAccelerationFallLineAhead - fallLineAcceleration
     }
     
     
     var headRelativeAccelerationAgainstBoard: Vector3DFloat{
-        headRelativeAcceleration - acceleration
+        headRelativeAccelerationBoardAhead - acceleration
     }
     
     var headFallineAcceleration: Float{
@@ -407,12 +424,6 @@ struct SkateBoardAnalysedData: Encodable {
         }()
         self.percentageOfTurnsByAngle = abs((rawData.attitude * lastTurnFinishedTurnPhaseAttitude.inverse).angle.radians) / abs(diffrencialAnleFromStartoEnd)
         self.headBoardDiffrencial = headBodyDiffrencial
-    }
-    var headAttitudeCalibrated : Rotation3DFloat{
-        headAttitude.inverse * headBoardDiffrencial
-    }
-    var headAttitudeZverticalTrueNorth: Rotation3DFloat{
-        headRelativeAttitudeAgainstBoard * attitude
     }
     
     let headBoardDiffrencial : Rotation3DFloat
@@ -512,8 +523,8 @@ struct SkateBoardAnalysedData: Encodable {
         try container.encode(Angle2DFloat(radians: headAttitude.eulerAngles(order: .xyz).angles.x).degrees, forKey: .headpitchingAngle)
         try container.encode(Angle2DFloat(radians: headAttitude.eulerAngles(order: .xyz).angles.y).degrees, forKey: .headrollingAngle)
         try container.encode(Angle2DFloat(radians: headAttitude.eulerAngles(order: .xyz).angles.z).degrees, forKey: .headyawingAngle)
-        try container.encode(headRelativeAcceleration, forKey: .headRelativeAcceleration)
-        try container.encode(headRelativeFallLineAcceleration, forKey: .headRelativeFallLineAcceleration)
+        try container.encode(headRelativeAccelerationBoardAhead, forKey: .headRelativeAcceleration)
+        try container.encode(headRelativeAccelerationFallLineAhead, forKey: .headRelativeFallLineAcceleration)
         try container.encode(headRelativeFallLineAccelerationAgainstBoard, forKey: .headRelativeFallLineAccelerationAgainstBoard)
         try container.encode(headRelativeAccelerationAgainstBoard, forKey: .headRelativeAccelerationAgainstBoard)
         try container.encode(headFallineAcceleration, forKey: .headFallineAcceleration)

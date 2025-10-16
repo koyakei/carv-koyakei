@@ -21,13 +21,31 @@ struct RotationAngleView: View {
     }
 }
 
+struct AccelerationView: View {
+    var acceleration: Vector3DFloat
+    var body: some View{
+        Rectangle()
+                        .fill(Color.blue)
+                        .frame(width: CGFloat(acceleration.uniformlyScaled(by: 100).x + 100), height: 20)
+                        .animation(.default, value: CGFloat(acceleration.uniformlyScaled(by: 100).x + 100))
+        Rectangle()
+                        .fill(Color.yellow)
+                        .frame(width: CGFloat(acceleration.uniformlyScaled(by: 100).y + 100), height: 20)
+                        .animation(.default, value: CGFloat(acceleration.uniformlyScaled(by: 100).y + 100))
+        Rectangle()
+                        .fill(Color.red)
+                        .frame(width: CGFloat(acceleration.uniformlyScaled(by: 100).z + 100), height: 20)
+                        .animation(.default, value: CGFloat(acceleration.uniformlyScaled(by: 100).z + 100))
+    }
+}
+
 struct SkateBoardView: View {
     @StateObject var skateboard: SkateBoardDataManager
     @AppStorage("ssid") var ssid: String = ""
     @AppStorage("password") var password: String = ""
 //    @StateObject var droggerBluetooth: DroggerBluetoothModel // Owns its own DroggerBluetoothModel instance.
     var body: some View {
-        VStack{
+        ScrollView{
 //            HStack () {
 //                Label("Device", systemImage: "info.circle")
 //                    .labelStyle(.automatic)
@@ -39,99 +57,59 @@ struct SkateBoardView: View {
 //                .font(.system(size: 10, design: .monospaced))
 //                .textSelection(.enabled)
             Text("number of turn \(skateboard.numberOfTurn.description)")
-            Text("heas \(skateboard.analysedData.headFallineAcceleration.description)")
-            Rectangle()
-                .fill(Color.blue)
-                .frame(width: CGFloat((skateboard.rawData.timestamp.timeIntervalSince1970 - skateboard.headMotion.timestamp.timeIntervalSince1970) * 1000 + 100), height: 20)
-                .animation(.default, value: CGFloat((skateboard.rawData.timestamp.timeIntervalSince1970 - skateboard.headMotion.timestamp.timeIntervalSince1970) * 1000 + 100))
-            // ヘッドフォンがどっち向いているか計算したい
-            // 絶対姿勢から相対姿勢を計算する　そこから
+//            Rectangle()
+//                .fill(Color.blue)
+//                .frame(width: CGFloat((skateboard.rawData.timestamp.timeIntervalSince1970 - skateboard.headMotion.timestamp.timeIntervalSince1970) * 1000 + 100), height: 20)
+//                .animation(.default, value: CGFloat((skateboard.rawData.timestamp.timeIntervalSince1970 - skateboard.headMotion.timestamp.timeIntervalSince1970) * 1000 + 100))
+//            // ヘッドフォンがどっち向いているか計算したい
+//            // 絶対姿勢から相対姿勢を計算する　そこから
             HStack{
                 Text("headRelativeAttitudeAgainstBoard")
                 RotationAngleView(attitude: skateboard.analysedData.headRelativeAttitudeAgainstBoard)
             }
-            HStack{
-                Text("headBoardDiffrencial")
-                RotationAngleView(attitude: skateboard.headBoardDiffrencial)
-            }
-            HStack{
-                Text("headBoardDiffrencialCalubratedAttitudeTrueNorthZVertical")
-                RotationAngleView(attitude: skateboard.headBoardDiffrencialCalubratedAttitudeTrueNorthZVertical)
-            }
-            HStack{
-                Text("headAttitude")
-                RotationAngleView(attitude: skateboard.analysedData.headAttitude)
-            }
+//            HStack{
+//                Text("headBoardDiffrencial")
+//                RotationAngleView(attitude: skateboard.headBoardDiffrencial)
+//            }
+//            HStack{
+//                Text("headBoardDiffrencialCalubratedAttitudeTrueNorthZVertical")
+//                RotationAngleView(attitude: skateboard.headBoardDiffrencialCalubratedAttitudeTrueNorthZVertical)
+//            }
+//            HStack{
+//                Text("headAttitude")
+//                RotationAngleView(attitude: skateboard.analysedData.headAttitude)
+//            }
+//            
+//            HStack{
+//                Text("headRelativeAttitudeAgainstFallLine")
+//                RotationAngleView(attitude: skateboard.analysedData.headRelativeAttitudeAgainstFallLine)
+//            }
+//            HStack{
+//                Text("headAttitudeZverticalTrueNorth")
+//                RotationAngleView(attitude: skateboard.analysedData.headAttitudeZverticalTrueNorth)
+//            }
+//            
+//            HStack{
+//                Text("boardAttitudeZverticalTrueNorth")
+//                RotationAngleView(attitude: skateboard.analysedData.attitude)
+//            }
+//            HStack{
+//                Text("fallLineDirection")
+//                RotationAngleView(attitude: skateboard.analysedData.fallLineDirection)
+//            }
             
-            HStack{
-                Text("headRelativeAttitudeAgainstFallLine")
-                RotationAngleView(attitude: skateboard.analysedData.headRelativeAttitudeAgainstFallLine)
-            }
-            HStack{
-                Text("headAttitudeZverticalTrueNorth")
-                RotationAngleView(attitude: skateboard.analysedData.headAttitudeZverticalTrueNorth)
-            }
+            Text("headRelativeAccelerationAgainstBoard2")
+            AccelerationView(acceleration: skateboard.analysedData.headRelativeAccelerationBoardAhead2)
+            Text("headRelativeAccelerationAgainstBoard3")
+            AccelerationView(acceleration: skateboard.analysedData.headRelativeAccelerationBoardAhead3)
+            Text("headRelativeAccelerationBoardAhead")
+            AccelerationView(acceleration: skateboard.analysedData.headRelativeAccelerationBoardAhead)
+            Text("headRelativeAccelerationFallLineAhead")
+            AccelerationView(acceleration: skateboard.analysedData.headRelativeAccelerationFallLineAhead)
             
-            HStack{
-                Text("boardAttitudeZverticalTrueNorth")
-                RotationAngleView(attitude: skateboard.analysedData.attitude)
-            }
-            HStack{
-                Text("fallLineDirection")
-                RotationAngleView(attitude: skateboard.analysedData.fallLineDirection)
-            }
-  
-//            Rectangle()
-//                            .fill(Color.blue)
-//                            .frame(width: CGFloat(skateboard.analysedData.headRelativeAccelerationAgainstBoard.uniformlyScaled(by: 100).x + 100), height: 20)
-//                            .animation(.default, value: CGFloat(skateboard.analysedData.headRelativeAccelerationAgainstBoard.uniformlyScaled(by: 100).x + 100))
-//            Rectangle()
-//                            .fill(Color.yellow)
-//                            .frame(width: CGFloat(skateboard.analysedData.headRelativeAccelerationAgainstBoard.uniformlyScaled(by: 100).y + 100), height: 20)
-//                            .animation(.default, value: CGFloat(skateboard.analysedData.headRelativeAccelerationAgainstBoard.uniformlyScaled(by: 100).y + 100))
-//            Rectangle()
-//                            .fill(Color.red)
-//                            .frame(width: CGFloat(skateboard.analysedData.headRelativeAccelerationAgainstBoard.uniformlyScaled(by: 100).z + 100), height: 20)
-//                            .animation(.default, value: CGFloat(skateboard.analysedData.headRelativeAccelerationAgainstBoard.uniformlyScaled(by: 100).z + 100))
-//            
-//            Rectangle()
-//                            .fill(Color.blue)
-//                            .frame(width: CGFloat(skateboard.analysedData.headRelativeAcceleration.uniformlyScaled(by: 100).x + 100), height: 20)
-//                            .animation(.default, value: CGFloat(skateboard.analysedData.headRelativeAcceleration.uniformlyScaled(by: 100).x + 100))
-//            Rectangle()
-//                            .fill(Color.yellow)
-//                            .frame(width: CGFloat(skateboard.analysedData.headRelativeAcceleration.uniformlyScaled(by: 100).y + 100), height: 20)
-//                            .animation(.default, value: CGFloat(skateboard.analysedData.headRelativeAcceleration.uniformlyScaled(by: 100).y + 100))
-//            Rectangle()
-//                            .fill(Color.red)
-//                            .frame(width: CGFloat(skateboard.analysedData.headRelativeAcceleration.uniformlyScaled(by: 100).z + 100), height: 20)
-//                            .animation(.default, value: CGFloat(skateboard.analysedData.headRelativeAcceleration.uniformlyScaled(by: 100).z + 100))
-//            
-//            Rectangle()
-//                            .fill(Color.blue)
-//                            .frame(width: CGFloat(skateboard.analysedData.headRelativeFallLineAcceleration.uniformlyScaled(by: 100).x + 100), height: 20)
-//                            .animation(.default, value: CGFloat(skateboard.analysedData.headRelativeFallLineAcceleration.uniformlyScaled(by: 100).x + 100))
-//            Rectangle()
-//                            .fill(Color.yellow)
-//                            .frame(width: CGFloat(skateboard.analysedData.headRelativeFallLineAcceleration.uniformlyScaled(by: 100).y + 100), height: 20)
-//                            .animation(.default, value: CGFloat(skateboard.analysedData.headRelativeFallLineAcceleration.uniformlyScaled(by: 100).y + 100))
-//            Rectangle()
-//                            .fill(Color.red)
-//                            .frame(width: CGFloat(skateboard.analysedData.headRelativeFallLineAcceleration.uniformlyScaled(by: 100).z + 100), height: 20)
-//                            .animation(.default, value: CGFloat(skateboard.analysedData.headRelativeFallLineAcceleration.uniformlyScaled(by: 100).z + 100))
-//            Rectangle()
-//                            .fill(Color.blue)
-//                            .frame(width: CGFloat(skateboard.headMotion.acceleration.uniformlyScaled(by: 100).x ?? 0), height: 20)
-//                            .animation(.default, value: CGFloat(skateboard.headMotion.acceleration.uniformlyScaled(by: 100).x ?? 0))
-//            Rectangle()
-//                            .fill(Color.blue)
-//                            .frame(width: CGFloat(skateboard.headMotion.acceleration.uniformlyScaled(by: 100).y ?? 0), height: 20)
-//                            .animation(.default, value: CGFloat(skateboard.headMotion.acceleration.uniformlyScaled(by: 100).y ?? 0))
-//            Rectangle()
-//                            .fill(Color.blue)
-//                            .frame(width: CGFloat(skateboard.headMotion.acceleration.uniformlyScaled(by: 100).z ?? 0), height: 20)
-//                            .animation(.default, value: CGFloat(skateboard.headMotion.acceleration.uniformlyScaled(by: 100).z ?? 0))
-//            
+            Text("headMotion.acceleration")
+            AccelerationView(acceleration: skateboard.analysedData.headAcceleration)
+            
             VStack{
                 Button("clear"){
                     skateboard.finishedTurnDataArray.removeAll()
