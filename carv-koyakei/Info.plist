@@ -16,6 +16,10 @@
 		<string>processing</string>
 		<string>push-to-talk</string>
 		<string>location</string>
+		<string>fetch</string>
+		<string>external-accessory</string>
+		<string>remote-notification</string>
+		<string>nearby-interaction</string>
 	</array>
 	<key>UIFileSharingEnabled</key>
 	<true/>

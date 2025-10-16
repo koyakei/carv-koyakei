@@ -7,17 +7,17 @@
 		<key>AudioKit (Playground).xcscheme</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>2</integer>
+			<integer>3</integer>
 		</dict>
 		<key>Controls (Playground).xcscheme</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>3</integer>
+			<integer>4</integer>
 		</dict>
 		<key>SoundpipeAudioKit (Playground).xcscheme</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>4</integer>
+			<integer>5</integer>
 		</dict>
 		<key>carv-koyakei- Watch App.xcscheme_^#shared#^_</key>
 		<dict>
@@ -27,12 +27,45 @@
 		<key>carv-koyakei-watch Watch App.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>1</integer>
+			<integer>6</integer>
 		</dict>
 		<key>carv-koyakei.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>0</integer>
+		</dict>
+		<key>carv-koyakeiWatchKitExtention.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>1</integer>
+		</dict>
+	</dict>
+	<key>SuppressBuildableAutocreation</key>
+	<dict>
+		<key>2226955F2E9B1F8E00528D42</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>22A43B772EA0C3E900B32630</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>22A73C722D4241AB00C1BF1C</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>22A73C832D4241AD00C1BF1C</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>22A73C8D2D4241AD00C1BF1C</key>
+		<dict>
+			<key>primary</key>
+			<true/>
 		</dict>
 	</dict>
 </dict>

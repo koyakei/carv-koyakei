@@ -13,6 +13,13 @@ struct ContentView: View {
     var droggerBlueTooth: DroggerBluetoothModel
     var body: some View {
         TabView {
+            SkateBoardView(skateboard: skateBoardDataManager
+//                           ,droggerBluetooth: droggerBlueTooth
+            )
+                .tabItem {
+                    Image(systemName: "skateboard.fill")
+                    Text("skateboard")
+                }
             HomeView(ble: ble, yawingBeep: yawingBeep,rollingBeep: rollingBeep,dataManager: dataManager)
                 .tabItem {
                     Image(systemName: "house.fill")
@@ -33,11 +40,7 @@ struct ContentView: View {
                     Text("pressure")
                 }
             
-            SkateBoardView(skateboard: skateBoardDataManager,droggerBluetooth: droggerBlueTooth)
-                .tabItem {
-                    Image(systemName: "skateboard.fill")
-                    Text("skateboard")
-                }
+            
 //            switch cameraViewModel.status {
 //                    case .configured:
 //                        YawingAnglerVelocityChartOverlay(cameraViewModel: cameraViewModel).tabItem {

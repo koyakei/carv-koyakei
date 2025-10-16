@@ -11,13 +11,7 @@ import WatchConnectivity
 struct ContentView: View {
     var wcManager = WatchSessionManager()
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
-        }
-        .padding()
+        
         Button("エクスポートする") {
             if WCSession.default.isReachable {
                 WCSession.default.sendMessage(
@@ -58,11 +52,11 @@ class TurnCountReceiver: NSObject, ObservableObject, WCSessionDelegate {
    
     
     @Published var finishedTurnCount: Int = 0
+    var session: WCSession = .default
     
     override init() {
         super.init()
         if WCSession.isSupported() {
-            let session = WCSession.default
             session.delegate = self
             session.activate()
         }
@@ -83,6 +77,7 @@ struct TurnCountView: View {
     @StateObject private var receiver = TurnCountReceiver()
     var body: some View {
         VStack {
+            Text(receiver.session.isReachable.description)
             Text("ターン数: \(receiver.finishedTurnCount)")
                 .font(.title)
                 .padding()

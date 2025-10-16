@@ -25,19 +25,19 @@ struct SkateBoardView: View {
     @StateObject var skateboard: SkateBoardDataManager
     @AppStorage("ssid") var ssid: String = ""
     @AppStorage("password") var password: String = ""
-    @StateObject var droggerBluetooth: DroggerBluetoothModel // Owns its own DroggerBluetoothModel instance.
+//    @StateObject var droggerBluetooth: DroggerBluetoothModel // Owns its own DroggerBluetoothModel instance.
     var body: some View {
         VStack{
-            HStack () {
-                Label("Device", systemImage: "info.circle")
-                    .labelStyle(.automatic)
-                    .padding(.bottom, 12)
-                Spacer() 
-                Text(droggerBluetooth.peripheralStatus.rawValue)
-            }
-            Text(droggerBluetooth.deviceDetail)
-                .font(.system(size: 10, design: .monospaced))
-                .textSelection(.enabled)
+//            HStack () {
+//                Label("Device", systemImage: "info.circle")
+//                    .labelStyle(.automatic)
+//                    .padding(.bottom, 12)
+//                Spacer() 
+//                Text(droggerBluetooth.peripheralStatus.rawValue)
+//            }
+//            Text(droggerBluetooth.deviceDetail)
+//                .font(.system(size: 10, design: .monospaced))
+//                .textSelection(.enabled)
             Text("number of turn \(skateboard.numberOfTurn.description)")
             Text("heas \(skateboard.analysedData.headFallineAcceleration.description)")
             Rectangle()
@@ -144,16 +144,16 @@ struct SkateBoardView: View {
                 TextField("password", text: $password)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                 Text( "head avalable \(skateboard.headMotionManager.isDeviceMotionActive.description)")
-                if let rtkDevice = droggerBluetooth.rtkDevice {
-                    Button("接続"){
-                        rtkDevice.setWifiSetting(ssid: ssid, password: password)
-                    }
-                    Button("start ntrip"){
-                        rtkDevice.startNtrip()
-                    }
-                    Text(rtkDevice.latestRes)
-                    Text("接続遅延秒数 \(String(describing: rtkDevice.age))")
-                }
+//                if let rtkDevice = droggerBluetooth.rtkDevice {
+//                    Button("接続"){
+//                        rtkDevice.setWifiSetting(ssid: ssid, password: password)
+//                    }
+//                    Button("start ntrip"){
+//                        rtkDevice.startNtrip()
+//                    }
+//                    Text(rtkDevice.latestRes)
+//                    Text("接続遅延秒数 \(String(describing: rtkDevice.age))")
+//                }
                 HStack{
                     Button("start motion"){
                         skateboard.startRecording()

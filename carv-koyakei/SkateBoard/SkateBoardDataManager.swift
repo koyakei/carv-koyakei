@@ -13,18 +13,6 @@ import Foundation
 import CoreLocation
 import WatchConnectivity
 
-extension Array where Element == Float {
-    // ２つのFloat配列足し算
-    static func + (lhs: [Float], rhs: [Float]) -> [Float] {
-        precondition(lhs.count == rhs.count, "配列の長さが一致しません")
-        return zip(lhs, rhs).map { $0 + $1 }
-    }
-    
-    static func / (lhs: [Float], rhs: Float) -> [Float] {
-        return lhs.map{$0 / rhs}
-    }
-}
-
 @MainActor
 final class SkateBoardDataManager:NSObject, ObservableObject, WCSessionDelegate {
     
@@ -40,13 +28,12 @@ final class SkateBoardDataManager:NSObject, ObservableObject, WCSessionDelegate 
     
     private var cancellables = Set<AnyCancellable>()
     @Published var numberOfTurn: Int = 0
-    
+    var session = WCSession.default
     init( analysedData: SkateBoardAnalysedData, droggerBluetooth: DroggerBluetoothModel) {
         self.droggerBluetooth = droggerBluetooth
         self.analysedData = analysedData
         super.init()
         if WCSession.isSupported() {
-            let session = WCSession.default
             session.delegate = self
             session.activate()
         }
