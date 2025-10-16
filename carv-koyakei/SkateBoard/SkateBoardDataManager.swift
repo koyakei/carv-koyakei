@@ -13,7 +13,7 @@ import Foundation
 import CoreLocation
 import WatchConnectivity
 
-@MainActor
+
 final class SkateBoardDataManager:NSObject, ObservableObject, WCSessionDelegate {
     
     @Published var rawData: SkateBoardRawData = .init()
@@ -28,14 +28,18 @@ final class SkateBoardDataManager:NSObject, ObservableObject, WCSessionDelegate 
     
     private var cancellables = Set<AnyCancellable>()
     @Published var numberOfTurn: Int = 0
-    var session = WCSession.default
-    init( analysedData: SkateBoardAnalysedData, droggerBluetooth: DroggerBluetoothModel) {
+    var session : WCSession
+    @MainActor
+    init( analysedData: SkateBoardAnalysedData, droggerBluetooth: DroggerBluetoothModel,session: WCSession = .default) {
         self.droggerBluetooth = droggerBluetooth
         self.analysedData = analysedData
+        self.session = session
         super.init()
         if WCSession.isSupported() {
-            session.delegate = self
-            session.activate()
+            self.session.delegate = self
+            Task { @MainActor in
+                self.session.activate()
+            }
         }
         $finishedTurnDataArray
             .sink { [weak self] turns in
@@ -248,9 +252,9 @@ final class SkateBoardDataManager:NSObject, ObservableObject, WCSessionDelegate 
     
     func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
         if message["command"] as? String == "export" {
-            DispatchQueue.main.async {
+            
                 self.export()
-            }
+            
         }
     }
 }
