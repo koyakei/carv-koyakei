@@ -252,9 +252,16 @@ final class SkateBoardDataManager:NSObject, ObservableObject, WCSessionDelegate 
     
     func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
         if message["command"] as? String == "export" {
-            
                 self.export()
-            
+        }
+        if message["command"] as? String == "stop" {
+                self.stopRecording()
+        }
+        if message["command"] as? String == "clear" {
+            self.finishedTurnDataArray.removeAll()
+        }
+        if message["command"] as? String == "startHeadAndBoard" {
+                self.startHeadAndBoardMotionRecording()
         }
     }
 }

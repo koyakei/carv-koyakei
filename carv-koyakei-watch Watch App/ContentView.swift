@@ -12,7 +12,7 @@ struct ContentView: View {
     var wcManager = WatchSessionManager()
     var body: some View {
         
-        Button("エクスポートする") {
+        Button("エクスポート") {
             if WCSession.default.isReachable {
                 WCSession.default.sendMessage(
                     ["command": "export"],
@@ -29,6 +29,32 @@ struct ContentView: View {
             if WCSession.default.isReachable {
                 WCSession.default.sendMessage(
                     ["command": "startHeadAndBoard"],
+                    replyHandler: nil,
+                    errorHandler: { error in
+                        print("送信失敗: \(error.localizedDescription)")
+                    }
+                )
+            } else {
+                print("iPhoneに接続されていません")
+            }
+        }
+        Button("clear") {
+            if WCSession.default.isReachable {
+                WCSession.default.sendMessage(
+                    ["command": "clear"],
+                    replyHandler: nil,
+                    errorHandler: { error in
+                        print("送信失敗: \(error.localizedDescription)")
+                    }
+                )
+            } else {
+                print("iPhoneに接続されていません")
+            }
+        }
+        Button("stop") {
+            if WCSession.default.isReachable {
+                WCSession.default.sendMessage(
+                    ["command": "stop"],
                     replyHandler: nil,
                     errorHandler: { error in
                         print("送信失敗: \(error.localizedDescription)")
