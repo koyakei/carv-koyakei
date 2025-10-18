@@ -353,20 +353,20 @@ struct SkateBoardAnalysedData: Encodable {
     }
     
     var headRelativeAccelerationBoardAhead: Vector3DFloat{
-        Vector3DFloat(x: Vector3DFloat(x: 1, y: 0, z: 0).rotated(by: headRelativeAttitudeAgainstBoard.inverse).dot(headAcceleration), y: Vector3DFloat(x: 0, y: 1, z: 0).rotated(by: headRelativeAttitudeAgainstBoard.inverse).dot(headAcceleration), z: Vector3DFloat(x: 0, y: 0, z: 1).rotated(by: headRelativeAttitudeAgainstBoard.inverse).dot(headAcceleration))
+        Vector3DFloat(x: headAcceleration.rotated(by: headRelativeAttitudeAgainstBoard.inverse).dot(Vector3DFloat(x: 1, y: 0, z: 0)), y: headAcceleration.rotated(by: headRelativeAttitudeAgainstBoard.inverse).dot(Vector3DFloat(x: 0, y: 1, z: 0)), z: headAcceleration.rotated(by: headRelativeAttitudeAgainstBoard.inverse).dot(Vector3DFloat(x: 0, y: 0, z: 1)))
     }
     
     var headRelativeAccelerationBoardAhead2: Vector3DFloat{
-        headAcceleration.projected(Vector3DFloat(x: 1, y: 1, z: 1).rotated(by: headRelativeAttitudeAgainstBoard.inverse))
+        headAcceleration.projected(Vector3DFloat(x: 0, y: 0, z: 1).rotated(by: headRelativeAttitudeAgainstBoard.inverse))
     }
     
     var headRelativeAccelerationBoardAhead3: Vector3DFloat{
-        headAcceleration.projected(Vector3DFloat(x: 1, y: 0, z: 0).rotated(by: headRelativeAttitudeAgainstBoard.inverse))
+        headAcceleration.projected(Vector3DFloat(x: 0, y: 1, z: 0).rotated(by: headRelativeAttitudeAgainstBoard.inverse))
     }
     
     var headRelativeAccelerationFallLineAhead: Vector3DFloat{
 //        headAcceleration.projected(Vector3DFloat(x: 0, y: 1, z: 0).rotated(by: headAttitudeCalibrated.inverse))
-        Vector3DFloat(x: headAcceleration.rotated(by: headRelativeAttitudeAgainstBoard.inverse).dot(Vector3DFloat(x: 1, y: 0, z: 0)), y: headAcceleration.rotated(by: headRelativeAttitudeAgainstBoard.inverse).dot(Vector3DFloat(x: 0, y: 1, z: 0)), z: headAcceleration.rotated(by: headRelativeAttitudeAgainstBoard.inverse).dot(Vector3DFloat(x: 0, y: 0, z: 1)))
+        Vector3DFloat(x: headAcceleration.rotated(by: headRelativeAttitudeAgainstFallLine.inverse).dot(Vector3DFloat(x: 1, y: 0, z: 0)), y: headAcceleration.rotated(by: headRelativeAttitudeAgainstFallLine.inverse).dot(Vector3DFloat(x: 0, y: 1, z: 0)), z: headAcceleration.rotated(by: headRelativeAttitudeAgainstFallLine.inverse).dot(Vector3DFloat(x: 0, y: 0, z: 1)))
     }
     
     var headRelativeFallLineAccelerationAgainstBoard: Vector3DFloat{
@@ -485,8 +485,8 @@ struct SkateBoardAnalysedData: Encodable {
         case headrollingAngle
         case headAcceleration
         case headAngulerVelocity
-        case headRelativeAcceleration
-        case headRelativeFallLineAcceleration
+        case headRelativeAccelerationBoardAhead
+        case headRelativeAccelerationFallLineAhead
         case headRelativeFallLineAccelerationAgainstBoard
         case headRelativeAccelerationAgainstBoard
         case headFallineAcceleration
@@ -523,8 +523,8 @@ struct SkateBoardAnalysedData: Encodable {
         try container.encode(Angle2DFloat(radians: headAttitude.eulerAngles(order: .xyz).angles.x).degrees, forKey: .headpitchingAngle)
         try container.encode(Angle2DFloat(radians: headAttitude.eulerAngles(order: .xyz).angles.y).degrees, forKey: .headrollingAngle)
         try container.encode(Angle2DFloat(radians: headAttitude.eulerAngles(order: .xyz).angles.z).degrees, forKey: .headyawingAngle)
-        try container.encode(headRelativeAccelerationBoardAhead, forKey: .headRelativeAcceleration)
-        try container.encode(headRelativeAccelerationFallLineAhead, forKey: .headRelativeFallLineAcceleration)
+        try container.encode(headRelativeAccelerationBoardAhead, forKey: .headRelativeAccelerationBoardAhead)
+        try container.encode(headRelativeAccelerationFallLineAhead, forKey: .headRelativeAccelerationFallLineAhead)
         try container.encode(headRelativeFallLineAccelerationAgainstBoard, forKey: .headRelativeFallLineAccelerationAgainstBoard)
         try container.encode(headRelativeAccelerationAgainstBoard, forKey: .headRelativeAccelerationAgainstBoard)
         try container.encode(headFallineAcceleration, forKey: .headFallineAcceleration)
