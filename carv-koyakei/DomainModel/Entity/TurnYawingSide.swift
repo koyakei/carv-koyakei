@@ -6,8 +6,9 @@
 //
 
 import Foundation
+import SwiftData
 
-enum TurnYawingSide : String{
+enum TurnYawingSide : String, Codable {
     case RightYawing = "Right"
     case LeftYawing = "Left"
     case Straight = "Straight"
