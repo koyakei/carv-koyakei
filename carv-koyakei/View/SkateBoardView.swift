@@ -11,6 +11,7 @@ import Combine
 import Foundation
 import CoreLocation
 import Charts
+import SwiftData
 
 struct RotationAngleView: View {
     var attitude: Rotation3DFloat
@@ -43,6 +44,7 @@ struct SkateBoardView: View {
     @StateObject var skateboard: SkateBoardDataManager
     @AppStorage("ssid") var ssid: String = ""
     @AppStorage("password") var password: String = ""
+    
 //    @StateObject var droggerBluetooth: DroggerBluetoothModel // Owns its own DroggerBluetoothModel instance.
     var body: some View {
         ScrollView{
@@ -57,6 +59,7 @@ struct SkateBoardView: View {
 //                .font(.system(size: 10, design: .monospaced))
 //                .textSelection(.enabled)
             Text("number of turn \(skateboard.numberOfTurn.description)")
+            
 //            Rectangle()
 //                .fill(Color.blue)
 //                .frame(width: CGFloat((skateboard.rawData.timestamp.timeIntervalSince1970 - skateboard.headMotion.timestamp.timeIntervalSince1970) * 1000 + 100), height: 20)
