@@ -8,6 +8,7 @@
 import SwiftUI
 import AVFAudio
 import Combine
+import SwiftData
 
 @main
 struct carv_koyakeiApp: App {
@@ -21,11 +22,18 @@ struct carv_koyakeiApp: App {
     private var bleManager : BluethoothCentralManager = BluethoothCentralManager()
     private var carv1BleManager : Carv1BluethoothCentralManager = Carv1BluethoothCentralManager()
     private var skateBoardDataManager: SkateBoardDataManager
+    private var modelContext :ModelContext
     private var droggerVluetooth: DroggerBluetoothModel = DroggerBluetoothModel()
     init() {
+        do{
+            let modelContainer = try ModelContainer(for: SkateBoardDataManager.SingleFinishedTurnData.self)
+            modelContext = ModelContext(modelContainer)
+        }catch {
+            fatalError("Could not set up ModelContainer: \(error)")
+        }
         dataManager = DataManager(bluethoothCentralManager: bleManager)
         carv1DataManager = Carv1DataManager(bluethoothCentralManager: carv1BleManager)
-        skateBoardDataManager = SkateBoardDataManager(analysedData: SkateBoardAnalysedData(), droggerBluetooth: droggerVluetooth)
+        skateBoardDataManager = SkateBoardDataManager(analysedData: SkateBoardAnalysedData(), droggerBluetooth: droggerVluetooth, modelContext: modelContext)
         self.yawingBeep = YawingBeep(dataManager: dataManager)
         self.rollingBeep = RollingBeep(dataManager: dataManager)
         self.outsidePressureBeep = OutsidePressureBeep(dataManager: carv1DataManager)

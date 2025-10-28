@@ -30,13 +30,8 @@ final class SkateBoardDataManager:NSObject, ObservableObject, WCSessionDelegate 
     @Published var numberOfTurn: Int = 0
     var session : WCSession
     @MainActor
-    init( analysedData: SkateBoardAnalysedData, droggerBluetooth: DroggerBluetoothModel,session: WCSession = .default) {
-        do{
-            let modelContainer = try ModelContainer(for: SkateBoardDataManager.SingleFinishedTurnData.self)
-            modelContext = ModelContext(modelContainer)
-        }catch {
-            fatalError("Could not set up ModelContainer: \(error)")
-        }
+    init( analysedData: SkateBoardAnalysedData, droggerBluetooth: DroggerBluetoothModel,modelContext :ModelContext,session: WCSession = .default) {
+        self.modelContext = modelContext
         self.droggerBluetooth = droggerBluetooth
         self.analysedData = analysedData
         self.session = session
