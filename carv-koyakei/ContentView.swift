@@ -15,9 +15,7 @@ struct ContentView: View {
         TabView {
             SkateBoardView(skateboard: skateBoardDataManager
 //                           ,droggerBluetooth: droggerBlueTooth
-            ).modelContainer(for:[
-                SkateBoardDataManager.SingleFinishedTurnData.self
-            ])
+            )
                 .tabItem {
                     Image(systemName: "skateboard.fill")
                     Text("skateboard")

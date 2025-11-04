@@ -25,13 +25,12 @@ final class SkateBoardDataManager:NSObject, ObservableObject, WCSessionDelegate 
     let droggerBluetooth: DroggerBluetoothModel
     @Published var headMotion: HeadMotionRawData = .init()
     @Published var headBoardDiffrencial: Rotation3DFloat = .identity
-    private var modelContext :ModelContext
     private var cancellables = Set<AnyCancellable>()
     @Published var numberOfTurn: Int = 0
     var session : WCSession
+    @Environment(\.modelContext) var modelContext
     @MainActor
-    init( analysedData: SkateBoardAnalysedData, droggerBluetooth: DroggerBluetoothModel,modelContext :ModelContext,session: WCSession = .default) {
-        self.modelContext = modelContext
+    init( analysedData: SkateBoardAnalysedData, droggerBluetooth: DroggerBluetoothModel,session: WCSession = .default) {
         self.droggerBluetooth = droggerBluetooth
         self.analysedData = analysedData
         self.session = session
@@ -70,7 +69,7 @@ final class SkateBoardDataManager:NSObject, ObservableObject, WCSessionDelegate 
     @Published var switchingAngluerRateDegree: Float = 15
     
     func isTurnSwithching(turnPhase: SkateBoardRawData,rotationAngle: Vector3DFloat) -> Bool{
-        (Angle2DFloat(degrees: -switchingAngluerRateDegree).radians..<Angle2DFloat(degrees: switchingAngluerRateDegree).radians ~= turnPhase.angulerVelocity.z && turnPhase.timestamp.timeIntervalSince1970 - self.lastFinishedTrunData.turnEndedTime.timeIntervalSince1970 > 0.4)
+        (Angle2DFloat(degrees: -switchingAngluerRateDegree).radians..<Angle2DFloat(degrees: switchingAngluerRateDegree).radians ~= turnPhase.angulerVelocity.z && turnPhase.timestamp.timeIntervalSince1970 - self.lastFinishedTrunData.turnEndedTime.timeIntervalSince1970 > 0.5)
     }
     
     func calibrateHeadBoardDifference(){
@@ -128,6 +127,12 @@ final class SkateBoardDataManager:NSObject, ObservableObject, WCSessionDelegate 
             if skatebordData.isTurnSwitching {
                 let lastTurn = SingleFinishedTurnData.init(numberOfTrun: self.numberOfTurn, turnPhases: self.latestNotCompletedTurn)
                 modelContext.insert(lastTurn)
+                do{
+                    try modelContext.save()
+                } catch {
+                    print("Unresolved error \(error), \(error._domain)")
+                }
+                
                 self.finishedTurnDataArray.append(lastTurn)
                 self.latestNotCompletedTurn.removeAll()
                 self.numberOfTurn += 1
