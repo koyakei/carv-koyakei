@@ -6,15 +6,26 @@ struct ContentView: View {
     var rollingBeep: RollingBeep
 //    var cameraViewModel = CameraViewModel()
     var dataManager: DataManager
+    var modelContainer : ModelContainer
     var carv1DataManager: Carv1DataManager
     var outsidePressureBeep: OutsidePressureBeep
     var carv1Ble:Carv1BluethoothCentralManager
-    var skateBoardDataManager: SkateBoardDataManager
-    var droggerBlueTooth: DroggerBluetoothModel
+//    var droggerBlueTooth: DroggerBluetoothModel
+    let skateBoardDataManager:SkateBoardDataManager
+    init(ble:BluethoothCentralManager, yawingBeep: YawingBeep, rollingBeep: RollingBeep,dataManager: DataManager,carv1DataManager: Carv1DataManager,outsidePressureBeep: OutsidePressureBeep,carv1Ble:Carv1BluethoothCentralManager,modelContainer:ModelContainer){
+        self.ble = ble
+        self.yawingBeep = yawingBeep
+        self.rollingBeep = rollingBeep
+        self.dataManager = dataManager
+        self.carv1DataManager = carv1DataManager
+        self.outsidePressureBeep = outsidePressureBeep
+        self.carv1Ble = carv1Ble
+        self.modelContainer = modelContainer
+        self.skateBoardDataManager = SkateBoardDataManager(analysedData: SkateBoardAnalysedData(),modelContext: modelContainer.mainContext)
+    }
     var body: some View {
         TabView {
-            SkateBoardView(skateboard: skateBoardDataManager
-//                           ,droggerBluetooth: droggerBlueTooth
+            SkateBoardView(skateboard: skateBoardDataManager,modelContext: modelContainer.mainContext
             )
                 .tabItem {
                     Image(systemName: "skateboard.fill")
@@ -55,3 +66,4 @@ struct ContentView: View {
         }
     }
 }
+

@@ -22,18 +22,22 @@ final class SkateBoardDataManager:NSObject, ObservableObject, WCSessionDelegate 
     @Published var finishedTurnDataArray: [SingleFinishedTurnData] = []
     let coreMotionManager: CMMotionManager = .init()
     let headMotionManager: CMHeadphoneMotionManager = .init()
-    let droggerBluetooth: DroggerBluetoothModel
+//    let droggerBluetooth: DroggerBluetoothModel
     @Published var headMotion: HeadMotionRawData = .init()
     @Published var headBoardDiffrencial: Rotation3DFloat = .identity
     private var cancellables = Set<AnyCancellable>()
     @Published var numberOfTurn: Int = 0
     var session : WCSession
-    @Environment(\.modelContext) var modelContext
+    var modelContext: ModelContext
+    func fetchAll() -> [SingleFinishedTurnData] {
+        let descriptor = FetchDescriptor<SingleFinishedTurnData>()
+        return (try? modelContext.fetch(descriptor)) ?? []
+    }
     @MainActor
-    init( analysedData: SkateBoardAnalysedData, droggerBluetooth: DroggerBluetoothModel,session: WCSession = .default) {
-        self.droggerBluetooth = droggerBluetooth
+    init( analysedData: SkateBoardAnalysedData,modelContext: ModelContext,session: WCSession = .default) {
         self.analysedData = analysedData
         self.session = session
+        self.modelContext = modelContext
         super.init()
         if WCSession.isSupported() {
             self.session.delegate = self
@@ -95,7 +99,7 @@ final class SkateBoardDataManager:NSObject, ObservableObject, WCSessionDelegate 
                 self.headMotion = HeadMotionRawData(data, Date(timeIntervalSince1970: self.headStartRecordingDate.timeIntervalSince1970 + data.timestamp))
             }
         }
-        $rawData.compactMap{$0}.combineLatest($headMotion.compactMap{$0}).sink { (rawData, headMotion) in
+        $rawData.compactMap{$0}.combineLatest($headMotion.compactMap{$0}).sink { [self] (rawData, headMotion) in
             let skatebordData = SkateBoardAnalysedData(rawData, with: CLLocation(), isTurnSwitching: self.isTurnSwithching(turnPhase: rawData,rotationAngle: rawData.angulerVelocity), fallLineDirection: self.finishedTurnDataArray.lastTurn.fallLineDirection, diffrencialAnleFromStartoEnd: self.lastFinishedTrunData.diffrencialAngleFromStartToEnd.radians, lastTurnFinishedTurnPhaseAttitude: self.lastFinishedTrunData.lastPhaseOfTune.attitude,
                                                        headAttitude: headMotion.attitude, // truenorth zvertical な値を出してほしい
                                                        headAngulerVelocity: headMotion.angulerVelocity, headAcceleration: headMotion.acceleration,headBodyDiffrencial: self.headBoardDiffrencial)
@@ -103,7 +107,7 @@ final class SkateBoardDataManager:NSObject, ObservableObject, WCSessionDelegate 
             self.latestNotCompletedTurn.append(skatebordData)
             if skatebordData.isTurnSwitching {
                 let lastTurn = SingleFinishedTurnData.init(numberOfTrun: self.numberOfTurn, turnPhases: self.latestNotCompletedTurn)
-                self.modelContext.insert(lastTurn)
+                modelContext.insert(lastTurn)
         
                 self.finishedTurnDataArray.append(lastTurn)
                 self.latestNotCompletedTurn.removeAll()
@@ -127,11 +131,11 @@ final class SkateBoardDataManager:NSObject, ObservableObject, WCSessionDelegate 
             if skatebordData.isTurnSwitching {
                 let lastTurn = SingleFinishedTurnData.init(numberOfTrun: self.numberOfTurn, turnPhases: self.latestNotCompletedTurn)
                 modelContext.insert(lastTurn)
-                do{
-                    try modelContext.save()
-                } catch {
-                    print("Unresolved error \(error), \(error._domain)")
-                }
+//                do{
+//                    try modelContext.save()
+//                } catch {
+//                    print("Unresolved error \(error), \(error._domain)")
+//                }
                 
                 self.finishedTurnDataArray.append(lastTurn)
                 self.latestNotCompletedTurn.removeAll()
