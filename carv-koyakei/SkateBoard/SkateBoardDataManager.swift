@@ -101,7 +101,11 @@ final class SkateBoardDataManager:NSObject, ObservableObject, WCSessionDelegate 
             if skatebordData.isTurnSwitching {
                 let lastTurn = SingleFinishedTurnData.init(numberOfTrun: self.numberOfTurn, turnPhases: self.latestNotCompletedTurn)
                 modelContext.insert(lastTurn)
-        
+//                do {
+//                            try modelContext.save()  // これでディスクに確実に書き込まれる
+//                        } catch {
+//                            print("保存エラー: \(error)")
+//                        }
                 self.finishedTurnDataArray.append(lastTurn)
                 self.latestNotCompletedTurn.removeAll()
                 self.numberOfTurn += 1
@@ -124,7 +128,11 @@ final class SkateBoardDataManager:NSObject, ObservableObject, WCSessionDelegate 
             if skatebordData.isTurnSwitching {
                 let lastTurn = SingleFinishedTurnData.init(numberOfTrun: self.numberOfTurn, turnPhases: self.latestNotCompletedTurn)
                 modelContext.insert(lastTurn)
-                
+//                do {
+//                            try modelContext.save()  //
+//                        } catch {
+//                            print("保存エラー: \(error)")
+//                        }
                 self.finishedTurnDataArray.append(lastTurn)
                 self.latestNotCompletedTurn.removeAll()
                 self.numberOfTurn += 1
@@ -200,7 +208,7 @@ final class SkateBoardDataManager:NSObject, ObservableObject, WCSessionDelegate 
         }
     }
     
-    @Model
+    @Model // swift data はプリミティブ型しか対応しないので、対応するまでストレージへの永続的保存はできない。そのうち対応するだろうから放っておこうか。
     final class SingleFinishedTurnData : SingleFinishedTurn{
         var turnPhases: [SkateBoardAnalysedData]
         
@@ -427,7 +435,7 @@ final class SkateBoardAnalysedData: Encodable {
         self.headAngulerVelocity = headAngulerVelocity
     }
     
-    init(headAttitude : Rotation3DFloat = .init(), headAngulerVelocity : Vector3DFloat = .init(), headAcceleration : Vector3DFloat = .init()){
+    init(headAttitude : Rotation3DFloat = .identity, headAngulerVelocity : Vector3DFloat = .zero, headAcceleration : Vector3DFloat = .zero){
         self.lontitude = 0
         self.latitude = 0
         timestamp = Date(timeIntervalSince1970: 0)
