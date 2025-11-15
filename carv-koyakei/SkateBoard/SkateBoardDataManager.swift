@@ -19,7 +19,6 @@ final class SkateBoardDataManager:NSObject, ObservableObject, WCSessionDelegate 
     @Published var rawData: SkateBoardRawData = .init()
     @Published var analysedData: SkateBoardAnalysedData
     @Published var latestNotCompletedTurn: [SkateBoardAnalysedData]  = []
-    @Published var finishedTurnDataArray: [SingleFinishedTurnData] = []
     let coreMotionManager: CMMotionManager = .init()
     let headMotionManager: CMHeadphoneMotionManager = .init()
 //    let droggerBluetooth: DroggerBluetoothModel
@@ -29,10 +28,9 @@ final class SkateBoardDataManager:NSObject, ObservableObject, WCSessionDelegate 
     @Published var numberOfTurn: Int = 0
     var session : WCSession
     var modelContext: ModelContext
-    func fetchAll() -> [SingleFinishedTurnData] {
-        let descriptor = FetchDescriptor<SingleFinishedTurnData>()
-        return (try? modelContext.fetch(descriptor)) ?? []
-    }
+    
+    @Published var finishedTurnDataArray: [SingleFinishedTurnData] = []
+    
     @MainActor
     init( analysedData: SkateBoardAnalysedData,modelContext: ModelContext,session: WCSession = .default) {
         self.analysedData = analysedData
@@ -45,11 +43,6 @@ final class SkateBoardDataManager:NSObject, ObservableObject, WCSessionDelegate 
                 self.session.activate()
             }
         }
-        $finishedTurnDataArray
-            .sink { [weak self] turns in
-                self?.sendFinishedTurnCountToWatch()
-            }
-            .store(in: &cancellables)
     }
     
     private func sendFinishedTurnCountToWatch() {
@@ -62,7 +55,7 @@ final class SkateBoardDataManager:NSObject, ObservableObject, WCSessionDelegate 
     
     var lastFinishedTrunData: SingleFinishedTurnData {
         get {
-            finishedTurnDataArray.last ?? .init(numberOfTrun: 0, turnPhases: [])
+            finishedTurnDataArray.last ?? SingleFinishedTurnData.init(numberOfTrun: 0, turnPhases: [])
         }
     }
     
@@ -131,11 +124,6 @@ final class SkateBoardDataManager:NSObject, ObservableObject, WCSessionDelegate 
             if skatebordData.isTurnSwitching {
                 let lastTurn = SingleFinishedTurnData.init(numberOfTrun: self.numberOfTurn, turnPhases: self.latestNotCompletedTurn)
                 modelContext.insert(lastTurn)
-//                do{
-//                    try modelContext.save()
-//                } catch {
-//                    print("Unresolved error \(error), \(error._domain)")
-//                }
                 
                 self.finishedTurnDataArray.append(lastTurn)
                 self.latestNotCompletedTurn.removeAll()
@@ -213,51 +201,14 @@ final class SkateBoardDataManager:NSObject, ObservableObject, WCSessionDelegate 
     }
     
     @Model
-    final class SingleFinishedTurnData {
+    final class SingleFinishedTurnData : SingleFinishedTurn{
+        var turnPhases: [SkateBoardAnalysedData]
+        
         init(numberOfTrun: Int, turnPhases: [SkateBoardAnalysedData]) {
             self.numberOfTrun = numberOfTrun
             self.turnPhases = turnPhases
         }
         var numberOfTrun: Int
-        var turnPhases: [SkateBoardAnalysedData]
-        
-        var yawingSide: TurnYawingSide {
-            switch turnPhases.map(\.angulerVelocity.z).reduce(0,+){
-            case let x where x < 0:
-                return .RightYawing
-            case let x where x > 0:
-                return .LeftYawing
-            default:
-                return .Straight
-            }
-        }
-        
-        var turnStartedTime: Date {
-            firstPhaseOfTune.timestamp
-        }
-        
-        var turnEndedTime: Date {
-            lastPhaseOfTune.timestamp
-        }
-        
-        var turnDuration: TimeInterval {
-            turnEndedTime.timeIntervalSince(turnStartedTime)
-        }
-        
-        var fallLineDirection: Rotation3DFloat{
-            Rotation3DFloat(quaternion: turnPhases.map{ $0.attitude.quaternion}.reduce(simd_quatf(ix: 0, iy: 0, iz: 0, r: 0), +).normalized)
-        }
-        
-        var diffrencialAngleFromStartToEnd: Angle2DFloat {
-            (lastPhaseOfTune.attitude * firstPhaseOfTune.attitude.inverse).angle
-        }
-        
-        var firstPhaseOfTune: SkateBoardAnalysedData {
-            turnPhases.first ?? .init()
-        }
-        var lastPhaseOfTune: SkateBoardAnalysedData {
-            turnPhases.last ?? .init()
-        }
     }
     
     struct TurnPhase : Encodable{
@@ -277,9 +228,9 @@ final class SkateBoardDataManager:NSObject, ObservableObject, WCSessionDelegate 
         if message["command"] as? String == "stop" {
                 self.stopRecording()
         }
-        if message["command"] as? String == "clear" {
-            self.finishedTurnDataArray.removeAll()
-        }
+//        if message["command"] as? String == "clear" {
+//            self.finishedTurnDataArray.removeAll()
+//        }
         if message["command"] as? String == "startHeadAndBoard" {
                 self.startHeadAndBoardMotionRecording()
         }
@@ -561,5 +512,4 @@ final class SkateBoardAnalysedData: Encodable {
         try container.encode(headFallineAcceleration, forKey: .headFallineAcceleration)
     }
 }
-
 

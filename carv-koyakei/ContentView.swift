@@ -6,13 +6,12 @@ struct ContentView: View {
     var rollingBeep: RollingBeep
 //    var cameraViewModel = CameraViewModel()
     var dataManager: DataManager
-    var modelContainer : ModelContainer
     var carv1DataManager: Carv1DataManager
     var outsidePressureBeep: OutsidePressureBeep
     var carv1Ble:Carv1BluethoothCentralManager
 //    var droggerBlueTooth: DroggerBluetoothModel
     let skateBoardDataManager:SkateBoardDataManager
-    init(ble:BluethoothCentralManager, yawingBeep: YawingBeep, rollingBeep: RollingBeep,dataManager: DataManager,carv1DataManager: Carv1DataManager,outsidePressureBeep: OutsidePressureBeep,carv1Ble:Carv1BluethoothCentralManager,modelContainer:ModelContainer){
+    init(ble:BluethoothCentralManager, yawingBeep: YawingBeep, rollingBeep: RollingBeep,dataManager: DataManager,carv1DataManager: Carv1DataManager,outsidePressureBeep: OutsidePressureBeep,carv1Ble:Carv1BluethoothCentralManager,skateBoardDataManager : SkateBoardDataManager){
         self.ble = ble
         self.yawingBeep = yawingBeep
         self.rollingBeep = rollingBeep
@@ -20,12 +19,11 @@ struct ContentView: View {
         self.carv1DataManager = carv1DataManager
         self.outsidePressureBeep = outsidePressureBeep
         self.carv1Ble = carv1Ble
-        self.modelContainer = modelContainer
-        self.skateBoardDataManager = SkateBoardDataManager(analysedData: SkateBoardAnalysedData(),modelContext: modelContainer.mainContext)
+        self.skateBoardDataManager = skateBoardDataManager
     }
     var body: some View {
         TabView {
-            SkateBoardView(skateboard: skateBoardDataManager,modelContext: modelContainer.mainContext
+            SkateBoardView(skateboard: skateBoardDataManager
             )
                 .tabItem {
                     Image(systemName: "skateboard.fill")

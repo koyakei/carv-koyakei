@@ -22,17 +22,22 @@ struct carv_koyakeiApp: App {
     private var bleManager : BluethoothCentralManager = BluethoothCentralManager()
     private var carv1BleManager : Carv1BluethoothCentralManager = Carv1BluethoothCentralManager()
     private var droggerBluetooth: DroggerBluetoothModel = DroggerBluetoothModel()
+    let skateBoardDataManager:SkateBoardDataManager
     init() {
         dataManager = DataManager(bluethoothCentralManager: bleManager)
         self.yawingBeep = YawingBeep(dataManager: dataManager)
         self.rollingBeep = RollingBeep(dataManager: dataManager)
         carv1DataManager = Carv1DataManager(bluethoothCentralManager: carv1BleManager)
         self.outsidePressureBeep = OutsidePressureBeep(dataManager: carv1DataManager)
-        self.modelContainer = try! ModelContainer(for: SkateBoardDataManager.SingleFinishedTurnData.self)
+        self.modelContainer = try! ModelContainer(for: SkateBoardDataManager.SingleFinishedTurnData.self, configurations:
+                                                    ModelConfiguration(
+                                                        schema: Schema([SkateBoardDataManager.SingleFinishedTurnData.self]),isStoredInMemoryOnly: false)
+        )
+        skateBoardDataManager = SkateBoardDataManager(analysedData: SkateBoardAnalysedData(),modelContext: modelContainer.mainContext)
     }
     var body: some Scene {
         WindowGroup {
-            ContentView(ble: bleManager, yawingBeep: yawingBeep,rollingBeep: rollingBeep,dataManager: dataManager, carv1DataManager: carv1DataManager,outsidePressureBeep: outsidePressureBeep, carv1Ble: carv1BleManager,modelContainer: modelContainer)
+            ContentView(ble: bleManager, yawingBeep: yawingBeep,rollingBeep: rollingBeep,dataManager: dataManager, carv1DataManager: carv1DataManager,outsidePressureBeep: outsidePressureBeep, carv1Ble: carv1BleManager,skateBoardDataManager: skateBoardDataManager).modelContext(modelContainer.mainContext)
         }
     }
 }

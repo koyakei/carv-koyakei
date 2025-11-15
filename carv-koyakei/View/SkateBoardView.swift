@@ -45,7 +45,7 @@ struct SkateBoardView: View {
     @AppStorage("ssid") var ssid: String = ""
     @AppStorage("password") var password: String = ""
 //    @StateObject var droggerBluetooth: DroggerBluetoothModel // Owns its own DroggerBluetoothModel instance.
-    var modelContext: ModelContext
+    @Environment(\.modelContext) var modelContext: ModelContext
     @Query private var savedTurns: [SkateBoardDataManager.SingleFinishedTurnData]
     var body: some View {
         ScrollView{
@@ -60,7 +60,7 @@ struct SkateBoardView: View {
 //                .font(.system(size: 10, design: .monospaced))
 //                .textSelection(.enabled)
             Text("number of turn \(skateboard.numberOfTurn.description)")
-            Text("\(skateboard.fetchAll().count )")
+            Text("\(savedTurns.count )")
 //            Rectangle()
 //                .fill(Color.blue)
 //                .frame(width: CGFloat((skateboard.rawData.timestamp.timeIntervalSince1970 - skateboard.headMotion.timestamp.timeIntervalSince1970) * 1000 + 100), height: 20)
@@ -120,8 +120,6 @@ struct SkateBoardView: View {
                     for turn in savedTurns {
                         modelContext.delete(turn)
                     }
-                    try? modelContext.save()
-                    skateboard.finishedTurnDataArray.removeAll()
                 }
                 Text(skateboard.rawData.timestamp.description)
                 Text(skateboard.lastFinishedTrunData.turnEndedTime.description)
@@ -158,18 +156,6 @@ struct SkateBoardView: View {
                 Button("export json"){
                     skateboard.export()
                 }
-            }
-            Divider()
-            Text("Saved Turns: \(savedTurns.count)")
-            ForEach(savedTurns, id: \.persistentModelID) { turn in
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("Turn #\(turn.numberOfTrun)").font(.headline)
-                    Text("Started: \(turn.turnStartedTime.formatted(date: .numeric, time: .standard))")
-                    Text("Ended: \(turn.turnEndedTime.formatted(date: .numeric, time: .standard))")
-                    Text("Phases: \(turn.turnPhases.count)")
-                    Text("Yawing Side: \(String(describing: turn.yawingSide))")
-                }
-                .padding(.vertical, 4)
             }
         }
     }
