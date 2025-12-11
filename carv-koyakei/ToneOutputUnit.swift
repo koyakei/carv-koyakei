@@ -67,7 +67,7 @@ class DynamicOscillatorConductor: ObservableObject {
             do {
                 try engine.start()
                 let session = AVAudioSession.sharedInstance()
-                try session.setCategory(.playback, mode: .voiceChat,options: [.mixWithOthers])
+                try session.setCategory(.playback, mode: .voiceChat,options: [.mixWithOthers, .allowBluetoothA2DP])
                 try session.setActive(true)
             } catch let err {
                 Log(err)

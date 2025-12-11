@@ -13,22 +13,10 @@ struct ContentView: View {
     var droggerBlueTooth: DroggerBluetoothModel
     var body: some View {
         TabView {
-            SkateBoardView(skateboard: skateBoardDataManager
-//                           ,droggerBluetooth: droggerBlueTooth
-            )
-                .tabItem {
-                    Image(systemName: "skateboard.fill")
-                    Text("skateboard")
-                }
             HomeView(ble: ble, yawingBeep: yawingBeep,rollingBeep: rollingBeep,dataManager: dataManager)
                 .tabItem {
                     Image(systemName: "house.fill")
                     Text("ホーム")
-                }
-            ARBootsView(dataManager: dataManager)
-                .tabItem {
-                    Image(systemName: "person.fill")
-                    Text("AR")
                 }
             Carv1View(dataManager: carv1DataManager,ble: carv1Ble,outsidePressureBeep: outsidePressureBeep)
                 .tabItem {
@@ -39,6 +27,20 @@ struct ContentView: View {
                     Image(systemName: "person.fill")
                     Text("pressure")
                 }
+            SkateBoardView(skateboard: skateBoardDataManager
+//                           ,droggerBluetooth: droggerBlueTooth
+            )
+                .tabItem {
+                    Image(systemName: "skateboard.fill")
+                    Text("skateboard")
+                }
+            
+            ARBootsView(dataManager: dataManager)
+                .tabItem {
+                    Image(systemName: "person.fill")
+                    Text("AR")
+                }
+            
             
             
 //            switch cameraViewModel.status {

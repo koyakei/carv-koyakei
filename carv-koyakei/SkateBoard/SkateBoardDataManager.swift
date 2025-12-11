@@ -246,7 +246,7 @@ final class SkateBoardDataManager:NSObject, ObservableObject, WCSessionDelegate 
     }
     
     // MARK: - WCSessionDelegate 
-    func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {}
+    func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: (any Error)?) {}
     func sessionDidBecomeInactive(_ session: WCSession) {}
     func sessionDidDeactivate(_ session: WCSession) {}
     

@@ -14,11 +14,14 @@ struct Carv1View: View {
     @State var outsidePressureBeep: OutsidePressureBeep
     var body: some View {
         ScrollView {
+            Text(
+                dataManager.carvRawDataPair.left.recordedAtFromBootDevice.description)
             let gridItems = Array(repeating: GridItem(.flexible()), count: 5)
             LazyVGrid(columns: gridItems, spacing: 10) {
-                ForEach(dataManager.carvRawDataPair.right.fordebug.indices, id: \.self) { i in
+                Text(dataManager.carvRawDataPair.left.debugString)
+                ForEach(dataManager.carvRawDataPair.left.fordebug.indices, id: \.self) { i in
                     Grid{
-                        Text("\(i.description)  \(dataManager.carvRawDataPair.right.fordebug[i].formatted(FloatingPointFormatStyle<Float>.number.precision(.fractionLength(1))))")
+                        Text("\(i.description)  \(dataManager.carvRawDataPair.left.fordebug[i].formatted(FloatingPointFormatStyle<Float>.number.precision(.fractionLength(1))))")
                     }
                 }
                 .padding()

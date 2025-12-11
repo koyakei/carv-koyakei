@@ -13,8 +13,10 @@ final class Carv1DataManager :ObservableObject {
     @Published var latestNotCompletedTurnCarvAnalyzedDataPairs: [Carv1AnalyzedDataPair]  = []
     @Published var finishedTurnDataArray: [Carv1SingleFinishedTurnData] = []
     @Published var skytechMode: Bool = false
-    @Published var calibration基準値Right :[Float] = [Float](repeating: 0, count: 18)
-    @Published var calibration基準値Left :[Float] = [Float](repeating: 0, count: 18)
+    @Published var calibration基準値Right :[Float] = [Float](repeating: 0, count: 16)
+    @Published var calibration基準値Left :[Float] = [Float](repeating: 0, count: 16)
+    
+    
     private var lastFinishedTrunData: Carv1SingleFinishedTurnData {
         get {
             finishedTurnDataArray.last ?? .init(numberOfTrun: 0, turnPhases: [])
@@ -25,12 +27,12 @@ final class Carv1DataManager :ObservableObject {
         self.bluethoothCentralManager = bluethoothCentralManager
         subscribe()
     }
-    
+   
     func calibratePressureLeft(){
         $carvRawDataPair
             .prefix(25)
             .map { $0.left.rawPressure }
-            .reduce([Float](repeating: 0, count: 18),+)
+            .reduce([Float](repeating: 0, count: 16),+)
             .map { $0 / Float(25)}
             .assign(to: \.calibration基準値Left, on: self)
             .store(in: &cancellables)
@@ -40,7 +42,7 @@ final class Carv1DataManager :ObservableObject {
         $carvRawDataPair
             .prefix(25)
             .map { $0.right.rawPressure }
-            .reduce([Float](repeating: 0, count: 18),+)
+            .reduce([Float](repeating: 0, count: 16),+)
             .map { $0 / Float(25)}
             .assign(to: \.calibration基準値Right, on: self)
             .store(in: &cancellables)
