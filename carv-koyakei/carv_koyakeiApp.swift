@@ -15,6 +15,7 @@ struct carv_koyakeiApp: App {
     @Environment(\.scenePhase) var scenePhase
     private var yawingBeep: YawingBeep
     private var rollingBeep: RollingBeep
+    private var pitchBeep: PitchingBeep
     private var outsidePressureBeep: OutsidePressureBeep
     private var dataManager: DataManager
     private var carv1DataManager: Carv1DataManager
@@ -28,11 +29,12 @@ struct carv_koyakeiApp: App {
         skateBoardDataManager = SkateBoardDataManager(analysedData: SkateBoardAnalysedData(), droggerBluetooth: droggerVluetooth)
         self.yawingBeep = YawingBeep(dataManager: dataManager)
         self.rollingBeep = RollingBeep(dataManager: dataManager)
+        self.pitchBeep = PitchingBeep(dataManager: dataManager)
         self.outsidePressureBeep = OutsidePressureBeep(dataManager: carv1DataManager)
     }
     var body: some Scene {
         WindowGroup {
-            ContentView(ble: bleManager, yawingBeep: yawingBeep,rollingBeep: rollingBeep,dataManager: dataManager, carv1DataManager: carv1DataManager,outsidePressureBeep: outsidePressureBeep, carv1Ble: carv1BleManager, skateBoardDataManager: skateBoardDataManager,droggerBlueTooth: droggerVluetooth)
+            ContentView(ble: bleManager, yawingBeep: yawingBeep,rollingBeep: rollingBeep, pitchingBeep: pitchBeep,dataManager: dataManager, carv1DataManager: carv1DataManager,outsidePressureBeep: outsidePressureBeep, carv1Ble: carv1BleManager, skateBoardDataManager: skateBoardDataManager,droggerBlueTooth: droggerVluetooth)
         }
     }
 }

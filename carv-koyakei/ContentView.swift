@@ -4,6 +4,7 @@ struct ContentView: View {
     var ble :BluethoothCentralManager
     var yawingBeep: YawingBeep
     var rollingBeep: RollingBeep
+    var pitchingBeep: PitchingBeep
 //    var cameraViewModel = CameraViewModel()
     var dataManager: DataManager
     var carv1DataManager: Carv1DataManager
@@ -13,7 +14,7 @@ struct ContentView: View {
     var droggerBlueTooth: DroggerBluetoothModel
     var body: some View {
         TabView {
-            HomeView(ble: ble, yawingBeep: yawingBeep,rollingBeep: rollingBeep,dataManager: dataManager)
+            HomeView(ble: ble, yawingBeep: yawingBeep,rollingBeep: rollingBeep, pitchingBeep: pitchingBeep,dataManager: dataManager)
                 .tabItem {
                     Image(systemName: "house.fill")
                     Text("ホーム")

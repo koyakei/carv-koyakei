@@ -94,4 +94,5 @@ struct Carv2AnalyzedDataPair:Encodable {
     // ローリングの方向を　realitykit 用の変換コードを一つの行列変換で表現したやつを掛けて揃えなきゃいけないんだけど、やってない。
     // ここでサボると加速度の変換がおかしなことになる。
     var rollingAngulerRateDiffrential: Float { Float(right.angularVelocity.x + left.angularVelocity.x)}
+    var pitchingAngulerRateDiffrential: Float { Float(right.angularVelocity.z + left.angularVelocity.z)}
 }

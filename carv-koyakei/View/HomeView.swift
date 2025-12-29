@@ -18,6 +18,7 @@ struct HomeView: View {
     
     @State var yawingBeep: YawingBeep
     @State var rollingBeep: RollingBeep
+    @State var pitchingBeep: PitchingBeep
     @StateObject var dataManager: DataManager
     
     
@@ -220,15 +221,7 @@ struct HomeView: View {
             //            .padding()
             //
             Text("number of turn \(dataManager.numberOfTurn.description)")
-            HStack{
-                Text(yawingBeep.conductor.data.isPlaying.description)
-                Button(action: {
-                    yawingBeep.isBeeping.toggle()}){
-                        Text("yawing beep \(yawingBeep.isBeeping ? "on" : "off")")
-                    }
-                Text("Current value: \(yawingBeep.diffYawingTargetAngle, specifier: "%.2f")")
-                    .padding()
-            }
+            
             Slider(
                 value: $dataManager.switchingAngluerRateDegree,
                 in: 0.0...30,
@@ -248,6 +241,16 @@ struct HomeView: View {
                 Text("export JSON")
             }
             
+            HStack{
+                Text(yawingBeep.conductor.data.isPlaying.description)
+                Button(action: {
+                    yawingBeep.isBeeping.toggle()}){
+                        Text("yawing beep \(yawingBeep.isBeeping ? "on" : "off")")
+                    }
+                Text("Current value: \(yawingBeep.diffYawingTargetAngle, specifier: "%.2f")")
+                    .padding()
+            }
+            
             if yawingBeep.isBeeping {
                 Slider(
                     value: $yawingBeep.diffYawingTargetAngle,
@@ -255,6 +258,23 @@ struct HomeView: View {
                     step: 0.2
                 ) {
                     Text("Yaw Adjustment")
+                }
+            }
+            HStack{
+                Button(action: {
+                    pitchingBeep.isBeeping.toggle()}){
+                        Text("pitching beep \(pitchingBeep.isBeeping ? "on" : "off")")
+                    }
+                Text("Current value: \(pitchingBeep.diffTargetAngle, specifier: "%.2f")")
+                    .padding()
+            }
+            if pitchingBeep.isBeeping {
+                Slider(
+                    value: $pitchingBeep.diffTargetAngle,
+                    in: 1.0...4.0,
+                    step: 0.1
+                ) {
+                    Text("pitching Adjustment")
                 }
             }
             HStack{
@@ -274,6 +294,8 @@ struct HomeView: View {
                     Text("Rolling Adjustment")
                 }
             }
+            
+            
             HStack{
                 Button(action: { ble.scan() }) {
                     Text("Scan")
