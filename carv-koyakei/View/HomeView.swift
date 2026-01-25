@@ -41,11 +41,11 @@ struct HomeView: View {
 //                                        Text(Angle2D(radians: carv2DataPair.beforeTurn.fallLineAttitude.eulerAngles(order: .xyz).angles.y).degrees.description)
 //                                        Text(Angle2D(radians: carv2DataPair.beforeTurn.fallLineAttitude.eulerAngles(order: .xyz).angles.z).degrees.description)
 //                                    }
-                                    HStack{
-                                        Text(Angle2D(radians: dataManager.carv2DataPair.left.leftRealityKitRotation.eulerAngles(order: .xyz).angles.x).degrees.formatted(.number.precision(.fractionLength(1))))
-                                        Text(Angle2D(radians: dataManager.carv2DataPair.left.leftRealityKitRotation.eulerAngles(order: .xyz).angles.y).degrees.formatted(.number.precision(.fractionLength(1))))
-                                        Text(Angle2D(radians: dataManager.carv2DataPair.left.leftRealityKitRotation.eulerAngles(order: .xyz).angles.z).degrees.formatted(.number.precision(.fractionLength(1))))
-                                    }
+//                                    HStack{
+//                                        Text(Angle2D(radians: dataManager.carv2DataPair.left.leftRealityKitRotation.eulerAngles(order: .xyz).angles.x).degrees.formatted(.number.precision(.fractionLength(1))))
+//                                        Text(Angle2D(radians: dataManager.carv2DataPair.left.leftRealityKitRotation.eulerAngles(order: .xyz).angles.y).degrees.formatted(.number.precision(.fractionLength(1))))
+//                                        Text(Angle2D(radians: dataManager.carv2DataPair.left.leftRealityKitRotation.eulerAngles(order: .xyz).angles.z).degrees.formatted(.number.precision(.fractionLength(1))))
+//                                    }
                                     HStack{
                                         Text(Angle2D(radians: dataManager.carv2DataPair.right.rightRealityKitRotation.eulerAngles(order: .xyz).angles.x).degrees.formatted(.number.precision(.fractionLength(1))))
                                         Text(Angle2D(radians: dataManager.carv2DataPair.right.rightRealityKitRotation.eulerAngles(order: .xyz).angles.y).degrees.formatted(.number.precision(.fractionLength(1))))
@@ -67,26 +67,26 @@ struct HomeView: View {
                 Text(Angle2D(radians: dataManager.carv2DataPair.left.attitude.eulerAngles(order: .xyz).angles.z).degrees.formatted(.number.precision(.fractionLength(1))))
             }
             HStack{
-                VStack{
-                    Text( dataManager.carv2DataPair.left.angularVelocity.x.formatted(.number.precision(.fractionLength(1))))
-                    Text( dataManager.carv2DataPair.left.angularVelocity.y.formatted(.number.precision(.fractionLength(1))))
-                    Text( dataManager.carv2DataPair.left.angularVelocity.z.formatted(.number.precision(.fractionLength(1))))
-                }
-                VStack{
-                    Text( dataManager.carv2DataPair.left.acceleration.x.formatted(.number.precision(.fractionLength(1))))
-                    Text( dataManager.carv2DataPair.left.acceleration.y.formatted(.number.precision(.fractionLength(1))))
-                    Text( dataManager.carv2DataPair.left.acceleration.z.formatted(.number.precision(.fractionLength(1))))
-                }
-                VStack{
-                    Text( dataManager.carv2DataPair.right.angularVelocity.x.formatted(.number.precision(.fractionLength(1))))
-                    Text( dataManager.carv2DataPair.right.angularVelocity.y.formatted(.number.precision(.fractionLength(1))))
-                    Text( dataManager.carv2DataPair.right.angularVelocity.z.formatted(.number.precision(.fractionLength(1))))
-                }
-                VStack{
-                    Text( dataManager.carv2DataPair.right.acceleration.x.formatted(.number.precision(.fractionLength(1))))
-                    Text( dataManager.carv2DataPair.right.acceleration.y.formatted(.number.precision(.fractionLength(1))))
-                    Text( dataManager.carv2DataPair.right.acceleration.z.formatted(.number.precision(.fractionLength(1))))
-                }
+//                VStack{
+//                    Text( dataManager.carv2DataPair.left.angularVelocity.x.formatted(.number.precision(.fractionLength(1))))
+//                    Text( dataManager.carv2DataPair.left.angularVelocity.y.formatted(.number.precision(.fractionLength(1))))
+//                    Text( dataManager.carv2DataPair.left.angularVelocity.z.formatted(.number.precision(.fractionLength(1))))
+//                }
+//                VStack{
+//                    Text( dataManager.carv2DataPair.left.acceleration.x.formatted(.number.precision(.fractionLength(1))))
+//                    Text( dataManager.carv2DataPair.left.acceleration.y.formatted(.number.precision(.fractionLength(1))))
+//                    Text( dataManager.carv2DataPair.left.acceleration.z.formatted(.number.precision(.fractionLength(1))))
+//                }
+//                VStack{
+//                    Text( dataManager.carv2DataPair.right.angularVelocity.x.formatted(.number.precision(.fractionLength(1))))
+//                    Text( dataManager.carv2DataPair.right.angularVelocity.y.formatted(.number.precision(.fractionLength(1))))
+//                    Text( dataManager.carv2DataPair.right.angularVelocity.z.formatted(.number.precision(.fractionLength(1))))
+//                }
+//                VStack{
+//                    Text( dataManager.carv2DataPair.right.acceleration.x.formatted(.number.precision(.fractionLength(1))))
+//                    Text( dataManager.carv2DataPair.right.acceleration.y.formatted(.number.precision(.fractionLength(1))))
+//                    Text( dataManager.carv2DataPair.right.acceleration.z.formatted(.number.precision(.fractionLength(1))))
+//                }
 //                                VStack{
 //                                    Text( carv2DataPair.right.初期姿勢に対しての角速度Right.x.formatted(.number.precision(.fractionLength(1))))
 //                                    Text( carv2DataPair.right.初期姿勢に対しての角速度Right.y.formatted(.number.precision(.fractionLength(1))))
