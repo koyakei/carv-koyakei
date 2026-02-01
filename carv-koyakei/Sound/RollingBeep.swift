@@ -23,15 +23,8 @@ class RollingBeep{
     }
     var diffYawingTargetAngle: Double = 2.0
     var conductor : DynamicOscillatorConductor = DynamicOscillatorConductor()
-    var dataManager: DataManager
     private var cancellables = Set<AnyCancellable>()
-    init(dataManager: DataManager){
-        self.dataManager = dataManager
-        dataManager.$carv2DataPair
-            .sink { [weak self] newValue in
-                self?.handleDataPairChange(newValue)
-            }
-            .store(in: &cancellables)  //handleDataPairChangeを実行したい
+    init(){
     }
     private var cancellable: AnyCancellable? = nil
     

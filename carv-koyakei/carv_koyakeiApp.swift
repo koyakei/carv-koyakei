@@ -13,28 +13,31 @@ import Combine
 struct carv_koyakeiApp: App {
     private var locationManager = LocationManager()
     @Environment(\.scenePhase) var scenePhase
-    private var yawingBeep: YawingBeep
-    private var rollingBeep: RollingBeep
-    private var pitchBeep: PitchingBeep
     private var outsidePressureBeep: OutsidePressureBeep
-    private var dataManager: DataManager
+    private var carvDataManager = CarvDataManager()
     private var carv1DataManager: Carv1DataManager
-    private var bleManager : BluethoothCentralManager = BluethoothCentralManager()
+    @StateObject private var bleManager : Carv2BluethoothCentralManager = Carv2BluethoothCentralManager()
     private var carv1BleManager : Carv1BluethoothCentralManager = Carv1BluethoothCentralManager()
     private var skateBoardDataManager: SkateBoardDataManager
     private var droggerVluetooth: DroggerBluetoothModel = DroggerBluetoothModel()
+    
     init() {
-        dataManager = DataManager(bluethoothCentralManager: bleManager)
         carv1DataManager = Carv1DataManager(bluethoothCentralManager: carv1BleManager)
         skateBoardDataManager = SkateBoardDataManager(analysedData: SkateBoardAnalysedData(), droggerBluetooth: droggerVluetooth)
-        self.yawingBeep = YawingBeep(dataManager: dataManager)
-        self.rollingBeep = RollingBeep(dataManager: dataManager)
-        self.pitchBeep = PitchingBeep(dataManager: dataManager)
         self.outsidePressureBeep = OutsidePressureBeep(dataManager: carv1DataManager)
     }
     var body: some Scene {
         WindowGroup {
-            ContentView(ble: bleManager, yawingBeep: yawingBeep,rollingBeep: rollingBeep, pitchingBeep: pitchBeep,dataManager: dataManager, carv1DataManager: carv1DataManager,outsidePressureBeep: outsidePressureBeep, carv1Ble: carv1BleManager, skateBoardDataManager: skateBoardDataManager,droggerBlueTooth: droggerVluetooth)
+            ContentView(ble: bleManager,dataManager: carvDataManager, carv1DataManager: carv1DataManager,outsidePressureBeep: outsidePressureBeep, carv1Ble: carv1BleManager, skateBoardDataManager: skateBoardDataManager,droggerBlueTooth: droggerVluetooth)
         }
+    }
+}
+
+@MainActor
+class CarvDataManager {
+    @StateObject  var yawingBeep: YawingBeep = YawingBeep()
+     var carv2DataManager: Carv2DataManager = Carv2DataManager()
+    @StateObject  var bleManager: Carv2BluethoothCentralManager =  Carv2BluethoothCentralManager()
+    init() {
     }
 }

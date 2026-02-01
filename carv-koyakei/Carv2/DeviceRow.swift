@@ -9,7 +9,7 @@ import CoreBluetooth
 
 struct DeviceRow: View {
     @StateObject var device: Carv2DevicePeripheral
-    let ble: BluethoothCentralManager
+    let ble: Carv2BluethoothCentralManager
     
     var body: some View {
         VStack(alignment: .leading) {

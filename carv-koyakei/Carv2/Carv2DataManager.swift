@@ -1,10 +1,11 @@
 import Combine
+import SwiftUI
 import Foundation
 import Spatial
 
 @MainActor
-final class DataManager :ObservableObject {
-    let bluethoothCentralManager: BluethoothCentralManager
+class Carv2DataManager :ObservableObject {
+    
     private var cancellables = Set<AnyCancellable>()
     @Published var carv2RawDataPair: Carv2DataPair = .init()
     @Published var carv2DataPair: Carv2AnalyzedDataPair = .init()
@@ -18,12 +19,11 @@ final class DataManager :ObservableObject {
         }
     }
     
-    init(bluethoothCentralManager: BluethoothCentralManager) {
-        self.bluethoothCentralManager = bluethoothCentralManager
+    init() {
         subscribe()
     }
     
-    @Published var switchingAngluerRateDegree: Float = 15
+    @State var switchingAngluerRateDegree: Float = 15
     //スカイテックモードと通常モードを分けよう。
     func isTurnSwitchInNomal(carvDataPair: Carv2DataPair) -> Bool{
         if skytechMode {
@@ -36,34 +36,34 @@ final class DataManager :ObservableObject {
     @Published var numberOfTurn = 0
     
     private func subscribe() {
-        bluethoothCentralManager.$carv2DeviceLeft
-            .combineLatest(bluethoothCentralManager.$carv2DeviceRight)
-            .compactMap { left, right in
-                left.flatMap { l in right.map { r in (l, r) } }
-            }
-            .flatMap { left, right in
-                left.$data
-                    .compactMap { $0 }
-                    .combineLatest(right.$data.compactMap { $0 })
-                    .map { leftData, rightData in
-                        let carvDataPair = Carv2DataPair(left: Carv2Data(leftData), right: Carv2Data(rightData))
-                        self.carv2RawDataPair = carvDataPair
-                        return Carv2AnalyzedDataPair(left: carvDataPair.left, right: carvDataPair.right, recordetTime: carvDataPair.recordedTime, isTurnSwitching: self.isTurnSwitchInNomal(carvDataPair: carvDataPair), percentageOfTurnsByAngle: abs((carvDataPair.unitedAttitude * self.lastFinishedTrunData.lastPhaseOfTune.unitedAttitude.inverse).angle.radians) / abs(self.lastFinishedTrunData.diffrencialAngleFromStartToEnd.radians), percentageOfTurnsByTime: abs((carvDataPair.recordedTime.timeIntervalSince1970 - self.lastFinishedTrunData.turnEndedTime.timeIntervalSince1970) / self.lastFinishedTrunData.turnDuration))
-                    }
-                    .eraseToAnyPublisher()
-            }
-            .receive(on: ImmediateScheduler.shared)
-            .sink { [weak self] (dataPair: Carv2AnalyzedDataPair) in
-                guard let self = self else { return }
-                self.carv2DataPair = dataPair
-                self.latestNotCompletedTurnCarv2AnalyzedDataPairs.append(dataPair)
-                if dataPair.isTurnSwitching {
-                    self.finishedTurnDataArray.append(.init(numberOfTrun: self.numberOfTurn, turnPhases: self.latestNotCompletedTurnCarv2AnalyzedDataPairs))
-                    self.latestNotCompletedTurnCarv2AnalyzedDataPairs.removeAll()
-                    self.numberOfTurn += 1
-                }
-            }
-            .store(in: &cancellables)
+//        bleManager.$carv2DeviceLeft
+//            .combineLatest(bleManager.$carv2DeviceRight)
+//            .compactMap { left, right in
+//                left.flatMap { l in right.map { r in (l, r) } }
+//            }
+//            .flatMap { left, right in
+//                left.$data
+//                    .compactMap { $0 }
+//                    .combineLatest(right.$data.compactMap { $0 })
+//                    .map { leftData, rightData in
+//                        let carvDataPair = Carv2DataPair(left: Carv2Data(leftData), right: Carv2Data(rightData))
+//                        self.carv2RawDataPair = carvDataPair
+//                        return Carv2AnalyzedDataPair(left: carvDataPair.left, right: carvDataPair.right, recordetTime: carvDataPair.recordedTime, isTurnSwitching: self.isTurnSwitchInNomal(carvDataPair: carvDataPair), percentageOfTurnsByAngle: abs((carvDataPair.unitedAttitude * self.lastFinishedTrunData.lastPhaseOfTune.unitedAttitude.inverse).angle.radians) / abs(self.lastFinishedTrunData.diffrencialAngleFromStartToEnd.radians), percentageOfTurnsByTime: abs((carvDataPair.recordedTime.timeIntervalSince1970 - self.lastFinishedTrunData.turnEndedTime.timeIntervalSince1970) / self.lastFinishedTrunData.turnDuration))
+//                    }
+//                    .eraseToAnyPublisher()
+//            }
+//            .receive(on: ImmediateScheduler.shared)
+//            .sink { [weak self] (dataPair: Carv2AnalyzedDataPair) in
+//                guard let self = self else { return }
+//                self.carv2DataPair = dataPair
+//                self.latestNotCompletedTurnCarv2AnalyzedDataPairs.append(dataPair)
+//                if dataPair.isTurnSwitching {
+//                    self.finishedTurnDataArray.append(.init(numberOfTrun: self.numberOfTurn, turnPhases: self.latestNotCompletedTurnCarv2AnalyzedDataPairs))
+//                    self.latestNotCompletedTurnCarv2AnalyzedDataPairs.removeAll()
+//                    self.numberOfTurn += 1
+//                }
+//            }
+//            .store(in: &cancellables)
     }
     
     // To convert:

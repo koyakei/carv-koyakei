@@ -1,12 +1,9 @@
 import SwiftUI
 
 struct ContentView: View {
-    var ble :BluethoothCentralManager
-    var yawingBeep: YawingBeep
-    var rollingBeep: RollingBeep
-    var pitchingBeep: PitchingBeep
+    @ObservedObject var ble :Carv2BluethoothCentralManager
 //    var cameraViewModel = CameraViewModel()
-    var dataManager: DataManager
+    var dataManager: CarvDataManager
     var carv1DataManager: Carv1DataManager
     var outsidePressureBeep: OutsidePressureBeep
     var carv1Ble:Carv1BluethoothCentralManager
@@ -14,7 +11,7 @@ struct ContentView: View {
     var droggerBlueTooth: DroggerBluetoothModel
     var body: some View {
         TabView {
-            HomeView(ble: ble, yawingBeep: yawingBeep,rollingBeep: rollingBeep, pitchingBeep: pitchingBeep,dataManager: dataManager)
+            HomeView(dataManager: dataManager, bleManager: ble)
                 .tabItem {
                     Image(systemName: "house.fill")
                     Text("ホーム")
@@ -36,11 +33,11 @@ struct ContentView: View {
                     Text("skateboard")
                 }
             
-            ARBootsView(dataManager: dataManager)
-                .tabItem {
-                    Image(systemName: "person.fill")
-                    Text("AR")
-                }
+//            ARBootsView(dataManager: dataManager)
+//                .tabItem {
+//                    Image(systemName: "person.fill")
+//                    Text("AR")
+//                }
             
             
             

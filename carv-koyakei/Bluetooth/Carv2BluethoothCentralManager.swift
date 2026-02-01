@@ -5,7 +5,7 @@ import Foundation
 import SwiftUI
 
 @MainActor
-class BluethoothCentralManager: NSObject, @MainActor CBCentralManagerDelegate , ObservableObject{
+class Carv2BluethoothCentralManager: NSObject, @MainActor CBCentralManagerDelegate , ObservableObject{
     
 //    // ipad
 //    static let rightCharactaristicUUID = UUID(uuidString: "85A29A4C-09C3-C632-858A-3387339C67CF")
@@ -34,12 +34,12 @@ class BluethoothCentralManager: NSObject, @MainActor CBCentralManagerDelegate , 
     
     func scan() {
         guard centralManager.state == .poweredOn else { return }
-        centralManager.scanForPeripherals(withServices: [BluethoothCentralManager.targetServiceUUID], options: nil)
+        centralManager.scanForPeripherals(withServices: [Carv2BluethoothCentralManager.targetServiceUUID], options: nil)
     }
     
     
     func retrieveAndConnect() {
-        let connectedPeripherals = centralManager.retrieveConnectedPeripherals(withServices: [BluethoothCentralManager.targetServiceUUID])
+        let connectedPeripherals = centralManager.retrieveConnectedPeripherals(withServices: [Carv2BluethoothCentralManager.targetServiceUUID])
         for peripheral in connectedPeripherals {
             addDevice(peripheral)
         }
@@ -78,12 +78,12 @@ class BluethoothCentralManager: NSObject, @MainActor CBCentralManagerDelegate , 
     
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
         if peripheral.identifier == carv2DeviceLeft?.peripheral.identifier{
-            peripheral.discoverServices([BluethoothCentralManager.targetServiceUUID])
+            peripheral.discoverServices([Carv2BluethoothCentralManager.targetServiceUUID])
             print("connected")
         }
         
         if peripheral.identifier == carv2DeviceRight?.peripheral.identifier{
-            peripheral.discoverServices([BluethoothCentralManager.targetServiceUUID])
+            peripheral.discoverServices([Carv2BluethoothCentralManager.targetServiceUUID])
             print("connected")
         }
     }

@@ -14,13 +14,8 @@ import AudioKit
 
 
 struct HomeView: View {
-    @StateObject var ble : BluethoothCentralManager
-    
-    @State var yawingBeep: YawingBeep
-    @State var rollingBeep: RollingBeep
-    @State var pitchingBeep: PitchingBeep
-    @StateObject var dataManager: DataManager
-    
+    var dataManager: CarvDataManager
+    @ObservedObject var bleManager: Carv2BluethoothCentralManager
     
     @AppStorage("carv2Right") var right: String = ""
      var Left: String = ""
@@ -38,9 +33,9 @@ struct HomeView: View {
 //            }
 //        }
         VStack {
-            TextField("Left", text: dataManager.bluethoothCentralManager.$leftCharactaristicUUIDString)
+            TextField("Left", text: bleManager.$leftCharactaristicUUIDString)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
-            TextField("Right", text: dataManager.bluethoothCentralManager.$rightCharactaristicUUIDString)
+            TextField("Right", text: bleManager.$rightCharactaristicUUIDString)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
 
 //                                    HStack{
@@ -49,50 +44,50 @@ struct HomeView: View {
 //                                        Text(Angle2D(radians: carv2DataPair.beforeTurn.fallLineAttitude.eulerAngles(order: .xyz).angles.z).degrees.description)
 //                                    }
                                     HStack{
-                                        Text(Angle2D(radians: dataManager.carv2DataPair.left.leftRealityKitRotation.eulerAngles(order: .xyz).angles.x).degrees.formatted(.number.precision(.fractionLength(1))))
-                                        Text(Angle2D(radians: dataManager.carv2DataPair.left.leftRealityKitRotation.eulerAngles(order: .xyz).angles.y).degrees.formatted(.number.precision(.fractionLength(1))))
-                                        Text(Angle2D(radians: dataManager.carv2DataPair.left.leftRealityKitRotation.eulerAngles(order: .xyz).angles.z).degrees.formatted(.number.precision(.fractionLength(1))))
+                                        Text(Angle2D(radians: dataManager.carv2DataManager.carv2DataPair.left.leftRealityKitRotation.eulerAngles(order: .xyz).angles.x).degrees.formatted(.number.precision(.fractionLength(1))))
+                                        Text(Angle2D(radians: dataManager.carv2DataManager.carv2DataPair.left.leftRealityKitRotation.eulerAngles(order: .xyz).angles.y).degrees.formatted(.number.precision(.fractionLength(1))))
+                                        Text(Angle2D(radians: dataManager.carv2DataManager.carv2DataPair.left.leftRealityKitRotation.eulerAngles(order: .xyz).angles.z).degrees.formatted(.number.precision(.fractionLength(1))))
                                     }
                                     HStack{
-                                        Text(Angle2D(radians: dataManager.carv2DataPair.right.rightRealityKitRotation.eulerAngles(order: .xyz).angles.x).degrees.formatted(.number.precision(.fractionLength(1))))
-                                        Text(Angle2D(radians: dataManager.carv2DataPair.right.rightRealityKitRotation.eulerAngles(order: .xyz).angles.y).degrees.formatted(.number.precision(.fractionLength(1))))
-                                        Text(Angle2D(radians: dataManager.carv2DataPair.right.rightRealityKitRotation.eulerAngles(order: .xyz).angles.z).degrees.formatted(.number.precision(.fractionLength(1))))
+                                        Text(Angle2D(radians: dataManager.carv2DataManager.carv2DataPair.right.rightRealityKitRotation.eulerAngles(order: .xyz).angles.x).degrees.formatted(.number.precision(.fractionLength(1))))
+                                        Text(Angle2D(radians: dataManager.carv2DataManager.carv2DataPair.right.rightRealityKitRotation.eulerAngles(order: .xyz).angles.y).degrees.formatted(.number.precision(.fractionLength(1))))
+                                        Text(Angle2D(radians: dataManager.carv2DataManager.carv2DataPair.right.rightRealityKitRotation.eulerAngles(order: .xyz).angles.z).degrees.formatted(.number.precision(.fractionLength(1))))
                                     }
                                     HStack{
-                                        Text(Angle2D(radians: dataManager.carv2DataPair.right.leftRealityKitRotation3.eulerAngles(order: .xyz).angles.x).degrees.formatted(.number.precision(.fractionLength(1))))
-                                        Text(Angle2D(radians: dataManager.carv2DataPair.right.leftRealityKitRotation3.eulerAngles(order: .xyz).angles.y).degrees.formatted(.number.precision(.fractionLength(1))))
-                                        Text(Angle2D(radians: dataManager.carv2DataPair.right.leftRealityKitRotation3.eulerAngles(order: .xyz).angles.z).degrees.formatted(.number.precision(.fractionLength(1))))
+                                        Text(Angle2D(radians: dataManager.carv2DataManager.carv2DataPair.right.leftRealityKitRotation3.eulerAngles(order: .xyz).angles.x).degrees.formatted(.number.precision(.fractionLength(1))))
+                                        Text(Angle2D(radians: dataManager.carv2DataManager.carv2DataPair.right.leftRealityKitRotation3.eulerAngles(order: .xyz).angles.y).degrees.formatted(.number.precision(.fractionLength(1))))
+                                        Text(Angle2D(radians: dataManager.carv2DataManager.carv2DataPair.right.leftRealityKitRotation3.eulerAngles(order: .xyz).angles.z).degrees.formatted(.number.precision(.fractionLength(1))))
                                     }
             HStack{
-                Text(Angle2D(radians: dataManager.carv2DataPair.right.attitude.eulerAngles(order: .xyz).angles.x).degrees.formatted(.number.precision(.fractionLength(1))))
-                Text(Angle2D(radians: dataManager.carv2DataPair.right.attitude.eulerAngles(order: .xyz).angles.y).degrees.formatted(.number.precision(.fractionLength(1))))
-                Text(Angle2D(radians: dataManager.carv2DataPair.right.attitude.eulerAngles(order: .xyz).angles.z).degrees.formatted(.number.precision(.fractionLength(1))))
+                Text(Angle2D(radians: dataManager.carv2DataManager.carv2DataPair.right.attitude.eulerAngles(order: .xyz).angles.x).degrees.formatted(.number.precision(.fractionLength(1))))
+                Text(Angle2D(radians: dataManager.carv2DataManager.carv2DataPair.right.attitude.eulerAngles(order: .xyz).angles.y).degrees.formatted(.number.precision(.fractionLength(1))))
+                Text(Angle2D(radians: dataManager.carv2DataManager.carv2DataPair.right.attitude.eulerAngles(order: .xyz).angles.z).degrees.formatted(.number.precision(.fractionLength(1))))
             }
             HStack{
-                Text(Angle2D(radians: dataManager.carv2DataPair.left.attitude.eulerAngles(order: .xyz).angles.x).degrees.formatted(.number.precision(.fractionLength(1))))
-                Text(Angle2D(radians: dataManager.carv2DataPair.left.attitude.eulerAngles(order: .xyz).angles.y).degrees.formatted(.number.precision(.fractionLength(1))))
-                Text(Angle2D(radians: dataManager.carv2DataPair.left.attitude.eulerAngles(order: .xyz).angles.z).degrees.formatted(.number.precision(.fractionLength(1))))
+                Text(Angle2D(radians: dataManager.carv2DataManager.carv2DataPair.left.attitude.eulerAngles(order: .xyz).angles.x).degrees.formatted(.number.precision(.fractionLength(1))))
+                Text(Angle2D(radians: dataManager.carv2DataManager.carv2DataPair.left.attitude.eulerAngles(order: .xyz).angles.y).degrees.formatted(.number.precision(.fractionLength(1))))
+                Text(Angle2D(radians: dataManager.carv2DataManager.carv2DataPair.left.attitude.eulerAngles(order: .xyz).angles.z).degrees.formatted(.number.precision(.fractionLength(1))))
             }
             HStack{
                 VStack{
-                    Text( dataManager.carv2DataPair.left.angularVelocity.x.formatted(.number.precision(.fractionLength(1))))
-                    Text( dataManager.carv2DataPair.left.angularVelocity.y.formatted(.number.precision(.fractionLength(1))))
-                    Text( dataManager.carv2DataPair.left.angularVelocity.z.formatted(.number.precision(.fractionLength(1))))
+                    Text( dataManager.carv2DataManager.carv2DataPair.left.angularVelocity.x.formatted(.number.precision(.fractionLength(1))))
+                    Text( dataManager.carv2DataManager.carv2DataPair.left.angularVelocity.y.formatted(.number.precision(.fractionLength(1))))
+                    Text( dataManager.carv2DataManager.carv2DataPair.left.angularVelocity.z.formatted(.number.precision(.fractionLength(1))))
                 }
                 VStack{
-                    Text( dataManager.carv2DataPair.left.acceleration.x.formatted(.number.precision(.fractionLength(1))))
-                    Text( dataManager.carv2DataPair.left.acceleration.y.formatted(.number.precision(.fractionLength(1))))
-                    Text( dataManager.carv2DataPair.left.acceleration.z.formatted(.number.precision(.fractionLength(1))))
+                    Text( dataManager.carv2DataManager.carv2DataPair.left.acceleration.x.formatted(.number.precision(.fractionLength(1))))
+                    Text( dataManager.carv2DataManager.carv2DataPair.left.acceleration.y.formatted(.number.precision(.fractionLength(1))))
+                    Text( dataManager.carv2DataManager.carv2DataPair.left.acceleration.z.formatted(.number.precision(.fractionLength(1))))
                 }
                 VStack{
-                    Text( dataManager.carv2DataPair.right.angularVelocity.x.formatted(.number.precision(.fractionLength(1))))
-                    Text( dataManager.carv2DataPair.right.angularVelocity.y.formatted(.number.precision(.fractionLength(1))))
-                    Text( dataManager.carv2DataPair.right.angularVelocity.z.formatted(.number.precision(.fractionLength(1))))
+                    Text( dataManager.carv2DataManager.carv2DataPair.right.angularVelocity.x.formatted(.number.precision(.fractionLength(1))))
+                    Text( dataManager.carv2DataManager.carv2DataPair.right.angularVelocity.y.formatted(.number.precision(.fractionLength(1))))
+                    Text( dataManager.carv2DataManager.carv2DataPair.right.angularVelocity.z.formatted(.number.precision(.fractionLength(1))))
                 }
                 VStack{
-                    Text( dataManager.carv2DataPair.right.acceleration.x.formatted(.number.precision(.fractionLength(1))))
-                    Text( dataManager.carv2DataPair.right.acceleration.y.formatted(.number.precision(.fractionLength(1))))
-                    Text( dataManager.carv2DataPair.right.acceleration.z.formatted(.number.precision(.fractionLength(1))))
+                    Text( dataManager.carv2DataManager.carv2DataPair.right.acceleration.x.formatted(.number.precision(.fractionLength(1))))
+                    Text( dataManager.carv2DataManager.carv2DataPair.right.acceleration.y.formatted(.number.precision(.fractionLength(1))))
+                    Text( dataManager.carv2DataManager.carv2DataPair.right.acceleration.z.formatted(.number.precision(.fractionLength(1))))
                 }
 //                                VStack{
 //                                    Text( carv2DataPair.right.初期姿勢に対しての角速度Right.x.formatted(.number.precision(.fractionLength(1))))
@@ -220,96 +215,96 @@ struct HomeView: View {
             //            }
             //            .padding()
             //
-            Text("number of turn \(dataManager.numberOfTurn.description)")
+            Text("number of turn \(dataManager.carv2DataManager.numberOfTurn.description)")
             
             Slider(
-                value: $dataManager.switchingAngluerRateDegree,
+                value: dataManager.carv2DataManager.$switchingAngluerRateDegree,
                 in: 0.0...30,
                 step: 1
             ) {
                 Text("Switching angle by degree")
             }
             Button(action: {
-                dataManager.skytechMode.toggle()
+                dataManager.carv2DataManager.skytechMode.toggle()
             }){
-                Text("Skytech mode \(dataManager.skytechMode ? "on" : "off")")
+                Text("Skytech mode \(dataManager.carv2DataManager.skytechMode ? "on" : "off")")
             }
             
             Button(action: {
-                dataManager.expoert()
+                dataManager.carv2DataManager.expoert()
             }){
                 Text("export JSON")
             }
             
             HStack{
-                Text(yawingBeep.conductor.data.isPlaying.description)
+                Text(dataManager.yawingBeep.conductor.data.isPlaying.description)
                 Button(action: {
-                    yawingBeep.isBeeping.toggle()}){
-                        Text("yawing beep \(yawingBeep.isBeeping ? "on" : "off")")
+                    dataManager.yawingBeep.isBeeping.toggle()}){
+                        Text("yawing beep \(dataManager.yawingBeep.isBeeping ? "on" : "off")")
                     }
-                Text("Current value: \(yawingBeep.diffYawingTargetAngle, specifier: "%.2f")")
+                Text("Current value: \(dataManager.yawingBeep.diffYawingTargetAngle, specifier: "%.2f")")
                     .padding()
             }
             
-            if yawingBeep.isBeeping {
+            if dataManager.yawingBeep.isBeeping {
                 Slider(
-                    value: $yawingBeep.diffYawingTargetAngle,
+                    value: dataManager.$yawingBeep.diffYawingTargetAngle,
                     in: 0.8...4.8,
                     step: 0.2
                 ) {
                     Text("Yaw Adjustment")
                 }
             }
-            HStack{
-                Button(action: {
-                    pitchingBeep.isBeeping.toggle()}){
-                        Text("pitching beep \(pitchingBeep.isBeeping ? "on" : "off")")
-                    }
-                Text("Current value: \(pitchingBeep.diffTargetAngle, specifier: "%.2f")")
-                    .padding()
-            }
-            if pitchingBeep.isBeeping {
-                Slider(
-                    value: $pitchingBeep.diffTargetAngle,
-                    in: 1.0...4.0,
-                    step: 0.1
-                ) {
-                    Text("pitching Adjustment")
-                }
-            }
-            HStack{
-                Button(action: {
-                    rollingBeep.isBeeping.toggle()}){
-                        Text("rolling beep \(rollingBeep.isBeeping ? "on" : "off")")
-                    }
-                Text("Current value: \(rollingBeep.diffYawingTargetAngle, specifier: "%.2f")")
-                    .padding()
-            }
-            if rollingBeep.isBeeping {
-                Slider(
-                    value: $rollingBeep.diffYawingTargetAngle,
-                    in: 0.0...2.0,
-                    step: 0.1
-                ) {
-                    Text("Rolling Adjustment")
-                }
-            }
+//            HStack{
+//                Button(action: {
+//                    pitchingBeep.isBeeping.toggle()}){
+//                        Text("pitching beep \(pitchingBeep.isBeeping ? "on" : "off")")
+//                    }
+//                Text("Current value: \(pitchingBeep.diffTargetAngle, specifier: "%.2f")")
+//                    .padding()
+//            }
+//            if pitchingBeep.isBeeping {
+//                Slider(
+//                    value: $pitchingBeep.diffTargetAngle,
+//                    in: 1.0...4.0,
+//                    step: 0.1
+//                ) {
+//                    Text("pitching Adjustment")
+//                }
+//            }
+//            HStack{
+//                Button(action: {
+//                    rollingBeep.isBeeping.toggle()}){
+//                        Text("rolling beep \(rollingBeep.isBeeping ? "on" : "off")")
+//                    }
+//                Text("Current value: \(rollingBeep.diffYawingTargetAngle, specifier: "%.2f")")
+//                    .padding()
+//            }
+//            if rollingBeep.isBeeping {
+//                Slider(
+//                    value: $rollingBeep.diffYawingTargetAngle,
+//                    in: 0.0...2.0,
+//                    step: 0.1
+//                ) {
+//                    Text("Rolling Adjustment")
+//                }
+//            }
             
             
             HStack{
-                Button(action: { ble.scan() }) {
+                Button(action: { dataManager.bleManager.scan() }) {
                     Text("Scan")
                 }
-                Button(action: { ble.retrieveAndConnect() }) {
+                Button(action: { dataManager.bleManager.retrieveAndConnect() }) {
                     Text("Retrieve and Connect")
                 }
                 .padding()
             }
-            if let left = ble.carv2DeviceLeft{
-                DeviceRow(device: left, ble: ble)
+            if let left = dataManager.bleManager.carv2DeviceLeft{
+                DeviceRow(device: left, ble: dataManager.bleManager)
             }
-            if let right = ble.carv2DeviceRight{
-                DeviceRow(device: right, ble: ble)
+            if let right = dataManager.bleManager.carv2DeviceRight{
+                DeviceRow(device: right, ble: dataManager.bleManager)
             }
         }
     }
