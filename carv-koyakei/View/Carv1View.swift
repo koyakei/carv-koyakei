@@ -12,6 +12,11 @@ struct Carv1View: View {
     @StateObject var dataManager: Carv1DataManager
     @StateObject var ble: Carv1BluethoothCentralManager
     @State var outsidePressureBeep: OutsidePressureBeep
+    // この数字で向きを揃えられるがヨーイングがいまいち揃わない
+       @State var diffrencialYaw : Float = -.pi
+       @State var diffrencialX : Float = -1
+       @State var diffrencialY : Float = 0
+       @State var diffrencialZ : Float = 0
     var body: some View {
         ScrollView {
             Text(
@@ -57,8 +62,10 @@ struct Carv1View: View {
                         String(
                             Int(
                                 Angle2DFloat(radians:
-                                                dataManager.carvDataPair.left.attitude.eulerAngles(order: .xyz).angles.x
-                                            ).degrees)
+                                                                                dataManager.carvDataPair.left.attitude.rotated(by: Rotation3DFloat(angle: Angle2DFloat(radians: diffrencialYaw), axis: RotationAxis3DFloat(x: diffrencialX, y: diffrencialY, z: diffrencialZ)))
+                                                                        .eulerAngles(order: .xyz).angles.x
+                                                                            ).degrees)
+                            
                         )
                     )
                     Text(
