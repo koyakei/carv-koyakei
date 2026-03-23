@@ -12,6 +12,7 @@ struct Carv1View: View {
     @StateObject var dataManager: Carv1DataManager
     @StateObject var ble: Carv1BluethoothCentralManager
     @State var outsidePressureBeep: OutsidePressureBeep
+    @State var yawingBeep: YawingBeepCarv1
     // この数字で向きを揃えられるがヨーイングがいまいち揃わない
        @State var diffrencialYaw : Float = -.pi
        @State var diffrencialX : Float = -1
@@ -23,20 +24,43 @@ struct Carv1View: View {
                 dataManager.carvRawDataPair.left.recordedAtFromBootDevice.description)
             let gridItems = Array(repeating: GridItem(.flexible()), count: 5)
             LazyVGrid(columns: gridItems, spacing: 10) {
-                Text(dataManager.carvRawDataPair.left.debugString)
+//                Text(dataManager.carvRawDataPair.left.debugString)
                 ForEach(dataManager.carvRawDataPair.left.fordebug.indices, id: \.self) { i in
                     Grid{
-                        Text("\(i.description)  \(dataManager.carvRawDataPair.left.fordebug[i].formatted(FloatingPointFormatStyle<Float>.number.precision(.fractionLength(1))))")
+                        VStack{
+                            Text("\(i.description)")
+                            Text(" \(dataManager.carvRawDataPair.left.fordebug[i].formatted(FloatingPointFormatStyle<Float>.number.precision(.fractionLength(3))))")
+                        }
+                        
                     }
                 }
                 .padding()
             }
         }
         VStack {
+            HStack{
+                Text(yawingBeep.conductor.data.isPlaying.description)
+                Button(action: {
+                    yawingBeep.isBeeping.toggle()}){
+                        Text("yawing beep \(yawingBeep.isBeeping ? "on" : "off")")
+                    }
+                Text("Current value: \(yawingBeep.diffYawingTargetAngle, specifier: "%.2f")")
+                    .padding()
+            }
+            
+            if yawingBeep.isBeeping {
+                Slider(
+                    value: $yawingBeep.diffYawingTargetAngle,
+                    in: 0.4...4.8,
+                    step: 0.2
+                ) {
+                    Text("Yaw Adjustment")
+                }
+            }
             HStack {
                 
                 VStack{
-                    Text("記録開始時からの時間経過　\(dataManager.carvRawDataPair.left.recordedAtFromBootDevice)")
+//                    Text("記録開始時からの時間経過　\(dataManager.carvRawDataPair.left.recordedAtFromBootDevice)")
                     Text( dataManager.carvDataPair.left.angularVelocity.x.formatted(.number.precision(.fractionLength(1))))
                     Text( dataManager.carvDataPair.left.angularVelocity.y.formatted(.number.precision(.fractionLength(1))))
                     Text( dataManager.carvDataPair.left.angularVelocity.z.formatted(.number.precision(.fractionLength(1))))
@@ -54,6 +78,25 @@ struct Carv1View: View {
                     Text( dataManager.carvDataPair.right.acceleration.y.formatted(.number.precision(.fractionLength(1))))
                     Text( dataManager.carvDataPair.right.acceleration.z.formatted(.number.precision(.fractionLength(1))))
                 }
+                VStack{
+                    Text(
+                        String(
+                            Int(
+                                Angle2DFloat(radians:
+                                                                                dataManager.carvDataPair.left.attitude
+                                                                        .eulerAngles(order: .xyz).angles.x
+                                                                            ).degrees)
+                            - Int(
+                                Angle2DFloat(radians:
+                                                                                dataManager.carvDataPair.right.attitude
+                                                                        .eulerAngles(order: .xyz).angles.x
+                                                                            ).degrees)
+                            
+                        )
+                    )
+                    Text("ヨーイング角度差")
+                    Text(dataManager.carvDataPair.yawingAnguleDiffrential.formatted(.number.precision(.fractionLength(1))))
+                }
             }
             
             HStack{
@@ -61,27 +104,22 @@ struct Carv1View: View {
                     Text(
                         String(
                             Int(
-                                Angle2DFloat(radians:
-                                                                                dataManager.carvDataPair.left.attitude.rotated(by: Rotation3DFloat(angle: Angle2DFloat(radians: diffrencialYaw), axis: RotationAxis3DFloat(x: diffrencialX, y: diffrencialY, z: diffrencialZ)))
-                                                                        .eulerAngles(order: .xyz).angles.x
-                                                                            ).degrees)
-                            
+                                dataManager.carvDataPair.left.attitude.twist(twistAxis: .x).angle.degrees
+                                )
                         )
                     )
                     Text(
                         String(
                             Int(
-                                Angle2DFloat(radians:
-                                                dataManager.carvDataPair.left.attitude.eulerAngles(order: .xyz).angles.y
-                                            ).degrees)
+                                dataManager.carvDataPair.left.attitude.twist(twistAxis: .y).angle.degrees
+                            )
                         )
                     )
                     Text(
                         String(
                             Int(
-                                Angle2DFloat(radians:
-                                                dataManager.carvDataPair.left.attitude.eulerAngles(order: .xyz).angles.z
-                                            ).degrees)
+                                dataManager.carvDataPair.left.attitude.twist(twistAxis: .z).angle.degrees
+                            )
                         )
                     )
                 }
@@ -89,28 +127,51 @@ struct Carv1View: View {
                     Text(
                         String(
                             Int(
-                                Angle2DFloat(radians:
-                                                dataManager.carvDataPair.right.attitude.eulerAngles(order: .xyz).angles.x
-                                            ).degrees)
+                                dataManager.carvDataPair.right.attitude.twist(twistAxis: .x).angle.degrees
+                                )
                         )
                     )
                     Text(
                         String(
                             Int(
-                                Angle2DFloat(radians:
-                                                dataManager.carvDataPair.right.attitude.eulerAngles(order: .xyz).angles.y
-                                            ).degrees)
+                                dataManager.carvDataPair.right.attitude.twist(twistAxis: .y).angle.degrees
+                            )
                         )
                     )
                     Text(
                         String(
                             Int(
-                                Angle2DFloat(radians:
-                                                dataManager.carvDataPair.right.attitude.eulerAngles(order: .xyz).angles.z
-                                            ).degrees)
+                                dataManager.carvDataPair.right.attitude.twist(twistAxis: .z).angle.degrees
+                            )
                         )
                     )
                 }
+//                VStack{
+//                    Text(
+//                        String(
+//                            Int(
+//                                Angle2DFloat(radians:
+//                                                dataManager.carvDataPair.right.attitude.eulerAngles(order: .xyz).angles.x
+//                                            ).degrees)
+//                        )
+//                    )
+//                    Text(
+//                        String(
+//                            Int(
+//                                Angle2DFloat(radians:
+//                                                dataManager.carvDataPair.right.attitude.eulerAngles(order: .xyz).angles.y
+//                                            ).degrees)
+//                        )
+//                    )
+//                    Text(
+//                        String(
+//                            Int(
+//                                Angle2DFloat(radians:
+//                                                dataManager.carvDataPair.right.attitude.eulerAngles(order: .xyz).angles.z
+//                                            ).degrees)
+//                        )
+//                    )
+//                }
             }
             HStack{
                 Text(outsidePressureBeep.conductor.data.isPlaying.description)

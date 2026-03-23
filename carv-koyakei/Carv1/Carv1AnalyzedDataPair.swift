@@ -77,6 +77,13 @@ class Carv1AnalyzedDataPair: Encodable{
     var unifiedDiffrentialAttitudeFromLeftToRight: Rotation3DFloat {
         left.attitude.inverse * right.attitude
     }
+    var yawingAnguleDiffrential: Float {
+        get{
+            left.attitude.twist(twistAxis: .y).quaternion.angle
+//            (left.attitude * right.attitude.inverse).angle.degrees
+        }
+    }
+    
     var rollingAngulerRateDiffrential: Float { Float(right.angularVelocity.x + left.angularVelocity.x)}
     var 外足荷重されているか: Bool {
         switch yawingSide {

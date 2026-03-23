@@ -19,7 +19,7 @@ struct ContentView: View {
                     Image(systemName: "house.fill")
                     Text("ホーム")
                 }
-            Carv1View(dataManager: carv1DataManager,ble: carv1Ble,outsidePressureBeep: outsidePressureBeep)
+            Carv1View(dataManager: carv1DataManager,ble: carv1Ble,outsidePressureBeep: outsidePressureBeep,yawingBeep: YawingBeepCarv1(dataManager: carv1DataManager))
                 .tabItem {
                     Text("carv1")
                 }

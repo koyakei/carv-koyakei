@@ -15,7 +15,22 @@ final class Carv1DataManager :ObservableObject {
     @Published var skytechMode: Bool = false
     @Published var calibration基準値Right :[Float] = [Float](repeating: 0, count: 16)
     @Published var calibration基準値Left :[Float] = [Float](repeating: 0, count: 16)
+    @Published var calibration平行度: Float = 0
     
+    func calibrate平行度(){
+        $carvDataPair
+            .map { $0.yawingAnguleDiffrential }
+            .collect(10)
+            .map { arr in arr.reduce(0, +) / Float(arr.count) }
+            .assign(to: \Self.calibration平行度, on: self)
+            .store(in: &cancellables)
+    }
+    
+    var yawingAnguleDiffrentialCalibrated: Float {
+        get{
+            (carvDataPair.yawingAnguleDiffrential - calibration平行度)
+        }
+    }
     
     private var lastFinishedTrunData: Carv1SingleFinishedTurnData {
         get {

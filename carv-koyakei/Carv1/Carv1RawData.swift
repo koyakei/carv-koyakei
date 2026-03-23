@@ -52,7 +52,7 @@ final class Carv1RawData:Encodable{
         }.map { Float($0) / (Float(Int16.max) + 1) }
         
         
-        let test = data.subdata(in: 35..<63).withUnsafeBytes { rawBuffer in
+        let test = data.withUnsafeBytes { rawBuffer in
             rawBuffer.bindMemory(to: UInt8.self).map { Int($0)}
         }
         // 各バイトを16進数2桁の文字列に変換し連結
@@ -62,12 +62,16 @@ final class Carv1RawData:Encodable{
         let hexDigitsAsInts = hexString.compactMap { Float(Int(String($0), radix: 16) ?? 0 )}
         
 //        let calibrated = test.map {Float($0) - (test.min() ?? 0)  }
-        fordebug = Carv1RawData.splitDataInto3BitArray(data: data.subdata(in: 35..<63)).map{Float($0)}
+        fordebug = data.dropFirst(1)
+        //            .subdata(in: 2..<13)
+                    .withUnsafeBytes {
+                    Array(UnsafeBufferPointer<Int16>(start: $0.baseAddress?.assumingMemoryBound(to: Int16.self), count: data.count / MemoryLayout<Int16>.stride))
+                }.map { Float($0) / (Float(Int16.max) + 1) }
         recordedAtFromBootDevice = Double(Float(255 - (test.min() ?? 0) ))
         attitude =
         Rotation3DFloat.init(simd_quatf(vector: simd_float4(intbyte[safe:25,default: 0], intbyte[safe:26,default: 0], intbyte[safe:27,default: 0], intbyte[safe:28,default: 0])))
         acceleration = SIMD3<Float>(x: intbyte[safe:29,default: 0] * 16, y: intbyte[safe:30,default: 0]  * 16, z: intbyte[safe:31,default: 0] * 16)
-        angularVelocity = SIMD3<Float>(x: intbyte[safe:32,default: 0] * .pi * 500, y: intbyte[safe:33,default: 0]  * .pi * 500, z: intbyte[safe:34,default: 0] * .pi * 500)
+        angularVelocity = SIMD3<Float>(x: intbyte[safe:3,default: 0]  * .pi * 50 , y: intbyte[safe:4,default: 0]  * .pi * 50 , z: intbyte[safe:5,default: 0] * .pi * 50)
     }
     
     static func splitDataInto3BitArray(data: Data) -> [UInt8] {
